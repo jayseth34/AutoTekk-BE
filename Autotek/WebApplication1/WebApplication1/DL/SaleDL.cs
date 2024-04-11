@@ -1,0 +1,240 @@
+﻿using Dapper;
+using Microsoft.AspNetCore.Http;
+using Npgsql;
+using NpgsqlTypes;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
+using System.Transactions;
+using WebApplication1.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+
+namespace WebApplication1.DL
+{
+	public class SaleDL
+	{
+		private readonly string _connectionFactory;
+		private static IConfigurationRoot root = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+		private static readonly string dbConn = root.GetValue<string>("ConnectionStrings");
+
+		public SaleDL(IConfiguration configuration)
+		{
+			this._connectionFactory = configuration.GetValue<string>("ConnectionStrings");
+		}
+
+		public TransactionRs SaveTransaction(TransactionRq otransactionRq)
+		{
+			TransactionRs otransactionrs = new TransactionRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "INSERT INTO transactions(typeofpay, invoicenumber, invoicedate, stateofsupply, paymenttype, total, received, balance, customername, phonenumber, registeredphonenumber, billingaddress," +
+						" shippingaddress) VALUES(@typeofpay, @invoicenumber, @invoicedate, @stateofsupply, @paymenttype, @total, @received, @balance, @customername, @phonenumber, @registeredphonenumber, @billingaddress," +
+						" @shippingaddress) RETURNING transaction_id";
+					cmd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
+					cmd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
+					cmd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
+					cmd.Parameters.AddWithValue("@stateofsupply", otransactionRq.stateofsupply);
+					cmd.Parameters.AddWithValue("@paymenttype", otransactionRq.paymenttype);
+					cmd.Parameters.AddWithValue("@total", otransactionRq.total);
+					cmd.Parameters.AddWithValue("@received", otransactionRq.received);
+					cmd.Parameters.AddWithValue("@balance", otransactionRq.balance);
+					cmd.Parameters.AddWithValue("@customername", otransactionRq.customername);
+					cmd.Parameters.AddWithValue("@phonenumber", otransactionRq.phonenumber);
+					cmd.Parameters.AddWithValue("@registeredphonenumber", otransactionRq.registeredphonenumber);
+					cmd.Parameters.AddWithValue("@billingaddress", otransactionRq.billingaddress);
+					cmd.Parameters.AddWithValue("@shippingaddress", otransactionRq.shippingaddress);
+					int transactionId = (int)cmd.ExecuteScalar();
+					if (otransactionRq.itemdetailslist.Count > 0)
+					{
+						foreach (var itemDetail in otransactionRq.itemdetailslist)
+						{
+							using (NpgsqlConnection connn = new NpgsqlConnection(this._connectionFactory))
+							{
+								connn.Open();
+								NpgsqlCommand cmdd = new NpgsqlCommand();
+								cmdd.Connection = connn;
+								cmdd.CommandType = CommandType.Text;
+								cmdd.CommandText = "INSERT INTO item_details (transaction_id, item, qty, unit, priceperunit) VALUES (@transaction_id, @item, @qty, @unit, @priceperunit)";
+								cmdd.Parameters.AddWithValue("@transaction_id", transactionId);
+								cmdd.Parameters.AddWithValue("@item", itemDetail.item);
+								cmdd.Parameters.AddWithValue("@qty", itemDetail.qty);
+								cmdd.Parameters.AddWithValue("@unit", itemDetail.unit);
+								cmdd.Parameters.AddWithValue("@priceperunit", itemDetail.priceperunit);
+								cmdd.ExecuteNonQuery();
+								otransactionrs.status = "SUCCESS";
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return otransactionrs;
+		}
+
+		public string FindOrInsertItem(TransactionRq otransactionRq)
+		{
+			TransactionRs otransactionrs = new TransactionRs();
+			string outputResult = string.Empty;
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(dbConn))
+				{
+					conn.Open(); // Open the connection outside the loop
+
+					foreach (var itemDetails in otransactionRq.itemdetailslist)
+					{
+						using (NpgsqlCommand cmd = new NpgsqlCommand("sp_findorinsertitems", conn))
+						{
+							cmd.CommandType = CommandType.StoredProcedure;
+							cmd.Parameters.AddWithValue("v_customername", NpgsqlDbType.Varchar).Value = otransactionRq.customername;
+							cmd.Parameters.AddWithValue("v_phonenumber", NpgsqlDbType.Numeric).Value = otransactionRq.phonenumber;
+							cmd.Parameters.AddWithValue("v_registeredphonenumber", NpgsqlDbType.Numeric).Value = otransactionRq.registeredphonenumber;
+							cmd.Parameters.AddWithValue("v_billingaddress", NpgsqlDbType.Varchar).Value = otransactionRq.billingaddress;
+							cmd.Parameters.AddWithValue("v_shippingaddress", NpgsqlDbType.Varchar).Value = otransactionRq.shippingaddress;
+							cmd.Parameters.AddWithValue("v_partybalance", NpgsqlDbType.Numeric).Value = otransactionRq.partybalance;
+							cmd.Parameters.AddWithValue("v_itembalance", NpgsqlDbType.Numeric).Value = otransactionRq.itembalance;
+							cmd.Parameters.AddWithValue("v_item", NpgsqlDbType.Varchar).Value = itemDetails.item;
+							cmd.Parameters.AddWithValue("v_qty", NpgsqlDbType.Numeric).Value = itemDetails.qty;
+							cmd.Parameters.AddWithValue("v_remainingquantity", NpgsqlDbType.Numeric).Value = itemDetails.remainingquantity;
+							var outputParameter = new NpgsqlParameter("output_result", NpgsqlDbType.Varchar);
+							outputParameter.Direction = ParameterDirection.Output;
+							cmd.Parameters.Add(outputParameter);
+							cmd.ExecuteNonQuery();
+							outputResult = cmd.Parameters["output_result"].Value.ToString();
+						}
+					}
+				}
+				otransactionrs.status = "SUCCESS";
+			}
+			catch(Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return outputResult;
+		}
+
+		public GetPartyTransactionsRs GetPartyTransactions(GetPartyTransactionsRq oGetPartyTransactionsRq)
+		{
+			GetPartyTransactionsRs oGetPartyTransactionsRs = new GetPartyTransactionsRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT tr.typeofpay, tr.invoicenumber, tr.invoicedate, tr.total, tr.balance, pr.emailid, pr.billingaddress, pr.creditlimit, pr.gst FROM transactions tr join party pr ON tr.registeredphonenumber = pr.registeredphonenumber" +
+						" where tr.registeredphonenumber = " + oGetPartyTransactionsRq.registeredphonenumber + " AND " +
+						"tr.customername = '" + oGetPartyTransactionsRq.customername + "'";
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+								GetAllPartyTransactionsList oGetAllPartyTransactionsList = new GetAllPartyTransactionsList();
+								oGetAllPartyTransactionsList.typeofpay = Convert.ToString(reader["typeofpay"]);
+								oGetAllPartyTransactionsList.gst = Convert.ToString(reader["gst"]);
+								oGetAllPartyTransactionsList.invoicenumber = Convert.ToInt64(reader["invoicenumber"]);
+								oGetAllPartyTransactionsList.creditlimit = Convert.ToInt64(reader["creditlimit"]);
+								oGetAllPartyTransactionsList.invoicedate = Convert.ToDateTime(reader["invoicedate"]);
+								oGetAllPartyTransactionsList.total = Convert.ToInt64(reader["total"]);
+								oGetAllPartyTransactionsList.balance = Convert.ToInt64(reader["balance"]);
+								oGetAllPartyTransactionsList.emailid = Convert.ToString(reader["emailid"]);
+								oGetAllPartyTransactionsList.billingaddress = Convert.ToString(reader["billingaddress"]);
+								oGetPartyTransactionsRs.partyTransactionsList.Add(oGetAllPartyTransactionsList);
+							}
+							oGetPartyTransactionsRs.status = "SUCCESS";
+						}
+						catch (Exception ex)
+						{
+							oGetPartyTransactionsRs.status = "FAILED";
+						}
+
+					}
+					else
+					{
+						oGetPartyTransactionsRs.status = "No Recods Found";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oGetPartyTransactionsRs;
+		}
+
+		public GetPartyTransactionDetailsRs GetPartyTransactionDetails(GetPartyTransactionDetailsRq oGetPartyTransactionDetailsRq)
+		{
+			GetPartyTransactionDetailsRs oGetPartyTransactionDetailsRs = new GetPartyTransactionDetailsRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT tr.typeofpay, tr.invoicedate, tr.stateofsupply, tr.paymenttype, tr.total, tr.received, tr.balance, tr.customername," +
+						"tr.phonenumber, tr.billingaddress, tr.shippingaddress, ide.item, ide,qty, ide.unit, ide.priceperunit FROM transactions tr join item_details ide" +
+						" ON tr.transaction_id = ide.transaction_id WHERE tr.invoicenumber = " + oGetPartyTransactionDetailsRq.invoicenumber + " AND tr.registeredphonenumber = " +
+						oGetPartyTransactionDetailsRq.registeredphonenumber + "";
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+								oGetPartyTransactionDetailsRs.typeofpay = Convert.ToString(reader["typeofpay"]);
+								oGetPartyTransactionDetailsRs.invoicedate = Convert.ToDateTime(reader["invoicedate"]);
+								oGetPartyTransactionDetailsRs.stateofsupply = Convert.ToString(reader["stateofsupply"]);
+								oGetPartyTransactionDetailsRs.paymenttype = Convert.ToString(reader["paymenttype"]);
+								oGetPartyTransactionDetailsRs.total = Convert.ToInt64(reader["total"]);
+								oGetPartyTransactionDetailsRs.received = Convert.ToInt64(reader["received"]);
+								oGetPartyTransactionDetailsRs.balance = Convert.ToInt64(reader["balance"]);
+								oGetPartyTransactionDetailsRs.customername = Convert.ToString(reader["customername"]);
+								oGetPartyTransactionDetailsRs.phonenumber = Convert.ToInt64(reader["phonenumber"]);
+								oGetPartyTransactionDetailsRs.billingaddress = Convert.ToString(reader["billingaddress"]);
+								oGetPartyTransactionDetailsRs.shippingaddress = Convert.ToString(reader["shippingaddress"]);
+								ItemDetailsListRs oItemDetailsListRs = new ItemDetailsListRs();
+								oItemDetailsListRs.item = Convert.ToString(reader["item"]);
+								oItemDetailsListRs.qty = Convert.ToInt64(reader["qty"]);
+								oItemDetailsListRs.unit = Convert.ToString(reader["unit"]);
+								oItemDetailsListRs.priceperunit = Convert.ToInt64(reader["priceperunit"]);
+								oGetPartyTransactionDetailsRs.itemdetailslist.Add(oItemDetailsListRs);
+							}
+							oGetPartyTransactionDetailsRs.status = "SUCCESS";
+						}
+						catch (Exception ex)
+						{
+							oGetPartyTransactionDetailsRs.status = "FAILED";
+						}
+
+					}
+					else
+					{
+						oGetPartyTransactionDetailsRs.status = "No Recods Found";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oGetPartyTransactionDetailsRs;
+		}
+	}
+}
