@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.BL;
+using WebApplication1.DL;
 using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
@@ -44,13 +45,24 @@ namespace WebApplication1.Controllers
 
 		[AllowAnonymous]
 		[HttpPost]
-		[Route("GetPartyTransactionDetails")]
+		[Route("GetPartyItemTransactionDetails")]
 		public async Task<ActionResult> GetPartyTransactionDetails(GetPartyTransactionDetailsRq oGetPartyTransactionDetailsRq)
 		{
 			GetPartyTransactionDetailsRs oGetPartyTransactionDetailsRs = new GetPartyTransactionDetailsRs();
 			SaleBL saleBl = new SaleBL(this.config);
 			oGetPartyTransactionDetailsRs = await saleBl.GetPartyTransactionDetails(oGetPartyTransactionDetailsRq);
 			return Ok(oGetPartyTransactionDetailsRs);
+		}
+
+		[AllowAnonymous]
+		[HttpPost]
+		[Route("GetItemTransactions")]
+		public async Task<ActionResult> GetItemTransactions(GetItemTransactionsRq oGetItemTransactionsRq)
+		{
+			GetItemTransactionsRs oGetItemTransactionsRs = new GetItemTransactionsRs();
+			SaleBL saleBl = new SaleBL(this.config);
+			oGetItemTransactionsRs = await saleBl.GetItemTransactions(oGetItemTransactionsRq);
+			return Ok(oGetItemTransactionsRs);
 		}
 	}
 }

@@ -47,5 +47,13 @@ namespace WebApplication1.BL
 			return oGetPartyTransactionDetailsRs;
 		}
 
+		public async Task<GetItemTransactionsRs> GetItemTransactions(GetItemTransactionsRq oGetItemTransactionsRq)
+		{
+			GetItemTransactionsRs oGetItemTransactionsRs = new GetItemTransactionsRs();
+			SaleDL saledl = new SaleDL(this.config);
+			oGetItemTransactionsRs = saledl.GetItemTransactions(oGetItemTransactionsRq);
+			return oGetItemTransactionsRs;
+		}
+
 	}
 }

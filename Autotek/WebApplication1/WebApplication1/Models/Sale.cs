@@ -14,9 +14,10 @@
 		public Int64 phonenumber { get; set; }
 		public Int64 registeredphonenumber { get; set; }
 		public Int64 partybalance { get; set; }
-		public Int64 itembalance { get; set; }
+		public Int64 remainingquantity { get; set; }
 		public string billingaddress { get; set; }
 		public string shippingaddress { get; set; }
+		public string paymentstatus { get; set; }
 		public TransactionRq()
 		{
 			itemdetailslist = new List<ItemDetailsListRq>();
@@ -53,8 +54,6 @@
 			partyTransactionsList = new List<GetAllPartyTransactionsList>();
 		}
 		public List<GetAllPartyTransactionsList> partyTransactionsList { get; set; }
-		
-
 	}
 	public class GetAllPartyTransactionsList
 	{
@@ -102,5 +101,34 @@
 		public Int64 qty { get; set; }
 		public string unit { get; set; }
 		public Int64 priceperunit { get; set; }
+	}
+
+	public class GetItemTransactionsRq
+	{
+		public Int64 registeredphonenumber { get; set; }
+		public string itemname { get; set; }
+	}
+
+	public class GetItemTransactionsRs
+	{
+		public string status { get; set; }
+		public GetItemTransactionsRs()
+		{
+			itemTransactionsList = new List<GetAllItemTransactionsList>();
+		}
+		public List<GetAllItemTransactionsList> itemTransactionsList { get; set; }
+	}
+
+	public class GetAllItemTransactionsList
+	{
+		public string typeofpay { get; set; }
+		public Int64 invoicenumber { get; set; }
+		public string partyName { get; set; }
+		public DateTime invoicedate { get; set; }
+		public Int64 qty { get; set; }
+		public Int64 saleprice { get; set; }
+		public string paymentstatus { get; set; }
+		public Int64 purchaseprice { get; set; }
+		public Int64 remainingquantity { get; set; }
 	}
 }

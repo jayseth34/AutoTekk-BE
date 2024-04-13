@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.BL;
+using WebApplication1.DL;
 using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
@@ -19,7 +20,7 @@ namespace WebApplication1.Controllers
 
 		[AllowAnonymous]
 		[HttpPost]
-		[Route("AddItem")]
+		[Route("SaveOrUpdateItem")]
 		public async Task<ActionResult> AddItem(ItemRq oitemRq)
 		{
 			ItemBL itemBL = new ItemBL(this.config);
@@ -30,6 +31,38 @@ namespace WebApplication1.Controllers
 				return Ok(oitemRs);
 			}
 			return BadRequest("");
+		}
+
+		[AllowAnonymous]
+		[HttpPost]
+		[Route("GetItemList")]
+		public async Task<ActionResult> GetItemList(GetItemListRq oGetItemListRq)
+		{
+			GetItemListRs oGetItemListRs = new GetItemListRs();
+			if (ModelState.IsValid)
+			{
+				ItemBL itemBL = new ItemBL(this.config);
+				oGetItemListRs = await itemBL.GetItemList(oGetItemListRq);
+				return Ok(oGetItemListRs);
+			}
+
+			return BadRequest("Please Provide Valid Details"); ;
+		}
+
+		[AllowAnonymous]
+		[HttpPost]
+		[Route("GetItemDetails")]
+		public async Task<ActionResult> GetItemDetails(GetItemRq oGetItemRq)
+		{
+			GetItemRs oGetItemRs = new GetItemRs();
+			if (ModelState.IsValid)
+			{
+				ItemBL itemBL = new ItemBL(this.config);
+				oGetItemRs = await itemBL.GetItemDetails(oGetItemRq);
+				return Ok(oGetItemRs);
+			}
+
+			return BadRequest("Please Provide Valid Details"); ;
 		}
 	}
 }

@@ -20,5 +20,21 @@ namespace WebApplication1.BL
 			oitemRs = itemDL.AddItem(oitemRq);
 			return oitemRs;
 		}
+
+		public async Task<GetItemListRs> GetItemList(GetItemListRq oGetItemListRq)
+		{
+			GetItemListRs oGetItemListRs = new GetItemListRs();
+			ItemDL itemDL = new ItemDL(this.config);
+			oGetItemListRs = itemDL.GetItemList(oGetItemListRq);
+			return oGetItemListRs;
+		}
+
+		public async Task<GetItemRs> GetItemDetails(GetItemRq oGetItemRq)
+		{
+			GetItemRs oGetItemRs = new GetItemRs();
+			ItemDL itemDL = new ItemDL(this.config);
+			oGetItemRs = itemDL.GetItemDetails(oGetItemRq);
+			return oGetItemRs;
+		}
 	}
 }

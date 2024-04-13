@@ -34,8 +34,8 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "INSERT INTO transactions(typeofpay, invoicenumber, invoicedate, stateofsupply, paymenttype, total, received, balance, customername, phonenumber, registeredphonenumber, billingaddress," +
-						" shippingaddress) VALUES(@typeofpay, @invoicenumber, @invoicedate, @stateofsupply, @paymenttype, @total, @received, @balance, @customername, @phonenumber, @registeredphonenumber, @billingaddress," +
-						" @shippingaddress) RETURNING transaction_id";
+						" shippingaddress, paymentstatus) VALUES(@typeofpay, @invoicenumber, @invoicedate, @stateofsupply, @paymenttype, @total, @received, @balance, @customername, @phonenumber, @registeredphonenumber, @billingaddress," +
+						" @shippingaddress, @paymentstatus) RETURNING transaction_id";
 					cmd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
 					cmd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
 					cmd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
@@ -49,6 +49,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@registeredphonenumber", otransactionRq.registeredphonenumber);
 					cmd.Parameters.AddWithValue("@billingaddress", otransactionRq.billingaddress);
 					cmd.Parameters.AddWithValue("@shippingaddress", otransactionRq.shippingaddress);
+					cmd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
 					int transactionId = (int)cmd.ExecuteScalar();
 					if (otransactionRq.itemdetailslist.Count > 0)
 					{
@@ -60,12 +61,18 @@ namespace WebApplication1.DL
 								NpgsqlCommand cmdd = new NpgsqlCommand();
 								cmdd.Connection = connn;
 								cmdd.CommandType = CommandType.Text;
-								cmdd.CommandText = "INSERT INTO item_details (transaction_id, item, qty, unit, priceperunit) VALUES (@transaction_id, @item, @qty, @unit, @priceperunit)";
+								cmdd.CommandText = "INSERT INTO item_details (transaction_id, item, qty, unit, priceperunit, registeredphonenumber, invoicenumber, customername, invoicedate, typeofpay, paymentstatus) VALUES (@transaction_id, @item, @qty, @unit, @priceperunit, @registeredphonenumber, @invoicenumber, @customername, @invoicedate, @typeofpay, @paymentstatus)";
 								cmdd.Parameters.AddWithValue("@transaction_id", transactionId);
 								cmdd.Parameters.AddWithValue("@item", itemDetail.item);
 								cmdd.Parameters.AddWithValue("@qty", itemDetail.qty);
 								cmdd.Parameters.AddWithValue("@unit", itemDetail.unit);
 								cmdd.Parameters.AddWithValue("@priceperunit", itemDetail.priceperunit);
+								cmdd.Parameters.AddWithValue("@registeredphonenumber", otransactionRq.registeredphonenumber);
+								cmdd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
+								cmdd.Parameters.AddWithValue("@customername", otransactionRq.customername);
+								cmdd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
+								cmdd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
+								cmdd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
 								cmdd.ExecuteNonQuery();
 								otransactionrs.status = "SUCCESS";
 							}
@@ -101,7 +108,6 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("v_billingaddress", NpgsqlDbType.Varchar).Value = otransactionRq.billingaddress;
 							cmd.Parameters.AddWithValue("v_shippingaddress", NpgsqlDbType.Varchar).Value = otransactionRq.shippingaddress;
 							cmd.Parameters.AddWithValue("v_partybalance", NpgsqlDbType.Numeric).Value = otransactionRq.partybalance;
-							cmd.Parameters.AddWithValue("v_itembalance", NpgsqlDbType.Numeric).Value = otransactionRq.itembalance;
 							cmd.Parameters.AddWithValue("v_item", NpgsqlDbType.Varchar).Value = itemDetails.item;
 							cmd.Parameters.AddWithValue("v_qty", NpgsqlDbType.Numeric).Value = itemDetails.qty;
 							cmd.Parameters.AddWithValue("v_remainingquantity", NpgsqlDbType.Numeric).Value = itemDetails.remainingquantity;
@@ -196,19 +202,24 @@ namespace WebApplication1.DL
 					{
 						try
 						{
+							bool recordFetched = true;
 							while (reader.Read())
 							{
-								oGetPartyTransactionDetailsRs.typeofpay = Convert.ToString(reader["typeofpay"]);
-								oGetPartyTransactionDetailsRs.invoicedate = Convert.ToDateTime(reader["invoicedate"]);
-								oGetPartyTransactionDetailsRs.stateofsupply = Convert.ToString(reader["stateofsupply"]);
-								oGetPartyTransactionDetailsRs.paymenttype = Convert.ToString(reader["paymenttype"]);
-								oGetPartyTransactionDetailsRs.total = Convert.ToInt64(reader["total"]);
-								oGetPartyTransactionDetailsRs.received = Convert.ToInt64(reader["received"]);
-								oGetPartyTransactionDetailsRs.balance = Convert.ToInt64(reader["balance"]);
-								oGetPartyTransactionDetailsRs.customername = Convert.ToString(reader["customername"]);
-								oGetPartyTransactionDetailsRs.phonenumber = Convert.ToInt64(reader["phonenumber"]);
-								oGetPartyTransactionDetailsRs.billingaddress = Convert.ToString(reader["billingaddress"]);
-								oGetPartyTransactionDetailsRs.shippingaddress = Convert.ToString(reader["shippingaddress"]);
+								if (recordFetched)
+								{
+									oGetPartyTransactionDetailsRs.typeofpay = Convert.ToString(reader["typeofpay"]);
+									oGetPartyTransactionDetailsRs.invoicedate = Convert.ToDateTime(reader["invoicedate"]);
+									oGetPartyTransactionDetailsRs.stateofsupply = Convert.ToString(reader["stateofsupply"]);
+									oGetPartyTransactionDetailsRs.paymenttype = Convert.ToString(reader["paymenttype"]);
+									oGetPartyTransactionDetailsRs.total = Convert.ToInt64(reader["total"]);
+									oGetPartyTransactionDetailsRs.received = Convert.ToInt64(reader["received"]);
+									oGetPartyTransactionDetailsRs.balance = Convert.ToInt64(reader["balance"]);
+									oGetPartyTransactionDetailsRs.customername = Convert.ToString(reader["customername"]);
+									oGetPartyTransactionDetailsRs.phonenumber = Convert.ToInt64(reader["phonenumber"]);
+									oGetPartyTransactionDetailsRs.billingaddress = Convert.ToString(reader["billingaddress"]);
+									oGetPartyTransactionDetailsRs.shippingaddress = Convert.ToString(reader["shippingaddress"]);
+									recordFetched = false;
+								}
 								ItemDetailsListRs oItemDetailsListRs = new ItemDetailsListRs();
 								oItemDetailsListRs.item = Convert.ToString(reader["item"]);
 								oItemDetailsListRs.qty = Convert.ToInt64(reader["qty"]);
@@ -235,6 +246,58 @@ namespace WebApplication1.DL
 				Console.WriteLine(ex.Message);
 			}
 			return oGetPartyTransactionDetailsRs;
+		}
+
+		public GetItemTransactionsRs GetItemTransactions(GetItemTransactionsRq oGetItemTransactionsRq)
+		{
+			GetItemTransactionsRs oGetItemTransactionsRs = new GetItemTransactionsRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT distinct(ide.invoicenumber), ide.typeofpay, ide.customername, ide.invoicedate, ide.qty, ide.priceperunit, ide.paymentstatus, it.remainingquantity, it.purchaseprice " +
+						"FROM item_details ide JOIN item it ON ide.item = it.itemname WHERE ide.registeredphonenumber = " + oGetItemTransactionsRq.registeredphonenumber + " and it.itemname = '" + oGetItemTransactionsRq.itemname + "'";
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+								GetAllItemTransactionsList oGetAllItemTransactionsList = new GetAllItemTransactionsList();
+								oGetAllItemTransactionsList.invoicenumber = Convert.ToInt64(reader["invoicenumber"]);
+								oGetAllItemTransactionsList.typeofpay = Convert.ToString(reader["typeofpay"]);
+								oGetAllItemTransactionsList.partyName = Convert.ToString(reader["customername"]);
+								oGetAllItemTransactionsList.invoicedate = Convert.ToDateTime(reader["invoicedate"]);
+								oGetAllItemTransactionsList.qty = Convert.ToInt64(reader["qty"]);
+								oGetAllItemTransactionsList.saleprice = Convert.ToInt64(reader["priceperunit"]);
+								oGetAllItemTransactionsList.paymentstatus = Convert.ToString(reader["paymentstatus"]);
+								oGetAllItemTransactionsList.remainingquantity = Convert.ToInt64(reader["remainingquantity"]);
+								oGetAllItemTransactionsList.purchaseprice = Convert.ToInt64(reader["purchaseprice"]);
+								oGetItemTransactionsRs.itemTransactionsList.Add(oGetAllItemTransactionsList);
+							}
+							oGetItemTransactionsRs.status = "SUCCESS";
+						}
+						catch (Exception ex)
+						{
+							oGetItemTransactionsRs.status = "FAILED";
+						}
+					}
+					else
+					{
+						oGetItemTransactionsRs.status = "No Recods Found";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oGetItemTransactionsRs;
 		}
 	}
 }

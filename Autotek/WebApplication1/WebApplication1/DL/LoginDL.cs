@@ -197,7 +197,7 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@additionalfieldname3", opartyRq.additionalFieldName3);
 							cmd.Parameters.AddWithValue("@additionalfieldname4", opartyRq.additionalFieldName4);
 							cmd.ExecuteNonQuery();
-							opartyRs.status = "Updated Successfully";
+							opartyRs.status = "Party Updated Successfully";
 						}
 					}
 					catch (Exception ex)
