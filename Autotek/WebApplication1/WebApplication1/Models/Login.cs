@@ -54,6 +54,7 @@ namespace WebApplication1.Models
 		public string? additionalFieldName2 { get; set; }
 		public string? additionalFieldName3 { get; set;}
 		public string? additionalFieldName4 { get; set; }
+		public Int64 partybalance { get; set; }
 	}
 
 	public class PartyRs
@@ -98,6 +99,7 @@ namespace WebApplication1.Models
 		public string additionalFieldName4 { get; set; }
 		public string typeofpay { get; set; }
 		public string toPayOrReceive { get; set; }
+		public Int64 partybalance { get; set; }
 	}
 
 	public class GetPartyListRq

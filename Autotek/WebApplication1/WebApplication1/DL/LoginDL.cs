@@ -135,8 +135,8 @@ namespace WebApplication1.DL
 							cmd.Connection = conn;
 							cmd.CommandType = CommandType.Text;
 							cmd.CommandText = "INSERT INTO party (typeofpay, registeredphonenumber, partyname, gst, phonenumber, partygroup, gsttype, _state, emailid, billingaddress, shippingaddress, openingbalance, topayorreceive, asofdate, creditlimit," +
-								" additionalfieldname1, additionalfieldname2, additionalfieldname3, additionalfieldname4) VALUES (@typeofpay, @registeredphonenumber, @partyname, @gst, @phonenumber, @partygroup, @gsttype, @_state, @emailid, @billingaddress, " +
-								"@shippingaddress, @openingbalance, @topayorreceive, @asofdate, @creditlimit, @additionalfieldname1, @additionalfieldname2, @additionalfieldname3, @additionalfieldname4)";
+								" additionalfieldname1, additionalfieldname2, additionalfieldname3, additionalfieldname4, partybalance) VALUES (@typeofpay, @registeredphonenumber, @partyname, @gst, @phonenumber, @partygroup, @gsttype, @_state, @emailid, @billingaddress, " +
+								"@shippingaddress, @openingbalance, @topayorreceive, @asofdate, @creditlimit, @additionalfieldname1, @additionalfieldname2, @additionalfieldname3, @additionalfieldname4, @partybalance)";
 							cmd.Parameters.AddWithValue("@typeofpay", opartyRq.typeofpay);
 							cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredPhoneNumber);
 							cmd.Parameters.AddWithValue("@partyname", opartyRq.partyName);
@@ -156,6 +156,7 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@additionalfieldname2", opartyRq.additionalFieldName2);
 							cmd.Parameters.AddWithValue("@additionalfieldname3", opartyRq.additionalFieldName3);
 							cmd.Parameters.AddWithValue("@additionalfieldname4", opartyRq.additionalFieldName4);
+							cmd.Parameters.AddWithValue("@partybalance", opartyRq.partybalance);
 							cmd.ExecuteNonQuery();
 							opartyRs.status = "Inserted Successfully";
 						}
@@ -178,7 +179,7 @@ namespace WebApplication1.DL
 							cmd.CommandType = CommandType.Text;
 							cmd.CommandText = " UPDATE party SET typeofpay = @typeofpay, gst = @gst, phonenumber = @phonenumber, partygroup = @partygroup, gsttype = @gsttype, _state = @_state, emailid = @emailid, billingaddress = @billingaddress, " +
 											  "shippingaddress = @shippingaddress, openingbalance = @openingbalance, topayorreceive = @topayorreceive, asofdate = @asofdate, creditlimit = @creditlimit, additionalfieldname1 = @additionalfieldname1," +
-											  "additionalfieldname2 = @additionalfieldname2, additionalfieldname3 = @additionalfieldname3, additionalfieldname4 = @additionalfieldname4 WHERE registeredPhoneNumber = " + opartyRq.registeredPhoneNumber + " AND partyname = '" + opartyRq.partyName + "'";
+											  "additionalfieldname2 = @additionalfieldname2, additionalfieldname3 = @additionalfieldname3, additionalfieldname4 = @additionalfieldname4, partybalance = @partybalance WHERE registeredPhoneNumber = " + opartyRq.registeredPhoneNumber + " AND partyname = '" + opartyRq.partyName + "'";
 							cmd.Parameters.AddWithValue("@typeofpay", opartyRq.typeofpay);
 							cmd.Parameters.AddWithValue("@gst", opartyRq.GST);
 							cmd.Parameters.AddWithValue("@phonenumber", opartyRq.phoneNumber);
@@ -196,6 +197,7 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@additionalfieldname2", opartyRq.additionalFieldName2);
 							cmd.Parameters.AddWithValue("@additionalfieldname3", opartyRq.additionalFieldName3);
 							cmd.Parameters.AddWithValue("@additionalfieldname4", opartyRq.additionalFieldName4);
+							cmd.Parameters.AddWithValue("@partybalance", opartyRq.partybalance);
 							cmd.ExecuteNonQuery();
 							opartyRs.status = "Party Updated Successfully";
 						}
@@ -225,7 +227,7 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT gst, phonenumber, partygroup, gsttype, _state, emailid, billingaddress, shippingaddress, openingbalance, asofdate, creditlimit," +
-						"additionalfieldname1, additionalfieldname2, additionalfieldname3, additionalfieldname4, typeofpay, topayorreceive FROM party WHERE registeredphonenumber = " + ogetPartyRq.registeredPhoneNumber + " AND partyname = '" +
+						"additionalfieldname1, additionalfieldname2, additionalfieldname3, additionalfieldname4, typeofpay, topayorreceive, partybalance FROM party WHERE registeredphonenumber = " + ogetPartyRq.registeredPhoneNumber + " AND partyname = '" +
 						ogetPartyRq.partyName + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if(reader.HasRows)
@@ -252,6 +254,7 @@ namespace WebApplication1.DL
 								ogetallpartylist.additionalFieldName4 = Convert.ToString(reader["additionalfieldname4"]);
 								ogetallpartylist.typeofpay = Convert.ToString(reader["typeofpay"]);
 								ogetallpartylist.toPayOrReceive = Convert.ToString(reader["topayorreceive"]);
+								ogetallpartylist.partybalance = Convert.ToInt64(reader["partybalance"]);
 								ogetPartyRs.partyList.Add(ogetallpartylist);
 								ogetPartyRs.status = "SUCCESS";
 							}
