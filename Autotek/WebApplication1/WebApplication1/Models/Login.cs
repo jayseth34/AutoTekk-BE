@@ -54,6 +54,10 @@ namespace WebApplication1.Models
 		public string? additionalFieldName2 { get; set; }
 		public string? additionalFieldName3 { get; set;}
 		public string? additionalFieldName4 { get; set; }
+		public string? additionalFieldName1value { get; set; }
+		public string? additionalFieldName2value { get; set; }
+		public string? additionalFieldName3value { get; set; }
+		public DateTime? additionalFieldName4value { get; set; }
 		public Int64 partybalance { get; set; }
 	}
 
@@ -97,6 +101,10 @@ namespace WebApplication1.Models
 		public string additionalFieldName2 { get; set; }
 		public string additionalFieldName3 { get; set; }
 		public string additionalFieldName4 { get; set; }
+		public string additionalFieldName1Value { get; set; }
+		public string additionalFieldName2Value { get; set; }
+		public string additionalFieldName3Value { get; set; }
+		public string additionalFieldName4Value { get; set; }
 		public string typeofpay { get; set; }
 		public string toPayOrReceive { get; set; }
 		public Int64 partybalance { get; set; }
@@ -120,5 +128,37 @@ namespace WebApplication1.Models
 	{
 		public string partyname { get; set; }
 		public Int64 partybalance { get; set; }
+	}
+
+	public class PartyGroupRq
+	{
+		public Int64 registeredPhoneNumber { get; set; }
+		public string partygroup { get; set; }
+
+	}
+
+	public class PartyGroupRs
+	{
+
+	}
+
+	public class GetPartyGroupRq
+	{
+		public Int64 registeredPhoneNumber { get; set; }
+	}
+
+	public class GetPartyGroupRs
+	{
+		public string status { get; set; }
+		public GetPartyGroupRs()
+		{
+			getPartyGroupList = new List<GetPartyGroupListtRs>();
+		}
+		public List<GetPartyGroupListtRs> getPartyGroupList { get; set; }
+	}
+	public class GetPartyGroupListtRs
+	{
+		public string partygroup { get; set; }
+		public Int64 partygroupcount { get; set; }
 	}
 }

@@ -139,7 +139,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT tr.typeofpay, tr.invoicenumber, tr.invoicedate, tr.total, tr.balance, pr.emailid, pr.billingaddress, pr.creditlimit, pr.gst FROM transactions tr join party pr ON tr.registeredphonenumber = pr.registeredphonenumber" +
+					cmd.CommandText = "SELECT distinct(tr.invoicenumber), tr.typeofpay, tr.invoicedate, tr.total, tr.balance, tr.phonenumber, pr.emailid, pr.billingaddress, pr.creditlimit, pr.gst FROM transactions tr join party pr ON tr.customername = pr.partyname" +
 						" where tr.registeredphonenumber = " + oGetPartyTransactionsRq.registeredphonenumber + " AND " +
 						"tr.customername = '" + oGetPartyTransactionsRq.customername + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
@@ -149,16 +149,17 @@ namespace WebApplication1.DL
 						{
 							while (reader.Read())
 							{
+								oGetPartyTransactionsRs.gst = Convert.ToString(reader["gst"]);
+								oGetPartyTransactionsRs.emailid = Convert.ToString(reader["emailid"]);
+								oGetPartyTransactionsRs.billingaddress = Convert.ToString(reader["billingaddress"]);
+								oGetPartyTransactionsRs.phonenumber = Convert.ToInt64(reader["phonenumber"]);
 								GetAllPartyTransactionsList oGetAllPartyTransactionsList = new GetAllPartyTransactionsList();
 								oGetAllPartyTransactionsList.typeofpay = Convert.ToString(reader["typeofpay"]);
-								oGetAllPartyTransactionsList.gst = Convert.ToString(reader["gst"]);
 								oGetAllPartyTransactionsList.invoicenumber = Convert.ToInt64(reader["invoicenumber"]);
 								oGetAllPartyTransactionsList.creditlimit = Convert.ToInt64(reader["creditlimit"]);
 								oGetAllPartyTransactionsList.invoicedate = Convert.ToDateTime(reader["invoicedate"]);
 								oGetAllPartyTransactionsList.total = Convert.ToInt64(reader["total"]);
 								oGetAllPartyTransactionsList.balance = Convert.ToInt64(reader["balance"]);
-								oGetAllPartyTransactionsList.emailid = Convert.ToString(reader["emailid"]);
-								oGetAllPartyTransactionsList.billingaddress = Convert.ToString(reader["billingaddress"]);
 								oGetPartyTransactionsRs.partyTransactionsList.Add(oGetAllPartyTransactionsList);
 							}
 							oGetPartyTransactionsRs.status = "SUCCESS";
@@ -268,6 +269,9 @@ namespace WebApplication1.DL
 						{
 							while (reader.Read())
 							{
+								oGetItemTransactionsRs.saleprice = Convert.ToInt64(reader["priceperunit"]);
+								oGetItemTransactionsRs.remainingquantity = Convert.ToInt64(reader["remainingquantity"]);
+								oGetItemTransactionsRs.purchaseprice = Convert.ToInt64(reader["purchaseprice"]);
 								GetAllItemTransactionsList oGetAllItemTransactionsList = new GetAllItemTransactionsList();
 								oGetAllItemTransactionsList.invoicenumber = Convert.ToInt64(reader["invoicenumber"]);
 								oGetAllItemTransactionsList.typeofpay = Convert.ToString(reader["typeofpay"]);
@@ -276,7 +280,6 @@ namespace WebApplication1.DL
 								oGetAllItemTransactionsList.qty = Convert.ToInt64(reader["qty"]);
 								oGetAllItemTransactionsList.saleprice = Convert.ToInt64(reader["priceperunit"]);
 								oGetAllItemTransactionsList.paymentstatus = Convert.ToString(reader["paymentstatus"]);
-								oGetAllItemTransactionsList.remainingquantity = Convert.ToInt64(reader["remainingquantity"]);
 								oGetAllItemTransactionsList.purchaseprice = Convert.ToInt64(reader["purchaseprice"]);
 								oGetItemTransactionsRs.itemTransactionsList.Add(oGetAllItemTransactionsList);
 							}

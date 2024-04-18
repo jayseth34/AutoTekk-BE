@@ -2,6 +2,7 @@
 using NpgsqlTypes;
 using System.Data;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.RegularExpressions;
 using WebApplication1.Models;
 
 namespace WebApplication1.DL
@@ -135,33 +136,40 @@ namespace WebApplication1.DL
 							cmd.Connection = conn;
 							cmd.CommandType = CommandType.Text;
 							cmd.CommandText = "INSERT INTO party (typeofpay, registeredphonenumber, partyname, gst, phonenumber, partygroup, gsttype, _state, emailid, billingaddress, shippingaddress, openingbalance, topayorreceive, asofdate, creditlimit," +
-								" additionalfieldname1, additionalfieldname2, additionalfieldname3, additionalfieldname4, partybalance) VALUES (@typeofpay, @registeredphonenumber, @partyname, @gst, @phonenumber, @partygroup, @gsttype, @_state, @emailid, @billingaddress, " +
-								"@shippingaddress, @openingbalance, @topayorreceive, @asofdate, @creditlimit, @additionalfieldname1, @additionalfieldname2, @additionalfieldname3, @additionalfieldname4, @partybalance)";
-							cmd.Parameters.AddWithValue("@typeofpay", opartyRq.typeofpay);
-							cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredPhoneNumber);
-							cmd.Parameters.AddWithValue("@partyname", opartyRq.partyName);
-							cmd.Parameters.AddWithValue("@gst", opartyRq.GST);
-							cmd.Parameters.AddWithValue("@phonenumber", opartyRq.phoneNumber);
-							cmd.Parameters.AddWithValue("@partygroup", opartyRq.partyGroup);
-							cmd.Parameters.AddWithValue("@gsttype", opartyRq.gstType);
-							cmd.Parameters.AddWithValue("@_state", opartyRq._state);
-							cmd.Parameters.AddWithValue("@emailid", opartyRq.emailId);
-							cmd.Parameters.AddWithValue("@billingaddress", opartyRq.billingAddress);
-							cmd.Parameters.AddWithValue("@shippingaddress", opartyRq.shippingAddress);
-							cmd.Parameters.AddWithValue("@openingbalance", opartyRq.openingBalance);
-							cmd.Parameters.AddWithValue("@topayorreceive", opartyRq.toPayOrReceive);
-							cmd.Parameters.AddWithValue("@asofdate", opartyRq.asOfDate);
-							cmd.Parameters.AddWithValue("@creditlimit", opartyRq.creditLimit);
-							cmd.Parameters.AddWithValue("@additionalfieldname1", opartyRq.additionalFieldName1);
-							cmd.Parameters.AddWithValue("@additionalfieldname2", opartyRq.additionalFieldName2);
-							cmd.Parameters.AddWithValue("@additionalfieldname3", opartyRq.additionalFieldName3);
-							cmd.Parameters.AddWithValue("@additionalfieldname4", opartyRq.additionalFieldName4);
-							cmd.Parameters.AddWithValue("@partybalance", opartyRq.partybalance);
+								" additionalfieldname1, additionalfieldname2, additionalfieldname3, additionalfieldname4, additionalfieldname1value, additionalfieldname2value, additionalfieldname3value, additionalfieldname4value, partybalance) VALUES (@typeofpay, @registeredphonenumber, @partyname, @gst, @phonenumber, @partygroup, @gsttype, @_state, @emailid, @billingaddress, " +
+								"@shippingaddress, @openingbalance, @topayorreceive, @asofdate, @creditlimit, @additionalfieldname1, @additionalfieldname2, @additionalfieldname3, @additionalfieldname4, @additionalfieldname1value, @additionalfieldname2value, @additionalfieldname3value, @additionalfieldname4value, @partybalance)";
+
+							cmd.Parameters.AddWithValue("typeofpay", opartyRq.typeofpay);
+							cmd.Parameters.AddWithValue("registeredphonenumber", opartyRq.registeredPhoneNumber);
+							cmd.Parameters.AddWithValue("partyname", opartyRq.partyName);
+							cmd.Parameters.AddWithValue("gst", opartyRq.GST);
+							cmd.Parameters.AddWithValue("phonenumber", opartyRq.phoneNumber);
+							cmd.Parameters.AddWithValue("partygroup", opartyRq.partyGroup);
+							cmd.Parameters.AddWithValue("gsttype", opartyRq.gstType);
+							cmd.Parameters.AddWithValue("_state", opartyRq._state);
+							cmd.Parameters.AddWithValue("emailid", opartyRq.emailId);
+							cmd.Parameters.AddWithValue("billingaddress", opartyRq.billingAddress);
+							cmd.Parameters.AddWithValue("shippingaddress", opartyRq.shippingAddress);
+							cmd.Parameters.AddWithValue("openingbalance", opartyRq.openingBalance);
+							cmd.Parameters.AddWithValue("topayorreceive", opartyRq.toPayOrReceive);
+							cmd.Parameters.AddWithValue("asofdate", opartyRq.asOfDate);
+							cmd.Parameters.AddWithValue("creditlimit", opartyRq.creditLimit);
+							cmd.Parameters.AddWithValue("additionalfieldname1", opartyRq.additionalFieldName1);
+							cmd.Parameters.AddWithValue("additionalfieldname2", opartyRq.additionalFieldName2);
+							cmd.Parameters.AddWithValue("additionalfieldname3", opartyRq.additionalFieldName3);
+							cmd.Parameters.AddWithValue("additionalfieldname4", opartyRq.additionalFieldName4);
+							cmd.Parameters.AddWithValue("additionalfieldname1value", opartyRq.additionalFieldName1value);
+							cmd.Parameters.AddWithValue("additionalfieldname2value", opartyRq.additionalFieldName2value);
+							cmd.Parameters.AddWithValue("additionalfieldname3value", opartyRq.additionalFieldName3value);
+							cmd.Parameters.AddWithValue("additionalfieldname4value", opartyRq.additionalFieldName4value);
+							cmd.Parameters.AddWithValue("partybalance", opartyRq.partybalance);
+
 							cmd.ExecuteNonQuery();
 							opartyRs.status = "Inserted Successfully";
 						}
+
 					}
-					catch(Exception ex)
+					catch (Exception ex)
 					{
 						Console.WriteLine(ex.Message);
 					}
@@ -179,7 +187,7 @@ namespace WebApplication1.DL
 							cmd.CommandType = CommandType.Text;
 							cmd.CommandText = " UPDATE party SET typeofpay = @typeofpay, gst = @gst, phonenumber = @phonenumber, partygroup = @partygroup, gsttype = @gsttype, _state = @_state, emailid = @emailid, billingaddress = @billingaddress, " +
 											  "shippingaddress = @shippingaddress, openingbalance = @openingbalance, topayorreceive = @topayorreceive, asofdate = @asofdate, creditlimit = @creditlimit, additionalfieldname1 = @additionalfieldname1," +
-											  "additionalfieldname2 = @additionalfieldname2, additionalfieldname3 = @additionalfieldname3, additionalfieldname4 = @additionalfieldname4, partybalance = @partybalance WHERE registeredPhoneNumber = " + opartyRq.registeredPhoneNumber + " AND partyname = '" + opartyRq.partyName + "'";
+											  "additionalfieldname2 = @additionalfieldname2, additionalfieldname3 = @additionalfieldname3, additionalfieldname4 = @additionalfieldname4, partybalance = @partybalance, additionalfieldname1value = @additionalfieldname1value, additionalfieldname2value = @additionalfieldname2value, additionalfieldname3value = @additionalfieldname3value, additionalfieldname4value = @additionalfieldname4value WHERE registeredPhoneNumber = " + opartyRq.registeredPhoneNumber + " AND partyname = '" + opartyRq.partyName + "'";
 							cmd.Parameters.AddWithValue("@typeofpay", opartyRq.typeofpay);
 							cmd.Parameters.AddWithValue("@gst", opartyRq.GST);
 							cmd.Parameters.AddWithValue("@phonenumber", opartyRq.phoneNumber);
@@ -198,9 +206,110 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@additionalfieldname3", opartyRq.additionalFieldName3);
 							cmd.Parameters.AddWithValue("@additionalfieldname4", opartyRq.additionalFieldName4);
 							cmd.Parameters.AddWithValue("@partybalance", opartyRq.partybalance);
+							cmd.Parameters.AddWithValue("@additionalfieldname1value", opartyRq.additionalFieldName1value);
+							cmd.Parameters.AddWithValue("@additionalfieldname2value", opartyRq.additionalFieldName2value);
+							cmd.Parameters.AddWithValue("@additionalfieldname3value", opartyRq.additionalFieldName3value);
+							cmd.Parameters.AddWithValue("@additionalfieldname4value", opartyRq.additionalFieldName4value);
 							cmd.ExecuteNonQuery();
 							opartyRs.status = "Party Updated Successfully";
 						}
+					}
+					catch (Exception ex)
+					{
+						Console.WriteLine(ex.Message);
+					}
+				}
+				if (opartyRq.typeofpay == "RECEIVABLE OPENING BALANCE" || opartyRq.typeofpay == "PAYABLE OPENING BALANCE")
+				{
+					try
+					{
+						using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+						{
+							conn.Open();
+							NpgsqlCommand cmd = new NpgsqlCommand();
+							cmd.Connection = conn;
+							cmd.CommandType = CommandType.Text;
+							cmd.CommandText = "INSERT INTO transactions(typeofpay, invoicedate, total, balance, customername, phonenumber, registeredphonenumber," +
+								"paymentstatus) VALUES(@typeofpay, @invoicedate, @total, @balance, @customername, @phonenumber, @registeredphonenumber," +
+								"@paymentstatus) RETURNING transaction_id";
+							cmd.Parameters.AddWithValue("@typeofpay", opartyRq.typeofpay);
+							cmd.Parameters.AddWithValue("@invoicedate", opartyRq.asOfDate);
+							cmd.Parameters.AddWithValue("@total", opartyRq.openingBalance);
+							cmd.Parameters.AddWithValue("@balance", opartyRq.openingBalance);
+							cmd.Parameters.AddWithValue("@customername", opartyRq.partyName);
+							cmd.Parameters.AddWithValue("@phonenumber", opartyRq.phoneNumber);
+							cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredPhoneNumber);
+							cmd.Parameters.AddWithValue("@paymentstatus", "UNPAID");
+							int transactionId = (int)cmd.ExecuteScalar();
+						}
+					}
+					catch (Exception ex)
+					{
+						Console.WriteLine(ex.Message);
+					}
+				}
+				if (!string.IsNullOrEmpty(opartyRq.partyGroup))
+				{
+					bool partygroupexist = false;
+					try
+					{
+						try
+						{
+							using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+							{
+								conn.Open();
+								NpgsqlCommand cmd = new NpgsqlCommand();
+								cmd.Connection = conn;
+								cmd.CommandType = CommandType.Text;
+								cmd.CommandText = "SELECT partygroup FROM partygroup WHERE registeredphonenumber = " + opartyRq.registeredPhoneNumber + " AND partygroup = '" + opartyRq.partyGroup + "'";
+								NpgsqlDataReader reader = cmd.ExecuteReader();
+								while (reader.Read())
+								{
+									partygroupexist = true;
+								}
+							}
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine(ex.Message);
+						}
+						try
+						{
+							if (!partygroupexist)
+							{
+								using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+								{
+									conn.Open();
+									NpgsqlCommand cmd = new NpgsqlCommand();
+									cmd.Connection = conn;
+									cmd.CommandType = CommandType.Text;
+									cmd.CommandText = "INSERT INTO partygroup(partygroup, registeredphonenumber) VALUES(@partygroup, @registeredphonenumber)";
+									cmd.Parameters.AddWithValue("@partygroup", opartyRq.partyGroup);
+									cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredPhoneNumber);
+									cmd.ExecuteNonQuery();
+								}
+							}
+							else
+							{
+								using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+								{
+									conn.Open();
+									NpgsqlCommand cmd = new NpgsqlCommand();
+									cmd.Connection = conn;
+									cmd.CommandType = CommandType.Text;
+									cmd.CommandText = "UPDATE partygroup SET partygroup = '" + opartyRq.partyGroup + "' WHERE registeredphonenumber = " + opartyRq.registeredPhoneNumber + " AND partyname = '" + opartyRq.partyName + "'";
+									cmd.Parameters.AddWithValue("@partygroup", opartyRq.partyGroup);
+									cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredPhoneNumber);
+									cmd.ExecuteNonQuery();
+								}
+							}
+							
+						}
+						catch(Exception ex)
+						{
+							Console.WriteLine(ex.Message);
+						}
+						
 					}
 					catch (Exception ex)
 					{
@@ -227,7 +336,7 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT gst, phonenumber, partygroup, gsttype, _state, emailid, billingaddress, shippingaddress, openingbalance, asofdate, creditlimit," +
-						"additionalfieldname1, additionalfieldname2, additionalfieldname3, additionalfieldname4, typeofpay, topayorreceive, partybalance FROM party WHERE registeredphonenumber = " + ogetPartyRq.registeredPhoneNumber + " AND partyname = '" +
+						"additionalfieldname1, additionalfieldname2, additionalfieldname3, additionalfieldname4, typeofpay, topayorreceive, partybalance, additionalfieldname1value, additionalfieldname2value, additionalfieldname3value, additionalfieldname4value FROM party WHERE registeredphonenumber = " + ogetPartyRq.registeredPhoneNumber + " AND partyname = '" +
 						ogetPartyRq.partyName + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if(reader.HasRows)
@@ -255,6 +364,10 @@ namespace WebApplication1.DL
 								ogetallpartylist.typeofpay = Convert.ToString(reader["typeofpay"]);
 								ogetallpartylist.toPayOrReceive = Convert.ToString(reader["topayorreceive"]);
 								ogetallpartylist.partybalance = Convert.ToInt64(reader["partybalance"]);
+								ogetallpartylist.additionalFieldName1Value = Convert.ToString(reader["additionalfieldname4value"]);
+								ogetallpartylist.additionalFieldName2Value = Convert.ToString(reader["additionalfieldname4value"]);
+								ogetallpartylist.additionalFieldName3Value = Convert.ToString(reader["additionalfieldname4value"]);
+								ogetallpartylist.additionalFieldName4Value = Convert.ToString(reader["additionalfieldname4value"]);
 								ogetPartyRs.partyList.Add(ogetallpartylist);
 								ogetPartyRs.status = "SUCCESS";
 							}
@@ -316,6 +429,45 @@ namespace WebApplication1.DL
 				Console.WriteLine(ex.Message);
 			}
 			return oGetPartyListRs;
+		}
+		public GetPartyGroupRs GetPartyGrop(GetPartyGroupRq oGetPartyGroupRq)
+		{
+			GetPartyGroupRs oGetPartyGroupRs = new GetPartyGroupRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT partygroup, COUNT(*) AS partygroup_count FROM party GROUP BY partygroup";
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+								GetPartyGroupListtRs oGetPartyGroupListtRs = new GetPartyGroupListtRs();
+								oGetPartyGroupListtRs.partygroup = Convert.ToString(reader["partygroup"]);
+								oGetPartyGroupListtRs.partygroupcount = Convert.ToInt64(reader["partygroup_count"]);
+								oGetPartyGroupRs.getPartyGroupList.Add(oGetPartyGroupListtRs);
+							}
+							oGetPartyGroupRs.status = "SUCCESS";
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine(ex.Message);
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oGetPartyGroupRs;
 		}
 	}
 }

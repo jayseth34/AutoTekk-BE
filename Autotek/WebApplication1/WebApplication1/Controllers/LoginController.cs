@@ -97,5 +97,21 @@ namespace WebApplication1.Controllers
 
 			return BadRequest("Please Provide Valid Details"); ;
 		}
+
+		[AllowAnonymous]
+		[HttpPost]
+		[Route("GetPartyGroup")]
+		public async Task<ActionResult> GetPartyGrop(GetPartyGroupRq oGetPartyGroupRq)
+		{
+			GetPartyGroupRs oGetPartyGroupRs = new GetPartyGroupRs();
+			if (ModelState.IsValid)
+			{
+				LoginBL loginBL = new LoginBL(this.config);
+				oGetPartyGroupRs = await loginBL.GetPartyGrop(oGetPartyGroupRq);
+				return Ok(oGetPartyGroupRs);
+			}
+
+			return BadRequest("Please Provide Valid Details"); ;
+		}
 	}
 }

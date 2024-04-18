@@ -49,6 +49,10 @@
 	public class GetPartyTransactionsRs
 	{
 		public string status { get; set;}
+		public string emailid { get; set; }
+		public string gst { get; set; }
+		public string billingaddress { get; set; }
+		public Int64 phonenumber { get; set; }
 		public GetPartyTransactionsRs()
 		{
 			partyTransactionsList = new List<GetAllPartyTransactionsList>();
@@ -58,9 +62,6 @@
 	public class GetAllPartyTransactionsList
 	{
 		public string typeofpay { get; set; }
-		public string emailid { get; set; }
-		public string gst { get; set; }
-		public string billingaddress { get; set; }
 		public Int64 invoicenumber { get; set; }
 		public Int64 creditlimit { get; set; }
 		public DateTime invoicedate { get; set; }
@@ -112,6 +113,10 @@
 	public class GetItemTransactionsRs
 	{
 		public string status { get; set; }
+		public Int64 saleprice { get; set; }
+		public Int64 purchaseprice { get; set; }
+		public Int64 remainingquantity { get; set; }
+
 		public GetItemTransactionsRs()
 		{
 			itemTransactionsList = new List<GetAllItemTransactionsList>();
@@ -129,6 +134,5 @@
 		public Int64 saleprice { get; set; }
 		public string paymentstatus { get; set; }
 		public Int64 purchaseprice { get; set; }
-		public Int64 remainingquantity { get; set; }
 	}
 }
