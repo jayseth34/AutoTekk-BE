@@ -36,5 +36,28 @@ namespace WebApplication1.BL
 			oGetItemRs = itemDL.GetItemDetails(oGetItemRq);
 			return oGetItemRs;
 		}
+
+		public async Task<GetCategoryRs> GetCategory(GetCategoryRq oGetCategoryRq)
+		{
+			GetCategoryRs oGetCategoryRs = new GetCategoryRs();
+			ItemDL itemDL = new ItemDL(this.config);
+			oGetCategoryRs = itemDL.GetCategory(oGetCategoryRq);
+			return oGetCategoryRs;
+		}
+
+		public async Task<GetItemByCategoryRs> GetItemByCategory(GetItemByCategoryRq oGetItemByCategoryRq)
+		{
+			GetItemByCategoryRs oGetItemByCategoryRs = new GetItemByCategoryRs();
+			ItemDL itemDL = new ItemDL(this.config);
+			oGetItemByCategoryRs = itemDL.GetItemByCategory(oGetItemByCategoryRq);
+			return oGetItemByCategoryRs;
+		}
+		public async Task<AddUpdateCategoryRs> AddUpdateCategory(AddUpdateCategoryRq oAddUpdateCategoryRq)
+		{
+			AddUpdateCategoryRs oAddUpdateCategoryRs = new AddUpdateCategoryRs();
+			ItemDL itemDL = new ItemDL(this.config);
+			oAddUpdateCategoryRs = itemDL.AddUpdateCategory(oAddUpdateCategoryRq);
+			return oAddUpdateCategoryRs;
+		}
 	}
 }

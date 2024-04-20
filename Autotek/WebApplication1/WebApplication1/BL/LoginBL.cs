@@ -82,12 +82,28 @@ namespace WebApplication1.BL
 			oGetPartyListRs = logindl.GetPartyList(oGetPartyListRq);
 			return oGetPartyListRs;
 		}
-		public async Task<GetPartyGroupRs> GetPartyGrop(GetPartyGroupRq oGetPartyGroupRq)
+		public async Task<GetPartyGroupRs> GetPartyGroup(GetPartyGroupRq oGetPartyGroupRq)
 		{
 			GetPartyGroupRs oGetPartyGroupRs = new GetPartyGroupRs();
 			LoginDL logindl = new LoginDL(this.config);
-			oGetPartyGroupRs = logindl.GetPartyGrop(oGetPartyGroupRq);
+			oGetPartyGroupRs = logindl.GetPartyGroup(oGetPartyGroupRq);
 			return oGetPartyGroupRs;
+		}
+
+		public async Task<GetPartyByGroupRs> GetPartyByGroup(GetPartyByGroupRq oGetPartyByGroupRq)
+		{
+			GetPartyByGroupRs oGetPartyByGroupRs = new GetPartyByGroupRs();
+			LoginDL logindl = new LoginDL(this.config);
+			oGetPartyByGroupRs = logindl.GetPartyByGroup(oGetPartyByGroupRq);
+			return oGetPartyByGroupRs;
+		}
+
+		public async Task<AddUpdatePartyGropRs> AddUpdatePartyGroup(AddUpdatePartyGropRq oAddUpdatePartyGropRq)
+		{
+			AddUpdatePartyGropRs oAddUpdatePartyGropRs = new AddUpdatePartyGropRs();
+			LoginDL logindl = new LoginDL(this.config);
+			oAddUpdatePartyGropRs = logindl.AddUpdatePartyGroup(oAddUpdatePartyGropRq);
+			return oAddUpdatePartyGropRs;
 		}
 	}
 }

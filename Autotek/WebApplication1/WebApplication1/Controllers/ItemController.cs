@@ -46,7 +46,7 @@ namespace WebApplication1.Controllers
 				return Ok(oGetItemListRs);
 			}
 
-			return BadRequest("Please Provide Valid Details"); ;
+			return BadRequest("Please Provide Valid Details");
 		}
 
 		[AllowAnonymous]
@@ -62,7 +62,55 @@ namespace WebApplication1.Controllers
 				return Ok(oGetItemRs);
 			}
 
-			return BadRequest("Please Provide Valid Details"); ;
+			return BadRequest("Please Provide Valid Details");
+		}
+
+		[AllowAnonymous]
+		[HttpPost]
+		[Route("GetCategory")]
+		public async Task<ActionResult> GetCategory(GetCategoryRq oGetCategoryRq)
+		{
+			GetCategoryRs oGetCategoryRs = new GetCategoryRs();
+			if (ModelState.IsValid)
+			{
+				ItemBL itemBL = new ItemBL(this.config);
+				oGetCategoryRs = await itemBL.GetCategory(oGetCategoryRq);
+				return Ok(oGetCategoryRs);
+			}
+
+			return BadRequest("Please Provide Valid Details");
+		}
+
+		[AllowAnonymous]
+		[HttpPost]
+		[Route("GetItemByCategory")]
+		public async Task<ActionResult> GetItemByCategory(GetItemByCategoryRq oGetItemByCategoryRq)
+		{
+			GetItemByCategoryRs oGetItemByCategoryRs = new GetItemByCategoryRs();
+			if (ModelState.IsValid)
+			{
+				ItemBL itemBL = new ItemBL(this.config);
+				oGetItemByCategoryRs = await itemBL.GetItemByCategory(oGetItemByCategoryRq);
+				return Ok(oGetItemByCategoryRs);
+			}
+
+			return BadRequest("Please Provide Valid Details");
+		}
+
+		[AllowAnonymous]
+		[HttpPost]
+		[Route("AddUpdateCategory")]
+		public async Task<ActionResult> AddUpdateCategory(AddUpdateCategoryRq oAddUpdateCategoryRq)
+		{
+			AddUpdateCategoryRs oAddUpdateCategoryRs = new AddUpdateCategoryRs();
+			if (ModelState.IsValid)
+			{
+				ItemBL itemBL = new ItemBL(this.config);
+				oAddUpdateCategoryRs = await itemBL.AddUpdateCategory(oAddUpdateCategoryRq);
+				return Ok(oAddUpdateCategoryRs);
+			}
+
+			return BadRequest("Please Provide Valid Details");
 		}
 	}
 }

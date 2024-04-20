@@ -97,4 +97,52 @@
 		public Int64 minimumstocktomaintain { get; set; }
 		public string _location { get; set; }
 	}
+
+	public class GetCategoryRq
+	{
+		public Int64 registeredPhoneNumber { get; set; }
+	}
+
+	public class GetCategoryRs
+	{
+		public string status { get; set; }
+		public GetCategoryRs()
+		{
+			getCateogoryList = new List<GetCategoryListtRs>();
+		}
+		public List<GetCategoryListtRs> getCateogoryList { get; set; }
+	}
+	public class GetCategoryListtRs
+	{
+		public string category { get; set; }
+		public Int64 categorycount { get; set; }
+	}
+
+	public class GetItemByCategoryRq
+	{
+		public string category { get; set; }
+		public Int64 registeredphonenumber { get; set; }
+	}
+
+	public class GetItemByCategoryRs
+	{
+		public string status { get; set; }
+		public GetItemByCategoryRs()
+		{
+			getItemList = new List<GetItemList>();
+		}
+		public List<GetItemList> getItemList { get; set; }
+	}
+
+	public class AddUpdateCategoryRq
+	{
+		public Int64 registeredphonenumber { get; set; }
+		public string newcategory { get; set; }
+		public string oldcategory { get; set; }
+	}
+
+	public class AddUpdateCategoryRs
+	{
+		public string status { get; set; }
+	}
 }

@@ -1,4 +1,5 @@
 ﻿using Npgsql;
+using NpgsqlTypes;
 using System.Data;
 using WebApplication1.Models;
 
@@ -131,6 +132,59 @@ namespace WebApplication1.DL
 						Console.WriteLine(ex.Message);
 					}
 				}
+				if(!string.IsNullOrEmpty(oitemRq.category))
+				{
+					bool categoryexist = false;
+					try
+					{
+						try
+						{
+							using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+							{
+								conn.Open();
+								NpgsqlCommand cmd = new NpgsqlCommand();
+								cmd.Connection = conn;
+								cmd.CommandType = CommandType.Text;
+								cmd.CommandText = "SELECT category FROM categorygroup WHERE registeredphonenumber = " + oitemRq.registeredphonenumber + " AND category = '" + oitemRq.category + "'";
+								NpgsqlDataReader reader = cmd.ExecuteReader();
+								while (reader.Read())
+								{
+									categoryexist = true;
+								}
+							}
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine(ex.Message);
+						}
+						try
+						{
+							if (!categoryexist)
+							{
+								using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+								{
+									conn.Open();
+									NpgsqlCommand cmd = new NpgsqlCommand();
+									cmd.Connection = conn;
+									cmd.CommandType = CommandType.Text;
+									cmd.CommandText = "INSERT INTO categorygroup(category, registeredphonenumber) VALUES(@category, @registeredphonenumber)";
+									cmd.Parameters.AddWithValue("@category", oitemRq.category);
+									cmd.Parameters.AddWithValue("@registeredphonenumber", oitemRq.registeredphonenumber);
+									cmd.ExecuteNonQuery();
+								}
+							}
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine(ex.Message);
+						}
+
+					}
+					catch (Exception ex)
+					{
+						Console.WriteLine(ex.Message);
+					}
+				}
 			}
 			catch (Exception ex)
 			{
@@ -245,6 +299,118 @@ namespace WebApplication1.DL
 				Console.WriteLine(ex.Message);
 			}
 			return oGetItemRs;
+		}
+
+		public GetCategoryRs GetCategory(GetCategoryRq oGetCategoryRq)
+		{
+			GetCategoryRs oGetCategoryRs = new GetCategoryRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT category, COUNT(*) AS categorycount FROM item WHERE registeredphonenumber = " + oGetCategoryRq.registeredPhoneNumber + " GROUP BY category";
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+								GetCategoryListtRs oGetCategoryListtRs = new GetCategoryListtRs();
+								oGetCategoryListtRs.category = Convert.ToString(reader["category"]);
+								oGetCategoryListtRs.categorycount = Convert.ToInt64(reader["categorycount"]);
+								oGetCategoryRs.getCateogoryList.Add(oGetCategoryListtRs);
+							}
+							oGetCategoryRs.status = "SUCCESS";
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine(ex.Message);
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oGetCategoryRs;
+		}
+
+		public GetItemByCategoryRs GetItemByCategory(GetItemByCategoryRq oGetItemByCategoryRq)
+		{
+			GetItemByCategoryRs oGetItemByCategoryRs = new GetItemByCategoryRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT itemname, remainingquantity from item where registeredphonenumber = " + oGetItemByCategoryRq.registeredphonenumber + " AND category = '" + oGetItemByCategoryRq.category + "'";
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+								GetItemList oGetItemList = new GetItemList();
+								oGetItemList.itemname = Convert.ToString(reader["itemname"]);
+								oGetItemList.remainingquantity = Convert.ToInt64(reader["remainingquantity"]);
+								oGetItemByCategoryRs.getItemList.Add(oGetItemList);
+							}
+							oGetItemByCategoryRs.status = "SUCCESS";
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine(ex.Message);
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oGetItemByCategoryRs;
+		}
+
+		public AddUpdateCategoryRs AddUpdateCategory(AddUpdateCategoryRq oAddUpdateCategoryRq)
+		{
+			AddUpdateCategoryRs oAddUpdateCategoryRs = new AddUpdateCategoryRs();
+			string outputResult = string.Empty;
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(dbConn))
+				{
+					conn.Open(); // Open the connection outside the loop
+
+					using (NpgsqlCommand cmd = new NpgsqlCommand("sp_addupdatecategory", conn))
+					{
+						cmd.CommandType = CommandType.StoredProcedure;
+						cmd.Parameters.AddWithValue("v_oldcategory", NpgsqlDbType.Varchar).Value = oAddUpdateCategoryRq.oldcategory;
+						cmd.Parameters.AddWithValue("v_newcategory", NpgsqlDbType.Varchar).Value = oAddUpdateCategoryRq.newcategory;
+						cmd.Parameters.AddWithValue("v_registeredphonenumber", NpgsqlDbType.Numeric).Value = oAddUpdateCategoryRq.registeredphonenumber;
+						var outputParameter = new NpgsqlParameter("output_result", NpgsqlDbType.Varchar);
+						outputParameter.Direction = ParameterDirection.Output;
+						cmd.Parameters.Add(outputParameter);
+						cmd.ExecuteNonQuery();
+						outputResult = cmd.Parameters["output_result"].Value.ToString();
+					}
+				}
+				oAddUpdateCategoryRs.status = outputResult;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oAddUpdateCategoryRs;
 		}
 	}
 }

@@ -289,21 +289,6 @@ namespace WebApplication1.DL
 									cmd.ExecuteNonQuery();
 								}
 							}
-							else
-							{
-								using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-								{
-									conn.Open();
-									NpgsqlCommand cmd = new NpgsqlCommand();
-									cmd.Connection = conn;
-									cmd.CommandType = CommandType.Text;
-									cmd.CommandText = "UPDATE partygroup SET partygroup = '" + opartyRq.partyGroup + "' WHERE registeredphonenumber = " + opartyRq.registeredPhoneNumber + " AND partyname = '" + opartyRq.partyName + "'";
-									cmd.Parameters.AddWithValue("@partygroup", opartyRq.partyGroup);
-									cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredPhoneNumber);
-									cmd.ExecuteNonQuery();
-								}
-							}
-							
 						}
 						catch(Exception ex)
 						{
@@ -376,7 +361,6 @@ namespace WebApplication1.DL
 						{
 							Console.WriteLine(ex.Message);
 						}
-
 					}
 					else
 					{
@@ -430,7 +414,7 @@ namespace WebApplication1.DL
 			}
 			return oGetPartyListRs;
 		}
-		public GetPartyGroupRs GetPartyGrop(GetPartyGroupRq oGetPartyGroupRq)
+		public GetPartyGroupRs GetPartyGroup(GetPartyGroupRq oGetPartyGroupRq)
 		{
 			GetPartyGroupRs oGetPartyGroupRs = new GetPartyGroupRs();
 			try
@@ -441,7 +425,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT partygroup, COUNT(*) AS partygroup_count FROM party GROUP BY partygroup";
+					cmd.CommandText = "SELECT partygroup, COUNT(*) AS partygroup_count FROM party WHERE registeredphonenumber = " + oGetPartyGroupRq.registeredPhoneNumber + " GROUP BY partygroup";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -468,6 +452,77 @@ namespace WebApplication1.DL
 				Console.WriteLine(ex.Message);
 			}
 			return oGetPartyGroupRs;
+		}
+
+		public GetPartyByGroupRs GetPartyByGroup(GetPartyByGroupRq oGetPartyByGroupRq)
+		{
+			GetPartyByGroupRs oGetPartyByGroupRs = new GetPartyByGroupRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT partyname, partybalance from party where registeredphonenumber = " + oGetPartyByGroupRq.registeredphonenumber + " AND partygroup = '" + oGetPartyByGroupRq.groupname + "'";
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+								GetPartyList oGetPartyList = new GetPartyList();
+								oGetPartyList.partyname = Convert.ToString(reader["partyname"]);
+								oGetPartyList.partybalance = Convert.ToInt64(reader["partybalance"]);
+								oGetPartyByGroupRs.getPartyList.Add(oGetPartyList);
+							}
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine(ex.Message);
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oGetPartyByGroupRs;
+		}
+
+		public AddUpdatePartyGropRs AddUpdatePartyGroup(AddUpdatePartyGropRq oAddUpdatePartyGropRq)
+		{
+			AddUpdatePartyGropRs oAddUpdatePartyGropRs = new AddUpdatePartyGropRs();
+			string outputResult = string.Empty;
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(dbConn))
+				{
+					conn.Open(); // Open the connection outside the loop
+
+						using (NpgsqlCommand cmd = new NpgsqlCommand("sp_addupdatepartygroup", conn))
+						{
+							cmd.CommandType = CommandType.StoredProcedure;
+							cmd.Parameters.AddWithValue("v_oldgroupname", NpgsqlDbType.Varchar).Value = oAddUpdatePartyGropRq.oldgroupname;
+							cmd.Parameters.AddWithValue("v_newgroupname", NpgsqlDbType.Varchar).Value = oAddUpdatePartyGropRq.newgroupname;
+							cmd.Parameters.AddWithValue("v_registeredphonenumber", NpgsqlDbType.Numeric).Value = oAddUpdatePartyGropRq.registeredphonenumber;
+							var outputParameter = new NpgsqlParameter("output_result", NpgsqlDbType.Varchar);
+							outputParameter.Direction = ParameterDirection.Output;
+							cmd.Parameters.Add(outputParameter);
+							cmd.ExecuteNonQuery();
+							outputResult = cmd.Parameters["output_result"].Value.ToString();
+						}
+				}
+				oAddUpdatePartyGropRs.status = outputResult;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oAddUpdatePartyGropRs;
 		}
 	}
 }

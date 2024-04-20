@@ -63,7 +63,7 @@ namespace WebApplication1.Controllers
 				return Ok(opartyRs);
 			}
 
-			return BadRequest("Please Provide Valid Details"); ;
+			return BadRequest("Please Provide Valid Details");
 		}
 
 		[AllowAnonymous]
@@ -79,7 +79,7 @@ namespace WebApplication1.Controllers
 				return Ok(ogetPartyRs);
 			}
 
-			return BadRequest("Please Provide Valid Details"); ;
+			return BadRequest("Please Provide Valid Details");
 		}
 
 		[AllowAnonymous]
@@ -95,23 +95,55 @@ namespace WebApplication1.Controllers
 				return Ok(oGetPartyListRs);
 			}
 
-			return BadRequest("Please Provide Valid Details"); ;
+			return BadRequest("Please Provide Valid Details");
 		}
 
 		[AllowAnonymous]
 		[HttpPost]
 		[Route("GetPartyGroup")]
-		public async Task<ActionResult> GetPartyGrop(GetPartyGroupRq oGetPartyGroupRq)
+		public async Task<ActionResult> GetPartyGroup(GetPartyGroupRq oGetPartyGroupRq)
 		{
 			GetPartyGroupRs oGetPartyGroupRs = new GetPartyGroupRs();
 			if (ModelState.IsValid)
 			{
 				LoginBL loginBL = new LoginBL(this.config);
-				oGetPartyGroupRs = await loginBL.GetPartyGrop(oGetPartyGroupRq);
+				oGetPartyGroupRs = await loginBL.GetPartyGroup(oGetPartyGroupRq);
 				return Ok(oGetPartyGroupRs);
 			}
 
-			return BadRequest("Please Provide Valid Details"); ;
+			return BadRequest("Please Provide Valid Details");
+		}
+
+		[AllowAnonymous]
+		[HttpPost]
+		[Route("GetPartyByGroup")]
+		public async Task<ActionResult> GetPartyByGroup(GetPartyByGroupRq oGetPartyByGroupRq)
+		{
+			GetPartyByGroupRs oGetPartyByGroupRs = new GetPartyByGroupRs();
+			if (ModelState.IsValid)
+			{
+				LoginBL loginBL = new LoginBL(this.config);
+				oGetPartyByGroupRs = await loginBL.GetPartyByGroup(oGetPartyByGroupRq);
+				return Ok(oGetPartyByGroupRs);
+			}
+
+			return BadRequest("Please Provide Valid Details");
+		}
+
+		[AllowAnonymous]
+		[HttpPost]
+		[Route("AddUpdatePartyGroup")]
+		public async Task<ActionResult> AddUpdatePartyGroup(AddUpdatePartyGropRq oAddUpdatePartyGropRq)
+		{
+			AddUpdatePartyGropRs oAddUpdatePartyGropRs = new AddUpdatePartyGropRs();
+			if (ModelState.IsValid)
+			{
+				LoginBL loginBL = new LoginBL(this.config);
+				oAddUpdatePartyGropRs = await loginBL.AddUpdatePartyGroup(oAddUpdatePartyGropRq);
+				return Ok(oAddUpdatePartyGropRs);
+			}
+
+			return BadRequest("Please Provide Valid Details");
 		}
 	}
 }
