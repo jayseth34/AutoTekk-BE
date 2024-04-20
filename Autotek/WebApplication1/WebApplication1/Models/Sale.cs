@@ -38,6 +38,7 @@
 	public class TransactionRs
 	{
 		public string status { get; set; }
+		public string statusmessage {  get; set; }
 	}
 
 	public class GetPartyTransactionsRq
@@ -134,5 +135,32 @@
 		public Int64 saleprice { get; set; }
 		public string paymentstatus { get; set; }
 		public Int64 purchaseprice { get; set; }
+	}
+
+	public class GetTypeOfPayTransactionsRq
+	{
+		public Int64 registeredphonenumber { get; set; }
+		public string typeofpay { get; set; }
+	}
+	public class GetTypeOfPayTransactionsRs
+	{
+		public string status { get; set; }
+		public GetTypeOfPayTransactionsRs()
+		{
+			typeofpaytransactionlist = new List<GetTypeOfPayTransactionsList>();
+		}
+		public List<GetTypeOfPayTransactionsList> typeofpaytransactionlist { get; set; }
+	}
+
+	public class GetTypeOfPayTransactionsList
+	{
+		public Int64 invoicenumber { get; set; }
+		public DateTime invoicedate { get; set; }
+		public string customername { get; set; }
+		public string typeofpay { get; set; }
+		public string paymenttype { get; set; }
+		public Int64 total { get; set; }
+		public Int64 balance { get; set; }
+		public string paymentstatus { get; set; }
 	}
 }

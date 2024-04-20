@@ -64,5 +64,16 @@ namespace WebApplication1.Controllers
 			oGetItemTransactionsRs = await saleBl.GetItemTransactions(oGetItemTransactionsRq);
 			return Ok(oGetItemTransactionsRs);
 		}
+
+		[AllowAnonymous]
+		[HttpPost]
+		[Route("GetTypeOfPayTransactions")]
+		public async Task<ActionResult> GetTypeOfPayTransactions(GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq)
+		{
+			GetTypeOfPayTransactionsRs oGetTypeOfPayTransactionsRs = new GetTypeOfPayTransactionsRs();
+			SaleBL saleBl = new SaleBL(this.config);
+			oGetTypeOfPayTransactionsRs = await saleBl.GetTypeOfPayTransactions(oGetTypeOfPayTransactionsRq);
+			return Ok(oGetTypeOfPayTransactionsRs);
+		}
 	}
 }

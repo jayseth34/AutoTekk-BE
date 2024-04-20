@@ -119,12 +119,13 @@ namespace WebApplication1.DL
 						}
 					}
 				}
-				otransactionrs.status = "SUCCESS";
+				
 			}
 			catch(Exception ex)
 			{
 				Console.WriteLine(ex.Message);
 			}
+			otransactionrs.statusmessage = outputResult;
 			return outputResult;
 		}
 
@@ -301,6 +302,58 @@ namespace WebApplication1.DL
 				Console.WriteLine(ex.Message);
 			}
 			return oGetItemTransactionsRs;
+		}
+
+		public GetTypeOfPayTransactionsRs GetTypeOfPayTransactions(GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq)
+		{
+			GetTypeOfPayTransactionsRs oGetTypeOfPayTransactionsRs = new GetTypeOfPayTransactionsRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT invoicenumber, typeofpay, customername, invoicedate, paymentstatus, paymenttype, total, balance FROM transactions where registeredphonenumber = " + oGetTypeOfPayTransactionsRq.registeredphonenumber +
+						" AND typeofpay = '" + oGetTypeOfPayTransactionsRq.typeofpay + "'";
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+
+								GetTypeOfPayTransactionsList oGetTypeOfPayTransactionsList = new GetTypeOfPayTransactionsList();
+								oGetTypeOfPayTransactionsList.invoicenumber = Convert.ToInt64(reader["invoicenumber"]);
+								oGetTypeOfPayTransactionsList.typeofpay = Convert.ToString(reader["typeofpay"]);
+								oGetTypeOfPayTransactionsList.customername = Convert.ToString(reader["customername"]);
+								oGetTypeOfPayTransactionsList.invoicedate = Convert.ToDateTime(reader["invoicedate"]);
+								oGetTypeOfPayTransactionsList.paymentstatus = Convert.ToString(reader["paymentstatus"]);
+								oGetTypeOfPayTransactionsList.paymenttype = Convert.ToString(reader["paymenttype"]);
+								oGetTypeOfPayTransactionsList.total = Convert.ToInt64(reader["total"]);
+								oGetTypeOfPayTransactionsList.balance = Convert.ToInt64(reader["balance"]);
+								oGetTypeOfPayTransactionsRs.typeofpaytransactionlist.Add(oGetTypeOfPayTransactionsList);
+							}
+							oGetTypeOfPayTransactionsRs.status = "SUCCESS";
+						}
+						catch (Exception ex)
+						{
+							oGetTypeOfPayTransactionsRs.status = "FAILED";
+						}
+					}
+					else
+					{
+						oGetTypeOfPayTransactionsRs.status = "No Recods Found";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oGetTypeOfPayTransactionsRs;
 		}
 	}
 }

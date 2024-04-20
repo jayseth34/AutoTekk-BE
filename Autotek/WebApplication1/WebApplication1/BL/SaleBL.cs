@@ -54,6 +54,13 @@ namespace WebApplication1.BL
 			oGetItemTransactionsRs = saledl.GetItemTransactions(oGetItemTransactionsRq);
 			return oGetItemTransactionsRs;
 		}
+		public async Task<GetTypeOfPayTransactionsRs> GetTypeOfPayTransactions(GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq)
+		{
+			GetTypeOfPayTransactionsRs oGetTypeOfPayTransactionsRs = new GetTypeOfPayTransactionsRs();
+			SaleDL saledl = new SaleDL(this.config);
+			oGetTypeOfPayTransactionsRs = saledl.GetTypeOfPayTransactions(oGetTypeOfPayTransactionsRq);
+			return oGetTypeOfPayTransactionsRs;
+		}
 
 	}
 }
