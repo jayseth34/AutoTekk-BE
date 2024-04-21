@@ -18,6 +18,7 @@
 		public string billingaddress { get; set; }
 		public string shippingaddress { get; set; }
 		public string paymentstatus { get; set; }
+		public bool isconverttosale { get; set; }
 		public TransactionRq()
 		{
 			itemdetailslist = new List<ItemDetailsListRq>();

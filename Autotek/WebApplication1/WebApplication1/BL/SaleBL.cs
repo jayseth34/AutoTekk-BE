@@ -25,8 +25,19 @@ namespace WebApplication1.BL
 			}
 			else
 			{
-				result = saledl.FindOrInsertItem(otransactionRq);
-				otransactionRs = saledl.SaveTransaction(otransactionRq);
+				if(otransactionRq.isconverttosale && otransactionRq.typeofpay == "DELIVERY CHALLAN")
+				{
+					string typeofpay = "SALE";
+					result = saledl.FindOrInsertItem(otransactionRq);
+					Int64 invoicecount = saledl.GetInvoiceNumberCountDLChallan(otransactionRq.registeredphonenumber, typeofpay);
+					otransactionRs = saledl.SaveDeliveryChallan(otransactionRq, invoicecount);
+					saledl.UpdateDlChallan(otransactionRq.invoicenumber,otransactionRq.registeredphonenumber);
+				}
+				else
+				{
+					result = saledl.FindOrInsertItem(otransactionRq);
+					otransactionRs = saledl.SaveTransaction(otransactionRq);
+				}
 			}
 			return otransactionRs;
 		}

@@ -142,7 +142,7 @@ namespace WebApplication1.DL
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT tr.invoicenumber, tr.typeofpay, tr.invoicedate, tr.total, tr.balance, tr.phonenumber, pr.emailid, pr.billingaddress, pr.creditlimit, pr.gst FROM transactions tr join party pr ON tr.customername = pr.partyname" +
 						" where tr.registeredphonenumber = " + oGetPartyTransactionsRq.registeredphonenumber + " AND " +
-						"tr.customername = '" + oGetPartyTransactionsRq.customername + "'";
+						"tr.customername = '" + oGetPartyTransactionsRq.customername + "' AND tr.showtransaction = 'SHOW'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -262,7 +262,7 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT invoicenumber, typeofpay, customername, invoicedate, qty, priceperunit, paymentstatus " +
-						"FROM item_details WHERE registeredphonenumber = " + oGetItemTransactionsRq.registeredphonenumber + " and item = '" + oGetItemTransactionsRq.itemname + "'";
+						"FROM item_details WHERE registeredphonenumber = " + oGetItemTransactionsRq.registeredphonenumber + " and item = '" + oGetItemTransactionsRq.itemname + "' AND showtransaction = 'SHOW'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -420,6 +420,142 @@ namespace WebApplication1.DL
 				Console.WriteLine (ex.Message);
 			}
 			return oGetTypeOfPayTransactionsRs.invoicenumbercount;
+		}
+
+		public TransactionRs SaveDeliveryChallan(TransactionRq otransactionRq, Int64 invoicecount)
+		{
+			TransactionRs otransactionrs = new TransactionRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "INSERT INTO transactions(typeofpay, invoicenumber, invoicedate, stateofsupply, paymenttype, total, received, balance, customername, phonenumber, registeredphonenumber, billingaddress," +
+						" shippingaddress, paymentstatus) VALUES(@typeofpay, @invoicenumber, @invoicedate, @stateofsupply, @paymenttype, @total, @received, @balance, @customername, @phonenumber, @registeredphonenumber, @billingaddress," +
+						" @shippingaddress, @paymentstatus) RETURNING transaction_id";
+					cmd.Parameters.AddWithValue("@typeofpay", "SALE");
+					cmd.Parameters.AddWithValue("@invoicenumber", (invoicecount+1));
+					cmd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
+					cmd.Parameters.AddWithValue("@stateofsupply", otransactionRq.stateofsupply);
+					cmd.Parameters.AddWithValue("@paymenttype", otransactionRq.paymenttype);
+					cmd.Parameters.AddWithValue("@total", otransactionRq.total);
+					cmd.Parameters.AddWithValue("@received", otransactionRq.received);
+					cmd.Parameters.AddWithValue("@balance", otransactionRq.balance);
+					cmd.Parameters.AddWithValue("@customername", otransactionRq.customername);
+					cmd.Parameters.AddWithValue("@phonenumber", otransactionRq.phonenumber);
+					cmd.Parameters.AddWithValue("@registeredphonenumber", otransactionRq.registeredphonenumber);
+					cmd.Parameters.AddWithValue("@billingaddress", otransactionRq.billingaddress);
+					cmd.Parameters.AddWithValue("@shippingaddress", otransactionRq.shippingaddress);
+					cmd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
+					int transactionId = (int)cmd.ExecuteScalar();
+					if (otransactionRq.itemdetailslist.Count > 0)
+					{
+						foreach (var itemDetail in otransactionRq.itemdetailslist)
+						{
+							using (NpgsqlConnection connn = new NpgsqlConnection(this._connectionFactory))
+							{
+								connn.Open();
+								NpgsqlCommand cmdd = new NpgsqlCommand();
+								cmdd.Connection = connn;
+								cmdd.CommandType = CommandType.Text;
+								cmdd.CommandText = "INSERT INTO item_details (transaction_id, item, qty, unit, priceperunit, registeredphonenumber, invoicenumber, customername, invoicedate, typeofpay, paymentstatus) VALUES (@transaction_id, @item, @qty, @unit, @priceperunit, @registeredphonenumber, @invoicenumber, @customername, @invoicedate, @typeofpay, @paymentstatus)";
+								cmdd.Parameters.AddWithValue("@transaction_id", transactionId);
+								cmdd.Parameters.AddWithValue("@item", itemDetail.item);
+								cmdd.Parameters.AddWithValue("@qty", itemDetail.qty);
+								cmdd.Parameters.AddWithValue("@unit", itemDetail.unit);
+								cmdd.Parameters.AddWithValue("@priceperunit", itemDetail.priceperunit);
+								cmdd.Parameters.AddWithValue("@registeredphonenumber", otransactionRq.registeredphonenumber);
+								cmdd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
+								cmdd.Parameters.AddWithValue("@customername", otransactionRq.customername);
+								cmdd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
+								cmdd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
+								cmdd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
+								cmdd.ExecuteNonQuery();
+								otransactionrs.status = "SUCCESS";
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return otransactionrs;
+		}
+
+		public Int64 GetInvoiceNumberCountDLChallan(Int64 registeredphonenumber, string typeofpay)
+		{
+			Int64 invoicecount = 0;
+			try
+			{
+				
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT MAX(invoicenumber) FROM transactions WHERE typeofpay = '" + typeofpay + "' AND registeredphonenumber = " + registeredphonenumber + "";
+					object result = cmd.ExecuteScalar();
+					if (result != DBNull.Value)
+					{
+						invoicecount = Convert.ToInt64(result);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return invoicecount;
+		}
+
+		public void UpdateDlChallan(Int64 invoicenumber,Int64 registeredphonenumber)
+		{
+			try
+			{
+				try
+				{
+					using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+					{
+						conn.Open();
+						NpgsqlCommand cmd = new NpgsqlCommand();
+						cmd.Connection = conn;
+						cmd.CommandType = CommandType.Text;
+						cmd.CommandText = "UPDATE transactions SET showtransaction = 'DONT SHOW' WHERE invoicenumber = '" + invoicenumber + "' AND registeredphonenumber = " + registeredphonenumber + "";
+						cmd.ExecuteNonQuery();
+					}
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine(ex.Message);
+				}
+
+				try
+				{
+					using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+					{
+						conn.Open();
+						NpgsqlCommand cmd = new NpgsqlCommand();
+						cmd.Connection = conn;
+						cmd.CommandType = CommandType.Text;
+						cmd.CommandText = "UPDATE item_details SET showtransaction = 'DONT SHOW' WHERE invoicenumber = '" + invoicenumber + "' AND registeredphonenumber = " + registeredphonenumber + "";
+						cmd.ExecuteNonQuery();
+					}
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine(ex.Message);
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
 		}
 	}
 }
