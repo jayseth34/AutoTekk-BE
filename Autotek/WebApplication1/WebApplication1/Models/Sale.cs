@@ -116,6 +116,7 @@
 		public string status { get; set; }
 		public Int64 saleprice { get; set; }
 		public Int64 purchaseprice { get; set; }
+		public Int64 wholesaleprice { get; set; }
 		public Int64 remainingquantity { get; set; }
 
 		public GetItemTransactionsRs()
@@ -132,7 +133,7 @@
 		public string partyName { get; set; }
 		public DateTime invoicedate { get; set; }
 		public Int64 qty { get; set; }
-		public Int64 saleprice { get; set; }
+		public Int64 priceperunit { get; set; }
 		public string paymentstatus { get; set; }
 		public Int64 purchaseprice { get; set; }
 	}

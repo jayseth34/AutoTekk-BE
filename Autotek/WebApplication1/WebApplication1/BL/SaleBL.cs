@@ -51,7 +51,8 @@ namespace WebApplication1.BL
 		{
 			GetItemTransactionsRs oGetItemTransactionsRs = new GetItemTransactionsRs();
 			SaleDL saledl = new SaleDL(this.config);
-			oGetItemTransactionsRs = saledl.GetItemTransactions(oGetItemTransactionsRq);
+			oGetItemTransactionsRs.itemTransactionsList = saledl.GetItemTransactions(oGetItemTransactionsRq);
+			oGetItemTransactionsRs = saledl.GetItemHeaderDetails(oGetItemTransactionsRq, oGetItemTransactionsRs.itemTransactionsList);
 			return oGetItemTransactionsRs;
 		}
 		public async Task<GetTypeOfPayTransactionsRs> GetTypeOfPayTransactions(GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq)
@@ -64,7 +65,7 @@ namespace WebApplication1.BL
 			{
 				oGetTypeOfPayTransactionsRs.invoicenumbercount = saledl.GetInvoiceNumberCount(oGetTypeOfPayTransactionsRq);
 			}
-				return oGetTypeOfPayTransactionsRs;
+			return oGetTypeOfPayTransactionsRs;
 		}
 
 	}

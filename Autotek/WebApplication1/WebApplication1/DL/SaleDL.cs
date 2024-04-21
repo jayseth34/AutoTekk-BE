@@ -140,7 +140,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT distinct(tr.invoicenumber), tr.typeofpay, tr.invoicedate, tr.total, tr.balance, tr.phonenumber, pr.emailid, pr.billingaddress, pr.creditlimit, pr.gst FROM transactions tr join party pr ON tr.customername = pr.partyname" +
+					cmd.CommandText = "SELECT tr.invoicenumber, tr.typeofpay, tr.invoicedate, tr.total, tr.balance, tr.phonenumber, pr.emailid, pr.billingaddress, pr.creditlimit, pr.gst FROM transactions tr join party pr ON tr.customername = pr.partyname" +
 						" where tr.registeredphonenumber = " + oGetPartyTransactionsRq.registeredphonenumber + " AND " +
 						"tr.customername = '" + oGetPartyTransactionsRq.customername + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
@@ -250,7 +250,7 @@ namespace WebApplication1.DL
 			return oGetPartyTransactionDetailsRs;
 		}
 
-		public GetItemTransactionsRs GetItemTransactions(GetItemTransactionsRq oGetItemTransactionsRq)
+		public List<GetAllItemTransactionsList> GetItemTransactions(GetItemTransactionsRq oGetItemTransactionsRq)
 		{
 			GetItemTransactionsRs oGetItemTransactionsRs = new GetItemTransactionsRs();
 			try
@@ -261,8 +261,8 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT distinct(ide.invoicenumber), ide.typeofpay, ide.customername, ide.invoicedate, ide.qty, ide.priceperunit, ide.paymentstatus, it.remainingquantity, it.purchaseprice " +
-						"FROM item_details ide JOIN item it ON ide.item = it.itemname WHERE ide.registeredphonenumber = " + oGetItemTransactionsRq.registeredphonenumber + " and it.itemname = '" + oGetItemTransactionsRq.itemname + "'";
+					cmd.CommandText = "SELECT invoicenumber, typeofpay, customername, invoicedate, qty, priceperunit, paymentstatus " +
+						"FROM item_details WHERE registeredphonenumber = " + oGetItemTransactionsRq.registeredphonenumber + " and item = '" + oGetItemTransactionsRq.itemname + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -270,18 +270,14 @@ namespace WebApplication1.DL
 						{
 							while (reader.Read())
 							{
-								oGetItemTransactionsRs.saleprice = Convert.ToInt64(reader["priceperunit"]);
-								oGetItemTransactionsRs.remainingquantity = Convert.ToInt64(reader["remainingquantity"]);
-								oGetItemTransactionsRs.purchaseprice = Convert.ToInt64(reader["purchaseprice"]);
 								GetAllItemTransactionsList oGetAllItemTransactionsList = new GetAllItemTransactionsList();
 								oGetAllItemTransactionsList.invoicenumber = Convert.ToInt64(reader["invoicenumber"]);
 								oGetAllItemTransactionsList.typeofpay = Convert.ToString(reader["typeofpay"]);
 								oGetAllItemTransactionsList.partyName = Convert.ToString(reader["customername"]);
 								oGetAllItemTransactionsList.invoicedate = Convert.ToDateTime(reader["invoicedate"]);
 								oGetAllItemTransactionsList.qty = Convert.ToInt64(reader["qty"]);
-								oGetAllItemTransactionsList.saleprice = Convert.ToInt64(reader["priceperunit"]);
+								oGetAllItemTransactionsList.priceperunit = Convert.ToInt64(reader["priceperunit"]);
 								oGetAllItemTransactionsList.paymentstatus = Convert.ToString(reader["paymentstatus"]);
-								oGetAllItemTransactionsList.purchaseprice = Convert.ToInt64(reader["purchaseprice"]);
 								oGetItemTransactionsRs.itemTransactionsList.Add(oGetAllItemTransactionsList);
 							}
 							oGetItemTransactionsRs.status = "SUCCESS";
@@ -290,6 +286,50 @@ namespace WebApplication1.DL
 						{
 							oGetItemTransactionsRs.status = "FAILED";
 						}
+					}
+					else
+					{
+						oGetItemTransactionsRs.status = "No Recods Found";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oGetItemTransactionsRs.itemTransactionsList;
+		}
+
+		public GetItemTransactionsRs GetItemHeaderDetails(GetItemTransactionsRq oGetItemTransactionsRq, List<GetAllItemTransactionsList> oGetAllItemTransactionsList)
+		{
+			GetItemTransactionsRs oGetItemTransactionsRs = new GetItemTransactionsRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT saleprice, wholesaleprice, purchaseprice, remainingquantity from item WHERE registeredphonenumber = " + oGetItemTransactionsRq.registeredphonenumber + " and itemname = '" + oGetItemTransactionsRq.itemname + "'";
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+								oGetItemTransactionsRs.saleprice = Convert.ToInt64(reader["saleprice"]);
+								oGetItemTransactionsRs.wholesaleprice = Convert.ToInt64(reader["wholesaleprice"]);
+								oGetItemTransactionsRs.purchaseprice = Convert.ToInt64(reader["purchaseprice"]);
+								oGetItemTransactionsRs.remainingquantity = Convert.ToInt64(reader["remainingquantity"]);
+							}
+						}
+						catch(Exception ex)
+						{
+							Console.WriteLine(ex.Message);
+						}
+						oGetItemTransactionsRs.itemTransactionsList = oGetAllItemTransactionsList;
 					}
 					else
 					{
