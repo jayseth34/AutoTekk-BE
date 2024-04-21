@@ -153,7 +153,7 @@
 			typeofpaytransactionlist = new List<GetTypeOfPayTransactionsList>();
 		}
 		public List<GetTypeOfPayTransactionsList> typeofpaytransactionlist { get; set; }
-	}
+	} 
 
 	public class GetTypeOfPayTransactionsList
 	{
