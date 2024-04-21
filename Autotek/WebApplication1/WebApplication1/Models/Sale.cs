@@ -145,6 +145,7 @@
 	public class GetTypeOfPayTransactionsRs
 	{
 		public string status { get; set; }
+		public Int64 invoicenumbercount {  get; set; }
 		public GetTypeOfPayTransactionsRs()
 		{
 			typeofpaytransactionlist = new List<GetTypeOfPayTransactionsList>();

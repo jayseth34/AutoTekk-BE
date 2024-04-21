@@ -59,7 +59,12 @@ namespace WebApplication1.BL
 			GetTypeOfPayTransactionsRs oGetTypeOfPayTransactionsRs = new GetTypeOfPayTransactionsRs();
 			SaleDL saledl = new SaleDL(this.config);
 			oGetTypeOfPayTransactionsRs = saledl.GetTypeOfPayTransactions(oGetTypeOfPayTransactionsRq);
-			return oGetTypeOfPayTransactionsRs;
+			if (oGetTypeOfPayTransactionsRq.typeofpay == "SALE" || oGetTypeOfPayTransactionsRq.typeofpay == "ESTIMATION/ QUOTATION" || oGetTypeOfPayTransactionsRq.typeofpay == "PAYMENT IN" ||
+				oGetTypeOfPayTransactionsRq.typeofpay == "SALE ORDER" || oGetTypeOfPayTransactionsRq.typeofpay == "DELIVERY CHALLAN" || oGetTypeOfPayTransactionsRq.typeofpay == "SALE RETURN/ CR. NOTE")
+			{
+				oGetTypeOfPayTransactionsRs.invoicenumbercount = saledl.GetInvoiceNumberCount(oGetTypeOfPayTransactionsRq);
+			}
+				return oGetTypeOfPayTransactionsRs;
 		}
 
 	}

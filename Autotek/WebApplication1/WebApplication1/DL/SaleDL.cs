@@ -355,5 +355,31 @@ namespace WebApplication1.DL
 			}
 			return oGetTypeOfPayTransactionsRs;
 		}
+
+		public Int64 GetInvoiceNumberCount(GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq)
+		{
+			GetTypeOfPayTransactionsRs oGetTypeOfPayTransactionsRs = new GetTypeOfPayTransactionsRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT MAX(invoicenumber) FROM transactions WHERE typeofpay = '" + oGetTypeOfPayTransactionsRq.typeofpay + "' AND registeredphonenumber = " + oGetTypeOfPayTransactionsRq .registeredphonenumber + "" ;
+					object result = cmd.ExecuteScalar();
+					if (result != DBNull.Value)
+					{
+						oGetTypeOfPayTransactionsRs.invoicenumbercount = Convert.ToInt64(result);
+					}
+				}
+			}
+			catch(Exception ex)
+			{
+				Console.WriteLine (ex.Message);
+			}
+			return oGetTypeOfPayTransactionsRs.invoicenumbercount;
+		}
 	}
 }
