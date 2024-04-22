@@ -66,12 +66,6 @@ namespace WebApplication1.Models
 		public string status { get; set; }
 	}
 
-	public class GetPartyRq
-	{
-		public Int64 registeredPhoneNumber { get; set; }
-		public string partyName { get; set;}
-	}
-
 	public class GetPartyRs
 	{
 		public GetPartyRs()
@@ -110,11 +104,6 @@ namespace WebApplication1.Models
 		public Int64 partybalance { get; set; }
 	}
 
-	public class GetPartyListRq
-	{
-		public Int64 registeredPhoneNumber { get; set; }
-	}
-
 	public class GetPartyListRs
 	{
 		public GetPartyListRs()
@@ -130,11 +119,6 @@ namespace WebApplication1.Models
 		public Int64 partybalance { get; set; }
 	}
 
-	public class GetPartyGroupRq
-	{
-		public Int64 registeredPhoneNumber { get; set; }
-	}
-
 	public class GetPartyGroupRs
 	{
 		public string status { get; set; }
@@ -148,11 +132,6 @@ namespace WebApplication1.Models
 	{
 		public string partygroup { get; set; }
 		public Int64 partygroupcount { get; set; }
-	}
-	public class GetPartyByGroupRq
-	{
-		public string groupname { get; set; }
-		public Int64 registeredphonenumber { get; set; }
 	}
 
 	public class GetPartyByGroupRs

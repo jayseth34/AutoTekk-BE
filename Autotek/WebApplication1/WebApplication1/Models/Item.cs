@@ -34,11 +34,6 @@
 		public string status { get; set; }
 	}
 
-	public class GetItemListRq
-	{
-		public Int64 registeredphonenumber { get; set; }
-	}
-
 	public class GetItemListRs
 	{
 		public GetItemListRs()
@@ -52,12 +47,6 @@
 	{
 		public string itemname { get; set; }
 		public Int64 remainingquantity { get; set; }
-	}
-
-	public class GetItemRq
-	{
-		public Int64 registeredPhoneNumber { get; set; }
-		public string itemName { get; set; }
 	}
 
 	public class GetItemRs
@@ -98,11 +87,6 @@
 		public string _location { get; set; }
 	}
 
-	public class GetCategoryRq
-	{
-		public Int64 registeredPhoneNumber { get; set; }
-	}
-
 	public class GetCategoryRs
 	{
 		public string status { get; set; }
@@ -116,12 +100,6 @@
 	{
 		public string category { get; set; }
 		public Int64 categorycount { get; set; }
-	}
-
-	public class GetItemByCategoryRq
-	{
-		public string category { get; set; }
-		public Int64 registeredphonenumber { get; set; }
 	}
 
 	public class GetItemByCategoryRs

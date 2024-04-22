@@ -34,15 +34,15 @@ namespace WebApplication1.Controllers
 		}
 
 		[AllowAnonymous]
-		[HttpPost]
+		[HttpGet]
 		[Route("GetItemList")]
-		public async Task<ActionResult> GetItemList(GetItemListRq oGetItemListRq)
+		public async Task<ActionResult> GetItemList([FromQuery] Int64 registeredphonenumber)
 		{
 			GetItemListRs oGetItemListRs = new GetItemListRs();
 			if (ModelState.IsValid)
 			{
 				ItemBL itemBL = new ItemBL(this.config);
-				oGetItemListRs = await itemBL.GetItemList(oGetItemListRq);
+				oGetItemListRs = await itemBL.GetItemList(registeredphonenumber);
 				return Ok(oGetItemListRs);
 			}
 
@@ -50,15 +50,15 @@ namespace WebApplication1.Controllers
 		}
 
 		[AllowAnonymous]
-		[HttpPost]
+		[HttpGet]
 		[Route("GetItemDetails")]
-		public async Task<ActionResult> GetItemDetails(GetItemRq oGetItemRq)
+		public async Task<ActionResult> GetItemDetails([FromQuery] Int64 registeredPhoneNumber, [FromQuery] string itemName)
 		{
 			GetItemRs oGetItemRs = new GetItemRs();
 			if (ModelState.IsValid)
 			{
 				ItemBL itemBL = new ItemBL(this.config);
-				oGetItemRs = await itemBL.GetItemDetails(oGetItemRq);
+				oGetItemRs = await itemBL.GetItemDetails(registeredPhoneNumber, itemName);
 				return Ok(oGetItemRs);
 			}
 
@@ -66,15 +66,15 @@ namespace WebApplication1.Controllers
 		}
 
 		[AllowAnonymous]
-		[HttpPost]
+		[HttpGet]
 		[Route("GetCategory")]
-		public async Task<ActionResult> GetCategory(GetCategoryRq oGetCategoryRq)
+		public async Task<ActionResult> GetCategory(Int64 registeredPhoneNumber)
 		{
 			GetCategoryRs oGetCategoryRs = new GetCategoryRs();
 			if (ModelState.IsValid)
 			{
 				ItemBL itemBL = new ItemBL(this.config);
-				oGetCategoryRs = await itemBL.GetCategory(oGetCategoryRq);
+				oGetCategoryRs = await itemBL.GetCategory(registeredPhoneNumber);
 				return Ok(oGetCategoryRs);
 			}
 
@@ -82,15 +82,15 @@ namespace WebApplication1.Controllers
 		}
 
 		[AllowAnonymous]
-		[HttpPost]
+		[HttpGet]
 		[Route("GetItemByCategory")]
-		public async Task<ActionResult> GetItemByCategory(GetItemByCategoryRq oGetItemByCategoryRq)
+		public async Task<ActionResult> GetItemByCategory([FromQuery] Int64 registeredphonenumber, [FromQuery] string category)
 		{
 			GetItemByCategoryRs oGetItemByCategoryRs = new GetItemByCategoryRs();
 			if (ModelState.IsValid)
 			{
 				ItemBL itemBL = new ItemBL(this.config);
-				oGetItemByCategoryRs = await itemBL.GetItemByCategory(oGetItemByCategoryRq);
+				oGetItemByCategoryRs = await itemBL.GetItemByCategory(registeredphonenumber, category);
 				return Ok(oGetItemByCategoryRs);
 			}
 

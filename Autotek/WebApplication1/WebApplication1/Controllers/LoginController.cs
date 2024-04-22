@@ -67,15 +67,15 @@ namespace WebApplication1.Controllers
 		}
 
 		[AllowAnonymous]
-		[HttpPost]
+		[HttpGet]
 		[Route("GetPartyDetails")]
-		public async Task<ActionResult> GetPartyDetails(GetPartyRq ogetPartyRq)
+		public async Task<ActionResult> GetPartyDetails([FromQuery] Int64 registeredPhoneNumber, [FromQuery] string partyName)
 		{
 			GetPartyRs ogetPartyRs = new GetPartyRs();
 			if (ModelState.IsValid)
 			{
 				LoginBL loginBL = new LoginBL(this.config);
-				ogetPartyRs = await loginBL.GetPartyDetails(ogetPartyRq);
+				ogetPartyRs = await loginBL.GetPartyDetails(registeredPhoneNumber, partyName);
 				return Ok(ogetPartyRs);
 			}
 
@@ -83,15 +83,15 @@ namespace WebApplication1.Controllers
 		}
 
 		[AllowAnonymous]
-		[HttpPost]
+		[HttpGet]
 		[Route("GetPartyList")]
-		public async Task<ActionResult> GetPartyList(GetPartyListRq oGetPartyListRq)
+		public async Task<ActionResult> GetPartyList([FromQuery] Int64 registeredPhoneNumber)
 		{
 			GetPartyListRs oGetPartyListRs = new GetPartyListRs();
 			if (ModelState.IsValid)
 			{
 				LoginBL loginBL = new LoginBL(this.config);
-				oGetPartyListRs = await loginBL.GetPartyList(oGetPartyListRq);
+				oGetPartyListRs = await loginBL.GetPartyList(registeredPhoneNumber);
 				return Ok(oGetPartyListRs);
 			}
 
@@ -99,15 +99,15 @@ namespace WebApplication1.Controllers
 		}
 
 		[AllowAnonymous]
-		[HttpPost]
+		[HttpGet]
 		[Route("GetPartyGroup")]
-		public async Task<ActionResult> GetPartyGroup(GetPartyGroupRq oGetPartyGroupRq)
+		public async Task<ActionResult> GetPartyGroup([FromQuery] Int64 registeredPhoneNumber)
 		{
 			GetPartyGroupRs oGetPartyGroupRs = new GetPartyGroupRs();
 			if (ModelState.IsValid)
 			{
 				LoginBL loginBL = new LoginBL(this.config);
-				oGetPartyGroupRs = await loginBL.GetPartyGroup(oGetPartyGroupRq);
+				oGetPartyGroupRs = await loginBL.GetPartyGroup(registeredPhoneNumber);
 				return Ok(oGetPartyGroupRs);
 			}
 
@@ -115,15 +115,15 @@ namespace WebApplication1.Controllers
 		}
 
 		[AllowAnonymous]
-		[HttpPost]
+		[HttpGet]
 		[Route("GetPartyByGroup")]
-		public async Task<ActionResult> GetPartyByGroup(GetPartyByGroupRq oGetPartyByGroupRq)
+		public async Task<ActionResult> GetPartyByGroup([FromQuery] Int64 registeredphonenumber, [FromQuery] string groupname)
 		{
 			GetPartyByGroupRs oGetPartyByGroupRs = new GetPartyByGroupRs();
 			if (ModelState.IsValid)
 			{
 				LoginBL loginBL = new LoginBL(this.config);
-				oGetPartyByGroupRs = await loginBL.GetPartyByGroup(oGetPartyByGroupRq);
+				oGetPartyByGroupRs = await loginBL.GetPartyByGroup(registeredphonenumber, groupname);
 				return Ok(oGetPartyByGroupRs);
 			}
 

@@ -194,7 +194,7 @@ namespace WebApplication1.DL
 			return oitemRs;
 		}
 
-		public GetItemListRs GetItemList(GetItemListRq oGetItemListRq)
+		public GetItemListRs GetItemList(Int64 registeredphonenumber)
 		{
 			GetItemListRs oGetItemListRs = new GetItemListRs();
 			try
@@ -205,7 +205,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT itemname, remainingquantity from item where registeredphonenumber = " + oGetItemListRq.registeredphonenumber;
+					cmd.CommandText = "SELECT itemname, remainingquantity from item where registeredphonenumber = " + registeredphonenumber;
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -233,7 +233,7 @@ namespace WebApplication1.DL
 			return oGetItemListRs;
 		}
 
-		public GetItemRs GetItemDetails(GetItemRq oGetItemRq)
+		public GetItemRs GetItemDetails(Int64 registeredPhoneNumber, string itemName)
 		{
 			GetItemRs oGetItemRs = new GetItemRs();
 			try
@@ -245,8 +245,8 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT typeofpay, itemhsn, baseunit, secondaryunit, conversionrates, category, itemcode, saleprice, salewithorwithouttax, discountonsaleprice, percentageoramount, wholesaleprice, wholesalewithorwithouttax," +
-						"minimumwholesalequantity, purchaseprice, purchasewithorwithouttax, taxrate, openingquantity, remainingquantity, atprice, asofdate, minimumstocktomaintain, _location FROM item WHERE registeredphonenumber = " + oGetItemRq.registeredPhoneNumber + " AND itemname = '" +
-						oGetItemRq.itemName + "'";
+						"minimumwholesalequantity, purchaseprice, purchasewithorwithouttax, taxrate, openingquantity, remainingquantity, atprice, asofdate, minimumstocktomaintain, _location FROM item WHERE registeredphonenumber = " + registeredPhoneNumber + " AND itemname = '" +
+						itemName + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -301,7 +301,7 @@ namespace WebApplication1.DL
 			return oGetItemRs;
 		}
 
-		public GetCategoryRs GetCategory(GetCategoryRq oGetCategoryRq)
+		public GetCategoryRs GetCategory(Int64 registeredPhoneNumber)
 		{
 			GetCategoryRs oGetCategoryRs = new GetCategoryRs();
 			try
@@ -312,7 +312,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT category, COUNT(*) AS categorycount FROM item WHERE registeredphonenumber = " + oGetCategoryRq.registeredPhoneNumber + " GROUP BY category";
+					cmd.CommandText = "SELECT category, COUNT(*) AS categorycount FROM item WHERE registeredphonenumber = " + registeredPhoneNumber + " GROUP BY category";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -341,7 +341,7 @@ namespace WebApplication1.DL
 			return oGetCategoryRs;
 		}
 
-		public GetItemByCategoryRs GetItemByCategory(GetItemByCategoryRq oGetItemByCategoryRq)
+		public GetItemByCategoryRs GetItemByCategory(Int64 registeredphonenumber, string category)
 		{
 			GetItemByCategoryRs oGetItemByCategoryRs = new GetItemByCategoryRs();
 			try
@@ -352,7 +352,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT itemname, remainingquantity from item where registeredphonenumber = " + oGetItemByCategoryRq.registeredphonenumber + " AND category = '" + oGetItemByCategoryRq.category + "'";
+					cmd.CommandText = "SELECT itemname, remainingquantity from item where registeredphonenumber = " + registeredphonenumber + " AND category = '" + category + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -67,34 +68,34 @@ namespace WebApplication1.BL
 			return opartyRs;
 		}
 
-		public async Task<GetPartyRs> GetPartyDetails(GetPartyRq ogetPartyRq)
+		public async Task<GetPartyRs> GetPartyDetails(Int64 registeredPhoneNumber, string partyName)
 		{
 			GetPartyRs ogetPartyRs = new GetPartyRs();
 			LoginDL logindl = new LoginDL(this.config);
-			ogetPartyRs = logindl.GetPartyDetails(ogetPartyRq);
+			ogetPartyRs = logindl.GetPartyDetails(registeredPhoneNumber, partyName);
 			return ogetPartyRs;
 		}
 
-		public async Task<GetPartyListRs> GetPartyList(GetPartyListRq oGetPartyListRq)
+		public async Task<GetPartyListRs> GetPartyList(Int64 registeredPhoneNumber)
 		{
 			GetPartyListRs oGetPartyListRs = new GetPartyListRs();
 			LoginDL logindl = new LoginDL(this.config);
-			oGetPartyListRs = logindl.GetPartyList(oGetPartyListRq);
+			oGetPartyListRs = logindl.GetPartyList(registeredPhoneNumber);
 			return oGetPartyListRs;
 		}
-		public async Task<GetPartyGroupRs> GetPartyGroup(GetPartyGroupRq oGetPartyGroupRq)
+		public async Task<GetPartyGroupRs> GetPartyGroup(Int64 registeredPhoneNumber)
 		{
 			GetPartyGroupRs oGetPartyGroupRs = new GetPartyGroupRs();
 			LoginDL logindl = new LoginDL(this.config);
-			oGetPartyGroupRs = logindl.GetPartyGroup(oGetPartyGroupRq);
+			oGetPartyGroupRs = logindl.GetPartyGroup(registeredPhoneNumber);
 			return oGetPartyGroupRs;
 		}
 
-		public async Task<GetPartyByGroupRs> GetPartyByGroup(GetPartyByGroupRq oGetPartyByGroupRq)
+		public async Task<GetPartyByGroupRs> GetPartyByGroup(Int64 registeredphonenumber, string groupname)
 		{
 			GetPartyByGroupRs oGetPartyByGroupRs = new GetPartyByGroupRs();
 			LoginDL logindl = new LoginDL(this.config);
-			oGetPartyByGroupRs = logindl.GetPartyByGroup(oGetPartyByGroupRq);
+			oGetPartyByGroupRs = logindl.GetPartyByGroup(registeredphonenumber, groupname);
 			return oGetPartyByGroupRs;
 		}
 

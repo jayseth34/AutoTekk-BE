@@ -309,7 +309,7 @@ namespace WebApplication1.DL
 			return opartyRs;
 		}
 
-		public GetPartyRs GetPartyDetails(GetPartyRq ogetPartyRq)
+		public GetPartyRs GetPartyDetails(Int64 registeredPhoneNumber, string partyName)
 		{
 			GetPartyRs ogetPartyRs = new GetPartyRs();
 			try
@@ -321,8 +321,8 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT gst, phonenumber, partygroup, gsttype, _state, emailid, billingaddress, shippingaddress, openingbalance, asofdate, creditlimit," +
-						"additionalfieldname1, additionalfieldname2, additionalfieldname3, additionalfieldname4, typeofpay, topayorreceive, partybalance, additionalfieldname1value, additionalfieldname2value, additionalfieldname3value, additionalfieldname4value FROM party WHERE registeredphonenumber = " + ogetPartyRq.registeredPhoneNumber + " AND partyname = '" +
-						ogetPartyRq.partyName + "'";
+						"additionalfieldname1, additionalfieldname2, additionalfieldname3, additionalfieldname4, typeofpay, topayorreceive, partybalance, additionalfieldname1value, additionalfieldname2value, additionalfieldname3value, additionalfieldname4value FROM party WHERE registeredphonenumber = " + registeredPhoneNumber + " AND partyname = '" +
+						partyName + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if(reader.HasRows)
 					{
@@ -376,7 +376,7 @@ namespace WebApplication1.DL
 			return ogetPartyRs;
 		}
 
-		public GetPartyListRs GetPartyList(GetPartyListRq oGetPartyListRq)
+		public GetPartyListRs GetPartyList(Int64 registeredPhoneNumber)
 		{
 			GetPartyListRs oGetPartyListRs = new GetPartyListRs();
 			try
@@ -387,7 +387,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT partyname, partybalance from party where registeredphonenumber = " + oGetPartyListRq.registeredPhoneNumber ;
+					cmd.CommandText = "SELECT partyname, partybalance from party where registeredphonenumber = " + registeredPhoneNumber ;
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -414,7 +414,7 @@ namespace WebApplication1.DL
 			}
 			return oGetPartyListRs;
 		}
-		public GetPartyGroupRs GetPartyGroup(GetPartyGroupRq oGetPartyGroupRq)
+		public GetPartyGroupRs GetPartyGroup(Int64 registeredPhoneNumber)
 		{
 			GetPartyGroupRs oGetPartyGroupRs = new GetPartyGroupRs();
 			try
@@ -425,7 +425,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT partygroup, COUNT(*) AS partygroup_count FROM party WHERE registeredphonenumber = " + oGetPartyGroupRq.registeredPhoneNumber + " GROUP BY partygroup";
+					cmd.CommandText = "SELECT partygroup, COUNT(*) AS partygroup_count FROM party WHERE registeredphonenumber = " + registeredPhoneNumber + " GROUP BY partygroup";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -454,7 +454,7 @@ namespace WebApplication1.DL
 			return oGetPartyGroupRs;
 		}
 
-		public GetPartyByGroupRs GetPartyByGroup(GetPartyByGroupRq oGetPartyByGroupRq)
+		public GetPartyByGroupRs GetPartyByGroup(Int64 registeredphonenumber, string groupname)
 		{
 			GetPartyByGroupRs oGetPartyByGroupRs = new GetPartyByGroupRs();
 			try
@@ -465,7 +465,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT partyname, partybalance from party where registeredphonenumber = " + oGetPartyByGroupRq.registeredphonenumber + " AND partygroup = '" + oGetPartyByGroupRq.groupname + "'";
+					cmd.CommandText = "SELECT partyname, partybalance from party where registeredphonenumber = " + registeredphonenumber + " AND partygroup = '" + groupname + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{

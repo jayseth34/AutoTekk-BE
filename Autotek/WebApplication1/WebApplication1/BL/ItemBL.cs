@@ -1,4 +1,5 @@
-﻿using WebApplication1.DL;
+﻿using Microsoft.AspNetCore.Mvc;
+using WebApplication1.DL;
 using WebApplication1.Models;
 
 namespace WebApplication1.BL
@@ -21,35 +22,35 @@ namespace WebApplication1.BL
 			return oitemRs;
 		}
 
-		public async Task<GetItemListRs> GetItemList(GetItemListRq oGetItemListRq)
+		public async Task<GetItemListRs> GetItemList(Int64 registeredphonenumber)
 		{
 			GetItemListRs oGetItemListRs = new GetItemListRs();
 			ItemDL itemDL = new ItemDL(this.config);
-			oGetItemListRs = itemDL.GetItemList(oGetItemListRq);
+			oGetItemListRs = itemDL.GetItemList(registeredphonenumber);
 			return oGetItemListRs;
 		}
 
-		public async Task<GetItemRs> GetItemDetails(GetItemRq oGetItemRq)
+		public async Task<GetItemRs> GetItemDetails(Int64 registeredPhoneNumber, string itemName)
 		{
 			GetItemRs oGetItemRs = new GetItemRs();
 			ItemDL itemDL = new ItemDL(this.config);
-			oGetItemRs = itemDL.GetItemDetails(oGetItemRq);
+			oGetItemRs = itemDL.GetItemDetails(registeredPhoneNumber, itemName);
 			return oGetItemRs;
 		}
 
-		public async Task<GetCategoryRs> GetCategory(GetCategoryRq oGetCategoryRq)
+		public async Task<GetCategoryRs> GetCategory(Int64 registeredPhoneNumber)
 		{
 			GetCategoryRs oGetCategoryRs = new GetCategoryRs();
 			ItemDL itemDL = new ItemDL(this.config);
-			oGetCategoryRs = itemDL.GetCategory(oGetCategoryRq);
+			oGetCategoryRs = itemDL.GetCategory(registeredPhoneNumber);
 			return oGetCategoryRs;
 		}
 
-		public async Task<GetItemByCategoryRs> GetItemByCategory(GetItemByCategoryRq oGetItemByCategoryRq)
+		public async Task<GetItemByCategoryRs> GetItemByCategory(Int64 registeredphonenumber, string category)
 		{
 			GetItemByCategoryRs oGetItemByCategoryRs = new GetItemByCategoryRs();
 			ItemDL itemDL = new ItemDL(this.config);
-			oGetItemByCategoryRs = itemDL.GetItemByCategory(oGetItemByCategoryRq);
+			oGetItemByCategoryRs = itemDL.GetItemByCategory(registeredphonenumber, category);
 			return oGetItemByCategoryRs;
 		}
 		public async Task<AddUpdateCategoryRs> AddUpdateCategory(AddUpdateCategoryRq oAddUpdateCategoryRq)
