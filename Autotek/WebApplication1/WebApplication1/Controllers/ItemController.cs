@@ -52,13 +52,13 @@ namespace WebApplication1.Controllers
 		[AllowAnonymous]
 		[HttpGet]
 		[Route("GetItemDetails")]
-		public async Task<ActionResult> GetItemDetails([FromQuery] Int64 registeredphonenumber, [FromQuery] string itemname)
+		public async Task<ActionResult> GetItemDetails([FromQuery] Int64 registeredPhoneNumber, [FromQuery] string itemName)
 		{
 			GetItemRs oGetItemRs = new GetItemRs();
 			if (ModelState.IsValid)
 			{
 				ItemBL itemBL = new ItemBL(this.config);
-				oGetItemRs = await itemBL.GetItemDetails(registeredphonenumber, itemname);
+				oGetItemRs = await itemBL.GetItemDetails(registeredPhoneNumber, itemName);
 				return Ok(oGetItemRs);
 			}
 
@@ -67,15 +67,15 @@ namespace WebApplication1.Controllers
 
 		[AllowAnonymous]
 		[HttpGet]
-		[Route("Getcategory")]
-		public async Task<ActionResult> Getcategory(Int64 registeredphonenumber)
+		[Route("GetCategory")]
+		public async Task<ActionResult> GetCategory(Int64 registeredPhoneNumber)
 		{
-			GetcategoryRs oGetcategoryRs = new GetcategoryRs();
+			GetCategoryRs oGetCategoryRs = new GetCategoryRs();
 			if (ModelState.IsValid)
 			{
 				ItemBL itemBL = new ItemBL(this.config);
-				oGetcategoryRs = await itemBL.Getcategory(registeredphonenumber);
-				return Ok(oGetcategoryRs);
+				oGetCategoryRs = await itemBL.GetCategory(registeredPhoneNumber);
+				return Ok(oGetCategoryRs);
 			}
 
 			return BadRequest("Please Provide Valid Details");
@@ -83,15 +83,15 @@ namespace WebApplication1.Controllers
 
 		[AllowAnonymous]
 		[HttpGet]
-		[Route("GetItemBycategory")]
-		public async Task<ActionResult> GetItemBycategory([FromQuery] Int64 registeredphonenumber, [FromQuery] string category)
+		[Route("GetItemByCategory")]
+		public async Task<ActionResult> GetItemByCategory([FromQuery] Int64 registeredphonenumber, [FromQuery] string category)
 		{
-			GetItemBycategoryRs oGetItemBycategoryRs = new GetItemBycategoryRs();
+			GetItemByCategoryRs oGetItemByCategoryRs = new GetItemByCategoryRs();
 			if (ModelState.IsValid)
 			{
 				ItemBL itemBL = new ItemBL(this.config);
-				oGetItemBycategoryRs = await itemBL.GetItemBycategory(registeredphonenumber, category);
-				return Ok(oGetItemBycategoryRs);
+				oGetItemByCategoryRs = await itemBL.GetItemByCategory(registeredphonenumber, category);
+				return Ok(oGetItemByCategoryRs);
 			}
 
 			return BadRequest("Please Provide Valid Details");
@@ -99,15 +99,15 @@ namespace WebApplication1.Controllers
 
 		[AllowAnonymous]
 		[HttpPost]
-		[Route("AddUpdatecategory")]
-		public async Task<ActionResult> AddUpdatecategory(AddUpdatecategoryRq oAddUpdatecategoryRq)
+		[Route("AddUpdateCategory")]
+		public async Task<ActionResult> AddUpdateCategory(AddUpdateCategoryRq oAddUpdateCategoryRq)
 		{
-			AddUpdatecategoryRs oAddUpdatecategoryRs = new AddUpdatecategoryRs();
+			AddUpdateCategoryRs oAddUpdateCategoryRs = new AddUpdateCategoryRs();
 			if (ModelState.IsValid)
 			{
 				ItemBL itemBL = new ItemBL(this.config);
-				oAddUpdatecategoryRs = await itemBL.AddUpdatecategory(oAddUpdatecategoryRq);
-				return Ok(oAddUpdatecategoryRs);
+				oAddUpdateCategoryRs = await itemBL.AddUpdateCategory(oAddUpdateCategoryRq);
+				return Ok(oAddUpdateCategoryRs);
 			}
 
 			return BadRequest("Please Provide Valid Details");

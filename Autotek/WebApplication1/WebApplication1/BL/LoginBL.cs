@@ -68,27 +68,27 @@ namespace WebApplication1.BL
 			return opartyRs;
 		}
 
-		public async Task<GetPartyRs> GetPartyDetails(Int64 registeredphonenumber, string partyname)
+		public async Task<GetPartyRs> GetPartyDetails(Int64 registeredPhoneNumber, string partyName)
 		{
 			GetPartyRs ogetPartyRs = new GetPartyRs();
 			LoginDL logindl = new LoginDL(this.config);
-			ogetPartyRs = logindl.GetPartyDetails(registeredphonenumber, partyname);
+			ogetPartyRs = logindl.GetPartyDetails(registeredPhoneNumber, partyName);
 			return ogetPartyRs;
 		}
 
-		public async Task<GetPartyListRs> GetPartyList(Int64 registeredphonenumber)
+		public async Task<GetPartyListRs> GetPartyList(Int64 registeredPhoneNumber)
 		{
 			GetPartyListRs oGetPartyListRs = new GetPartyListRs();
 			LoginDL logindl = new LoginDL(this.config);
-			oGetPartyListRs = logindl.GetPartyList(registeredphonenumber);
+			oGetPartyListRs = logindl.GetPartyList(registeredPhoneNumber);
 			return oGetPartyListRs;
 		}
-		public async Task<GetpartygroupRs> Getpartygroup(Int64 registeredphonenumber)
+		public async Task<GetPartyGroupRs> GetPartyGroup(Int64 registeredPhoneNumber)
 		{
-			GetpartygroupRs oGetpartygroupRs = new GetpartygroupRs();
+			GetPartyGroupRs oGetPartyGroupRs = new GetPartyGroupRs();
 			LoginDL logindl = new LoginDL(this.config);
-			oGetpartygroupRs = logindl.Getpartygroup(registeredphonenumber);
-			return oGetpartygroupRs;
+			oGetPartyGroupRs = logindl.GetPartyGroup(registeredPhoneNumber);
+			return oGetPartyGroupRs;
 		}
 
 		public async Task<GetPartyByGroupRs> GetPartyByGroup(Int64 registeredphonenumber, string groupname)
@@ -99,11 +99,11 @@ namespace WebApplication1.BL
 			return oGetPartyByGroupRs;
 		}
 
-		public async Task<AddUpdatePartyGropRs> AddUpdatepartygroup(AddUpdatePartyGropRq oAddUpdatePartyGropRq)
+		public async Task<AddUpdatePartyGropRs> AddUpdatePartyGroup(AddUpdatePartyGropRq oAddUpdatePartyGropRq)
 		{
 			AddUpdatePartyGropRs oAddUpdatePartyGropRs = new AddUpdatePartyGropRs();
 			LoginDL logindl = new LoginDL(this.config);
-			oAddUpdatePartyGropRs = logindl.AddUpdatepartygroup(oAddUpdatePartyGropRq);
+			oAddUpdatePartyGropRs = logindl.AddUpdatePartyGroup(oAddUpdatePartyGropRq);
 			return oAddUpdatePartyGropRs;
 		}
 	}
