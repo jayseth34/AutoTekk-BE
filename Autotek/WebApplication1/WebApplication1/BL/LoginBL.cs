@@ -68,26 +68,26 @@ namespace WebApplication1.BL
 			return opartyRs;
 		}
 
-		public async Task<GetPartyRs> GetPartyDetails(Int64 registeredPhoneNumber, string partyName)
+		public async Task<GetPartyRs> GetPartyDetails(Int64 registeredphonenumber, string partyName)
 		{
 			GetPartyRs ogetPartyRs = new GetPartyRs();
 			LoginDL logindl = new LoginDL(this.config);
-			ogetPartyRs = logindl.GetPartyDetails(registeredPhoneNumber, partyName);
+			ogetPartyRs = logindl.GetPartyDetails(registeredphonenumber, partyName);
 			return ogetPartyRs;
 		}
 
-		public async Task<GetPartyListRs> GetPartyList(Int64 registeredPhoneNumber)
+		public async Task<GetPartyListRs> GetPartyList(Int64 registeredphonenumber)
 		{
 			GetPartyListRs oGetPartyListRs = new GetPartyListRs();
 			LoginDL logindl = new LoginDL(this.config);
-			oGetPartyListRs = logindl.GetPartyList(registeredPhoneNumber);
+			oGetPartyListRs = logindl.GetPartyList(registeredphonenumber);
 			return oGetPartyListRs;
 		}
-		public async Task<GetPartyGroupRs> GetPartyGroup(Int64 registeredPhoneNumber)
+		public async Task<GetPartyGroupRs> GetPartyGroup(Int64 registeredphonenumber)
 		{
 			GetPartyGroupRs oGetPartyGroupRs = new GetPartyGroupRs();
 			LoginDL logindl = new LoginDL(this.config);
-			oGetPartyGroupRs = logindl.GetPartyGroup(registeredPhoneNumber);
+			oGetPartyGroupRs = logindl.GetPartyGroup(registeredphonenumber);
 			return oGetPartyGroupRs;
 		}
 

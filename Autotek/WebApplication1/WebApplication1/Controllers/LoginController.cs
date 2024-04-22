@@ -69,13 +69,13 @@ namespace WebApplication1.Controllers
 		[AllowAnonymous]
 		[HttpGet]
 		[Route("GetPartyDetails")]
-		public async Task<ActionResult> GetPartyDetails([FromQuery] Int64 registeredPhoneNumber, [FromQuery] string partyName)
+		public async Task<ActionResult> GetPartyDetails([FromQuery] Int64 registeredphonenumber, [FromQuery] string partyName)
 		{
 			GetPartyRs ogetPartyRs = new GetPartyRs();
 			if (ModelState.IsValid)
 			{
 				LoginBL loginBL = new LoginBL(this.config);
-				ogetPartyRs = await loginBL.GetPartyDetails(registeredPhoneNumber, partyName);
+				ogetPartyRs = await loginBL.GetPartyDetails(registeredphonenumber, partyName);
 				return Ok(ogetPartyRs);
 			}
 
@@ -85,13 +85,13 @@ namespace WebApplication1.Controllers
 		[AllowAnonymous]
 		[HttpGet]
 		[Route("GetPartyList")]
-		public async Task<ActionResult> GetPartyList([FromQuery] Int64 registeredPhoneNumber)
+		public async Task<ActionResult> GetPartyList([FromQuery] Int64 registeredphonenumber)
 		{
 			GetPartyListRs oGetPartyListRs = new GetPartyListRs();
 			if (ModelState.IsValid)
 			{
 				LoginBL loginBL = new LoginBL(this.config);
-				oGetPartyListRs = await loginBL.GetPartyList(registeredPhoneNumber);
+				oGetPartyListRs = await loginBL.GetPartyList(registeredphonenumber);
 				return Ok(oGetPartyListRs);
 			}
 
@@ -101,13 +101,13 @@ namespace WebApplication1.Controllers
 		[AllowAnonymous]
 		[HttpGet]
 		[Route("GetPartyGroup")]
-		public async Task<ActionResult> GetPartyGroup([FromQuery] Int64 registeredPhoneNumber)
+		public async Task<ActionResult> GetPartyGroup([FromQuery] Int64 registeredphonenumber)
 		{
 			GetPartyGroupRs oGetPartyGroupRs = new GetPartyGroupRs();
 			if (ModelState.IsValid)
 			{
 				LoginBL loginBL = new LoginBL(this.config);
-				oGetPartyGroupRs = await loginBL.GetPartyGroup(registeredPhoneNumber);
+				oGetPartyGroupRs = await loginBL.GetPartyGroup(registeredphonenumber);
 				return Ok(oGetPartyGroupRs);
 			}
 

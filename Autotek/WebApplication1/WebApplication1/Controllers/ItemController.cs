@@ -52,13 +52,13 @@ namespace WebApplication1.Controllers
 		[AllowAnonymous]
 		[HttpGet]
 		[Route("GetItemDetails")]
-		public async Task<ActionResult> GetItemDetails([FromQuery] Int64 registeredPhoneNumber, [FromQuery] string itemName)
+		public async Task<ActionResult> GetItemDetails([FromQuery] Int64 registeredphonenumber, [FromQuery] string itemname)
 		{
 			GetItemRs oGetItemRs = new GetItemRs();
 			if (ModelState.IsValid)
 			{
 				ItemBL itemBL = new ItemBL(this.config);
-				oGetItemRs = await itemBL.GetItemDetails(registeredPhoneNumber, itemName);
+				oGetItemRs = await itemBL.GetItemDetails(registeredphonenumber, itemname);
 				return Ok(oGetItemRs);
 			}
 
@@ -68,13 +68,13 @@ namespace WebApplication1.Controllers
 		[AllowAnonymous]
 		[HttpGet]
 		[Route("GetCategory")]
-		public async Task<ActionResult> GetCategory(Int64 registeredPhoneNumber)
+		public async Task<ActionResult> GetCategory(Int64 registeredphonenumber)
 		{
 			GetCategoryRs oGetCategoryRs = new GetCategoryRs();
 			if (ModelState.IsValid)
 			{
 				ItemBL itemBL = new ItemBL(this.config);
-				oGetCategoryRs = await itemBL.GetCategory(registeredPhoneNumber);
+				oGetCategoryRs = await itemBL.GetCategory(registeredphonenumber);
 				return Ok(oGetCategoryRs);
 			}
 

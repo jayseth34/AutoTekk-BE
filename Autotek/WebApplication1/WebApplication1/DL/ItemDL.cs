@@ -233,7 +233,7 @@ namespace WebApplication1.DL
 			return oGetItemListRs;
 		}
 
-		public GetItemRs GetItemDetails(Int64 registeredPhoneNumber, string itemName)
+		public GetItemRs GetItemDetails(Int64 registeredphonenumber, string itemname)
 		{
 			GetItemRs oGetItemRs = new GetItemRs();
 			try
@@ -245,8 +245,8 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT typeofpay, itemhsn, baseunit, secondaryunit, conversionrates, category, itemcode, saleprice, salewithorwithouttax, discountonsaleprice, percentageoramount, wholesaleprice, wholesalewithorwithouttax," +
-						"minimumwholesalequantity, purchaseprice, purchasewithorwithouttax, taxrate, openingquantity, remainingquantity, atprice, asofdate, minimumstocktomaintain, _location FROM item WHERE registeredphonenumber = " + registeredPhoneNumber + " AND itemname = '" +
-						itemName + "'";
+						"minimumwholesalequantity, purchaseprice, purchasewithorwithouttax, taxrate, openingquantity, remainingquantity, atprice, asofdate, minimumstocktomaintain, _location FROM item WHERE registeredphonenumber = " + registeredphonenumber + " AND itemname = '" +
+						itemname + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -301,7 +301,7 @@ namespace WebApplication1.DL
 			return oGetItemRs;
 		}
 
-		public GetCategoryRs GetCategory(Int64 registeredPhoneNumber)
+		public GetCategoryRs GetCategory(Int64 registeredphonenumber)
 		{
 			GetCategoryRs oGetCategoryRs = new GetCategoryRs();
 			try
@@ -312,7 +312,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT category, COUNT(*) AS categorycount FROM item WHERE registeredphonenumber = " + registeredPhoneNumber + " GROUP BY category";
+					cmd.CommandText = "SELECT category, COUNT(*) AS categorycount FROM item WHERE registeredphonenumber = " + registeredphonenumber + " GROUP BY category";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{

@@ -30,19 +30,19 @@ namespace WebApplication1.BL
 			return oGetItemListRs;
 		}
 
-		public async Task<GetItemRs> GetItemDetails(Int64 registeredPhoneNumber, string itemName)
+		public async Task<GetItemRs> GetItemDetails(Int64 registeredphonenumber, string itemname)
 		{
 			GetItemRs oGetItemRs = new GetItemRs();
 			ItemDL itemDL = new ItemDL(this.config);
-			oGetItemRs = itemDL.GetItemDetails(registeredPhoneNumber, itemName);
+			oGetItemRs = itemDL.GetItemDetails(registeredphonenumber, itemname);
 			return oGetItemRs;
 		}
 
-		public async Task<GetCategoryRs> GetCategory(Int64 registeredPhoneNumber)
+		public async Task<GetCategoryRs> GetCategory(Int64 registeredphonenumber)
 		{
 			GetCategoryRs oGetCategoryRs = new GetCategoryRs();
 			ItemDL itemDL = new ItemDL(this.config);
-			oGetCategoryRs = itemDL.GetCategory(registeredPhoneNumber);
+			oGetCategoryRs = itemDL.GetCategory(registeredphonenumber);
 			return oGetCategoryRs;
 		}
 
