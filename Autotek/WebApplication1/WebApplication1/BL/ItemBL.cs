@@ -30,35 +30,35 @@ namespace WebApplication1.BL
 			return oGetItemListRs;
 		}
 
-		public async Task<GetItemRs> GetItemDetails(Int64 registeredPhoneNumber, string itemName)
+		public async Task<GetItemRs> GetItemDetails(Int64 registeredphonenumber, string itemname)
 		{
 			GetItemRs oGetItemRs = new GetItemRs();
 			ItemDL itemDL = new ItemDL(this.config);
-			oGetItemRs = itemDL.GetItemDetails(registeredPhoneNumber, itemName);
+			oGetItemRs = itemDL.GetItemDetails(registeredphonenumber, itemname);
 			return oGetItemRs;
 		}
 
-		public async Task<GetCategoryRs> GetCategory(Int64 registeredPhoneNumber)
+		public async Task<GetcategoryRs> Getcategory(Int64 registeredphonenumber)
 		{
-			GetCategoryRs oGetCategoryRs = new GetCategoryRs();
+			GetcategoryRs oGetcategoryRs = new GetcategoryRs();
 			ItemDL itemDL = new ItemDL(this.config);
-			oGetCategoryRs = itemDL.GetCategory(registeredPhoneNumber);
-			return oGetCategoryRs;
+			oGetcategoryRs = itemDL.Getcategory(registeredphonenumber);
+			return oGetcategoryRs;
 		}
 
-		public async Task<GetItemByCategoryRs> GetItemByCategory(Int64 registeredphonenumber, string category)
+		public async Task<GetItemBycategoryRs> GetItemBycategory(Int64 registeredphonenumber, string category)
 		{
-			GetItemByCategoryRs oGetItemByCategoryRs = new GetItemByCategoryRs();
+			GetItemBycategoryRs oGetItemBycategoryRs = new GetItemBycategoryRs();
 			ItemDL itemDL = new ItemDL(this.config);
-			oGetItemByCategoryRs = itemDL.GetItemByCategory(registeredphonenumber, category);
-			return oGetItemByCategoryRs;
+			oGetItemBycategoryRs = itemDL.GetItemBycategory(registeredphonenumber, category);
+			return oGetItemBycategoryRs;
 		}
-		public async Task<AddUpdateCategoryRs> AddUpdateCategory(AddUpdateCategoryRq oAddUpdateCategoryRq)
+		public async Task<AddUpdatecategoryRs> AddUpdatecategory(AddUpdatecategoryRq oAddUpdatecategoryRq)
 		{
-			AddUpdateCategoryRs oAddUpdateCategoryRs = new AddUpdateCategoryRs();
+			AddUpdatecategoryRs oAddUpdatecategoryRs = new AddUpdatecategoryRs();
 			ItemDL itemDL = new ItemDL(this.config);
-			oAddUpdateCategoryRs = itemDL.AddUpdateCategory(oAddUpdateCategoryRq);
-			return oAddUpdateCategoryRs;
+			oAddUpdatecategoryRs = itemDL.AddUpdatecategory(oAddUpdatecategoryRq);
+			return oAddUpdatecategoryRs;
 		}
 	}
 }

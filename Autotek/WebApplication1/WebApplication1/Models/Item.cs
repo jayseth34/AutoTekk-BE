@@ -87,39 +87,39 @@
 		public string _location { get; set; }
 	}
 
-	public class GetCategoryRs
+	public class GetcategoryRs
 	{
 		public string status { get; set; }
-		public GetCategoryRs()
+		public GetcategoryRs()
 		{
-			getCateogoryList = new List<GetCategoryListtRs>();
+			getCateogoryList = new List<GetcategoryListtRs>();
 		}
-		public List<GetCategoryListtRs> getCateogoryList { get; set; }
+		public List<GetcategoryListtRs> getCateogoryList { get; set; }
 	}
-	public class GetCategoryListtRs
+	public class GetcategoryListtRs
 	{
 		public string category { get; set; }
 		public Int64 categorycount { get; set; }
 	}
 
-	public class GetItemByCategoryRs
+	public class GetItemBycategoryRs
 	{
 		public string status { get; set; }
-		public GetItemByCategoryRs()
+		public GetItemBycategoryRs()
 		{
 			getItemList = new List<GetItemList>();
 		}
 		public List<GetItemList> getItemList { get; set; }
 	}
 
-	public class AddUpdateCategoryRq
+	public class AddUpdatecategoryRq
 	{
 		public Int64 registeredphonenumber { get; set; }
 		public string newcategory { get; set; }
 		public string oldcategory { get; set; }
 	}
 
-	public class AddUpdateCategoryRs
+	public class AddUpdatecategoryRs
 	{
 		public string status { get; set; }
 	}

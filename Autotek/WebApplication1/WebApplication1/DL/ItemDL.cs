@@ -233,7 +233,7 @@ namespace WebApplication1.DL
 			return oGetItemListRs;
 		}
 
-		public GetItemRs GetItemDetails(Int64 registeredPhoneNumber, string itemName)
+		public GetItemRs GetItemDetails(Int64 registeredphonenumber, string itemname)
 		{
 			GetItemRs oGetItemRs = new GetItemRs();
 			try
@@ -245,8 +245,8 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT typeofpay, itemhsn, baseunit, secondaryunit, conversionrates, category, itemcode, saleprice, salewithorwithouttax, discountonsaleprice, percentageoramount, wholesaleprice, wholesalewithorwithouttax," +
-						"minimumwholesalequantity, purchaseprice, purchasewithorwithouttax, taxrate, openingquantity, remainingquantity, atprice, asofdate, minimumstocktomaintain, _location FROM item WHERE registeredphonenumber = " + registeredPhoneNumber + " AND itemname = '" +
-						itemName + "'";
+						"minimumwholesalequantity, purchaseprice, purchasewithorwithouttax, taxrate, openingquantity, remainingquantity, atprice, asofdate, minimumstocktomaintain, _location FROM item WHERE registeredphonenumber = " + registeredphonenumber + " AND itemname = '" +
+						itemname + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -301,9 +301,9 @@ namespace WebApplication1.DL
 			return oGetItemRs;
 		}
 
-		public GetCategoryRs GetCategory(Int64 registeredPhoneNumber)
+		public GetcategoryRs Getcategory(Int64 registeredphonenumber)
 		{
-			GetCategoryRs oGetCategoryRs = new GetCategoryRs();
+			GetcategoryRs oGetcategoryRs = new GetcategoryRs();
 			try
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
@@ -312,7 +312,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT category, COUNT(*) AS categorycount FROM item WHERE registeredphonenumber = " + registeredPhoneNumber + " GROUP BY category";
+					cmd.CommandText = "SELECT category, COUNT(*) AS categorycount FROM item WHERE registeredphonenumber = " + registeredphonenumber + " GROUP BY category";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -320,12 +320,12 @@ namespace WebApplication1.DL
 						{
 							while (reader.Read())
 							{
-								GetCategoryListtRs oGetCategoryListtRs = new GetCategoryListtRs();
-								oGetCategoryListtRs.category = Convert.ToString(reader["category"]);
-								oGetCategoryListtRs.categorycount = Convert.ToInt64(reader["categorycount"]);
-								oGetCategoryRs.getCateogoryList.Add(oGetCategoryListtRs);
+								GetcategoryListtRs oGetcategoryListtRs = new GetcategoryListtRs();
+								oGetcategoryListtRs.category = Convert.ToString(reader["category"]);
+								oGetcategoryListtRs.categorycount = Convert.ToInt64(reader["categorycount"]);
+								oGetcategoryRs.getCateogoryList.Add(oGetcategoryListtRs);
 							}
-							oGetCategoryRs.status = "SUCCESS";
+							oGetcategoryRs.status = "SUCCESS";
 						}
 						catch (Exception ex)
 						{
@@ -338,12 +338,12 @@ namespace WebApplication1.DL
 			{
 				Console.WriteLine(ex.Message);
 			}
-			return oGetCategoryRs;
+			return oGetcategoryRs;
 		}
 
-		public GetItemByCategoryRs GetItemByCategory(Int64 registeredphonenumber, string category)
+		public GetItemBycategoryRs GetItemBycategory(Int64 registeredphonenumber, string category)
 		{
-			GetItemByCategoryRs oGetItemByCategoryRs = new GetItemByCategoryRs();
+			GetItemBycategoryRs oGetItemBycategoryRs = new GetItemBycategoryRs();
 			try
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
@@ -363,9 +363,9 @@ namespace WebApplication1.DL
 								GetItemList oGetItemList = new GetItemList();
 								oGetItemList.itemname = Convert.ToString(reader["itemname"]);
 								oGetItemList.remainingquantity = Convert.ToInt64(reader["remainingquantity"]);
-								oGetItemByCategoryRs.getItemList.Add(oGetItemList);
+								oGetItemBycategoryRs.getItemList.Add(oGetItemList);
 							}
-							oGetItemByCategoryRs.status = "SUCCESS";
+							oGetItemBycategoryRs.status = "SUCCESS";
 						}
 						catch (Exception ex)
 						{
@@ -378,12 +378,12 @@ namespace WebApplication1.DL
 			{
 				Console.WriteLine(ex.Message);
 			}
-			return oGetItemByCategoryRs;
+			return oGetItemBycategoryRs;
 		}
 
-		public AddUpdateCategoryRs AddUpdateCategory(AddUpdateCategoryRq oAddUpdateCategoryRq)
+		public AddUpdatecategoryRs AddUpdatecategory(AddUpdatecategoryRq oAddUpdatecategoryRq)
 		{
-			AddUpdateCategoryRs oAddUpdateCategoryRs = new AddUpdateCategoryRs();
+			AddUpdatecategoryRs oAddUpdatecategoryRs = new AddUpdatecategoryRs();
 			string outputResult = string.Empty;
 			try
 			{
@@ -394,9 +394,9 @@ namespace WebApplication1.DL
 					using (NpgsqlCommand cmd = new NpgsqlCommand("sp_addupdatecategory", conn))
 					{
 						cmd.CommandType = CommandType.StoredProcedure;
-						cmd.Parameters.AddWithValue("v_oldcategory", NpgsqlDbType.Varchar).Value = oAddUpdateCategoryRq.oldcategory;
-						cmd.Parameters.AddWithValue("v_newcategory", NpgsqlDbType.Varchar).Value = oAddUpdateCategoryRq.newcategory;
-						cmd.Parameters.AddWithValue("v_registeredphonenumber", NpgsqlDbType.Numeric).Value = oAddUpdateCategoryRq.registeredphonenumber;
+						cmd.Parameters.AddWithValue("v_oldcategory", NpgsqlDbType.Varchar).Value = oAddUpdatecategoryRq.oldcategory;
+						cmd.Parameters.AddWithValue("v_newcategory", NpgsqlDbType.Varchar).Value = oAddUpdatecategoryRq.newcategory;
+						cmd.Parameters.AddWithValue("v_registeredphonenumber", NpgsqlDbType.Numeric).Value = oAddUpdatecategoryRq.registeredphonenumber;
 						var outputParameter = new NpgsqlParameter("output_result", NpgsqlDbType.Varchar);
 						outputParameter.Direction = ParameterDirection.Output;
 						cmd.Parameters.Add(outputParameter);
@@ -404,13 +404,13 @@ namespace WebApplication1.DL
 						outputResult = cmd.Parameters["output_result"].Value.ToString();
 					}
 				}
-				oAddUpdateCategoryRs.status = outputResult;
+				oAddUpdatecategoryRs.status = outputResult;
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex.Message);
 			}
-			return oAddUpdateCategoryRs;
+			return oAddUpdatecategoryRs;
 		}
 	}
 }

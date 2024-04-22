@@ -36,11 +36,11 @@ namespace WebApplication1.Models
 	public class PartyRq
 	{
 		public string typeofpay { get; set; }
-		public Int64? registeredPhoneNumber { get; set; }
-		public string? partyName { get; set; }
+		public Int64? registeredphonenumber { get; set; }
+		public string? partyname { get; set; }
 		public string? GST { get; set; } = "";
 		public Int64 phoneNumber { get; set;}
-		public string? partyGroup { get; set; }
+		public string? partygroup { get; set; }
 		public string? gstType { get; set; }
 		public string? _state { get; set;}
 		public string? emailId { get; set; }
@@ -82,7 +82,7 @@ namespace WebApplication1.Models
 	{
 		public string GST { get; set; }
 		public Int64 phoneNumber { get; set; }
-		public string partyGroup { get; set; }
+		public string partygroup { get; set; }
 		public string gstType { get; set; }
 		public string _state { get; set; }
 		public string emailId { get; set; }
@@ -119,16 +119,16 @@ namespace WebApplication1.Models
 		public Int64 partybalance { get; set; }
 	}
 
-	public class GetPartyGroupRs
+	public class GetpartygroupRs
 	{
 		public string status { get; set; }
-		public GetPartyGroupRs()
+		public GetpartygroupRs()
 		{
-			getPartyGroupList = new List<GetPartyGroupListtRs>();
+			getpartygroupList = new List<GetpartygroupListtRs>();
 		}
-		public List<GetPartyGroupListtRs> getPartyGroupList { get; set; }
+		public List<GetpartygroupListtRs> getpartygroupList { get; set; }
 	}
-	public class GetPartyGroupListtRs
+	public class GetpartygroupListtRs
 	{
 		public string partygroup { get; set; }
 		public Int64 partygroupcount { get; set; }
