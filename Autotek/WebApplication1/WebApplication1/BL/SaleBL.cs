@@ -25,9 +25,18 @@ namespace WebApplication1.BL
 			}
 			else
 			{
-				if(otransactionRq.isconverttosale && otransactionRq.typeofpay == "DELIVERY CHALLAN")
+				if(otransactionRq.isconvert && otransactionRq.isupdate && (otransactionRq.typeofpay == "SALE" || otransactionRq.typeofpay == "SALE ORDER"))
 				{
-					string typeofpay = "SALE";
+					string typeofpay = string.Empty;
+					if (otransactionRq.typeofpay == "SALE ORDER")
+					{
+						typeofpay = "SALE ORDER";
+					}
+					else if (otransactionRq.typeofpay == "SALE")
+					{
+						typeofpay = "SALE";
+					}
+					
 					result = saledl.FindOrInsertItem(otransactionRq);
 					Int64 invoicecount = saledl.GetInvoiceNumberCountDLChallan(otransactionRq.registeredphonenumber, typeofpay);
 					otransactionRs = saledl.SaveDeliveryChallan(otransactionRq, invoicecount);
@@ -52,9 +61,24 @@ namespace WebApplication1.BL
 
 		public async Task<GetPartyTransactionDetailsRs> GetPartyTransactionDetails(GetPartyTransactionDetailsRq oGetPartyTransactionDetailsRq)
 		{
-			GetPartyTransactionDetailsRs oGetPartyTransactionDetailsRs = new GetPartyTransactionDetailsRs();
 			SaleDL saledl = new SaleDL(this.config);
+			GetPartyTransactionDetailsRs oGetPartyTransactionDetailsRs = new GetPartyTransactionDetailsRs();
+			GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq = new GetTypeOfPayTransactionsRq();
+			oGetTypeOfPayTransactionsRq.typeofpay = oGetPartyTransactionDetailsRq.typeofpay;
+			oGetTypeOfPayTransactionsRq.registeredphonenumber = oGetPartyTransactionDetailsRq.registeredphonenumber;
+			
 			oGetPartyTransactionDetailsRs = saledl.GetPartyTransactionDetails(oGetPartyTransactionDetailsRq);
+			if (oGetPartyTransactionDetailsRq.issaleconvert)
+			{
+				oGetPartyTransactionDetailsRs.typeofpay = "SALE";
+				oGetPartyTransactionDetailsRs.invoicenumbercount = saledl.GetInvoiceNumberCount(oGetTypeOfPayTransactionsRq);
+			}
+			else if (oGetPartyTransactionDetailsRq.issaleorderconvert)
+			{
+				oGetPartyTransactionDetailsRs.typeofpay = "SALE ORDER";
+				oGetPartyTransactionDetailsRs.invoicenumbercount = saledl.GetInvoiceNumberCount(oGetTypeOfPayTransactionsRq);
+			
+			}
 			return oGetPartyTransactionDetailsRs;
 		}
 
@@ -72,11 +96,26 @@ namespace WebApplication1.BL
 			SaleDL saledl = new SaleDL(this.config);
 			oGetTypeOfPayTransactionsRs = saledl.GetTypeOfPayTransactions(oGetTypeOfPayTransactionsRq);
 			if (oGetTypeOfPayTransactionsRq.typeofpay == "SALE" || oGetTypeOfPayTransactionsRq.typeofpay == "ESTIMATION/ QUOTATION" || oGetTypeOfPayTransactionsRq.typeofpay == "PAYMENT IN" ||
-				oGetTypeOfPayTransactionsRq.typeofpay == "SALE ORDER" || oGetTypeOfPayTransactionsRq.typeofpay == "DELIVERY CHALLAN" || oGetTypeOfPayTransactionsRq.typeofpay == "SALE RETURN/ CR. NOTE")
+				oGetTypeOfPayTransactionsRq.typeofpay == "SALE ORDER" || oGetTypeOfPayTransactionsRq.typeofpay == "DELIVERY CHALLAN" || oGetTypeOfPayTransactionsRq.typeofpay == "SALE RETURN/ CR. NOTE" || oGetTypeOfPayTransactionsRq.typeofpay == "PURCHASE ORDER")
 			{
 				oGetTypeOfPayTransactionsRs.invoicenumbercount = saledl.GetInvoiceNumberCount(oGetTypeOfPayTransactionsRq);
 			}
 			return oGetTypeOfPayTransactionsRs;
+		}
+
+		public async Task<GetPartyTransactionDetailsRs> ConvertToSaleSaleOrder(ConvertToSaleSaleOrderRq oConvertToSaleSaleOrderRq)
+		{
+			GetPartyTransactionDetailsRs oConvertToSaleSaleOrderRs = new GetPartyTransactionDetailsRs();
+			GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq = new GetTypeOfPayTransactionsRq();
+			oGetTypeOfPayTransactionsRq.typeofpay = oConvertToSaleSaleOrderRq.typeofpay;
+			oGetTypeOfPayTransactionsRq.registeredphonenumber = oConvertToSaleSaleOrderRq.registeredphonenumber;
+			SaleDL saledl = new SaleDL(this.config);
+			if (oConvertToSaleSaleOrderRq.isconvert && (oConvertToSaleSaleOrderRq.typeofpay == "SALE" || oConvertToSaleSaleOrderRq.typeofpay == "SALE ORDER"))
+			{
+				oConvertToSaleSaleOrderRs = saledl.ConvertToSaleSaleOrder(oConvertToSaleSaleOrderRq);
+				oConvertToSaleSaleOrderRs.invoicenumbercount = saledl.GetInvoiceNumberCount(oGetTypeOfPayTransactionsRq);
+			}
+			return oConvertToSaleSaleOrderRs;
 		}
 
 	}

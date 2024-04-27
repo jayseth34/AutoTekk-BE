@@ -75,5 +75,28 @@ namespace WebApplication1.Controllers
 			oGetTypeOfPayTransactionsRs = await saleBl.GetTypeOfPayTransactions(oGetTypeOfPayTransactionsRq);
 			return Ok(oGetTypeOfPayTransactionsRs);
 		}
+
+		[AllowAnonymous]
+		[HttpGet]
+		[Route("GetLinkedPaymentTransaction")]
+		public async Task<ActionResult> GetLinkedPaymentTransaction([FromQuery] Int64 registeredphonenumber, [FromQuery] string customername)
+		{
+			GetTypeOfPayTransactionsRs oGetTypeOfPayTransactionsRs = new GetTypeOfPayTransactionsRs();
+			SaleBL saleBl = new SaleBL(this.config);
+			//oGetTypeOfPayTransactionsRs = await saleBl.GetLinkedPaymentTransaction(registeredphonenumber, customername);
+			return Ok(oGetTypeOfPayTransactionsRs);
+		}
+
+		//no need to use this api as of now
+		[AllowAnonymous]
+		[HttpPost]
+		[Route("ConvertToSaleSaleOrder")]
+		public async Task<ActionResult> ConvertToSaleSaleOrder(ConvertToSaleSaleOrderRq oConvertToSaleSaleOrderRq)
+		{
+			GetPartyTransactionDetailsRs oConvertToSaleSaleOrderRs = new GetPartyTransactionDetailsRs();
+			SaleBL saleBl = new SaleBL(this.config);
+			oConvertToSaleSaleOrderRs = await saleBl.ConvertToSaleSaleOrder(oConvertToSaleSaleOrderRq);
+			return Ok(oConvertToSaleSaleOrderRs);
+		}
 	}
 }
