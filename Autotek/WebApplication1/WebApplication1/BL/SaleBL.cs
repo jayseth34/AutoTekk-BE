@@ -63,21 +63,21 @@ namespace WebApplication1.BL
 		{
 			SaleDL saledl = new SaleDL(this.config);
 			GetPartyTransactionDetailsRs oGetPartyTransactionDetailsRs = new GetPartyTransactionDetailsRs();
-			GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq = new GetTypeOfPayTransactionsRq();
-			oGetTypeOfPayTransactionsRq.typeofpay = oGetPartyTransactionDetailsRq.typeofpay;
-			oGetTypeOfPayTransactionsRq.registeredphonenumber = oGetPartyTransactionDetailsRq.registeredphonenumber;
+			
 			
 			oGetPartyTransactionDetailsRs = saledl.GetPartyTransactionDetails(oGetPartyTransactionDetailsRq);
+			GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq = new GetTypeOfPayTransactionsRq();
+			
+			oGetTypeOfPayTransactionsRq.registeredphonenumber = oGetPartyTransactionDetailsRq.registeredphonenumber;
 			if (oGetPartyTransactionDetailsRq.issaleconvert)
 			{
-				oGetPartyTransactionDetailsRs.typeofpay = "SALE";
+				oGetTypeOfPayTransactionsRq.typeofpay = "SALE";
 				oGetPartyTransactionDetailsRs.invoicenumbercount = saledl.GetInvoiceNumberCount(oGetTypeOfPayTransactionsRq);
 			}
 			else if (oGetPartyTransactionDetailsRq.issaleorderconvert)
 			{
-				oGetPartyTransactionDetailsRs.typeofpay = "SALE ORDER";
+				oGetTypeOfPayTransactionsRq.typeofpay = "SALE ORDER";
 				oGetPartyTransactionDetailsRs.invoicenumbercount = saledl.GetInvoiceNumberCount(oGetTypeOfPayTransactionsRq);
-			
 			}
 			return oGetPartyTransactionDetailsRs;
 		}
