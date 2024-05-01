@@ -69,13 +69,13 @@ namespace WebApplication1.Controllers
 		[AllowAnonymous]
 		[HttpGet]
 		[Route("GetPartyDetails")]
-		public async Task<ActionResult> GetPartyDetails([FromQuery] Int64 registeredphonenumber, [FromQuery] string partyName)
+		public async Task<ActionResult> GetPartyDetails([FromQuery] Int64 registeredphonenumber, [FromQuery] string partyname)
 		{
 			GetPartyRs ogetPartyRs = new GetPartyRs();
 			if (ModelState.IsValid)
 			{
 				LoginBL loginBL = new LoginBL(this.config);
-				ogetPartyRs = await loginBL.GetPartyDetails(registeredphonenumber, partyName);
+				ogetPartyRs = await loginBL.GetPartyDetails(registeredphonenumber, partyname);
 				return Ok(ogetPartyRs);
 			}
 

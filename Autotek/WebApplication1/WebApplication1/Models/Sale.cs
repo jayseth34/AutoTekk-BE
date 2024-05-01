@@ -136,7 +136,7 @@
 	{
 		public string typeofpay { get; set; }
 		public Int64 invoicenumber { get; set; }
-		public string partyName { get; set; }
+		public string partyname { get; set; }
 		public DateTime invoicedate { get; set; }
 		public Int64 qty { get; set; }
 		public Int64 priceperunit { get; set; }

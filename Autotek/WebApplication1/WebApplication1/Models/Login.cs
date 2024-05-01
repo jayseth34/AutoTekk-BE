@@ -7,7 +7,7 @@ namespace WebApplication1.Models
 	{
 		[Key]
 		[Required]
-		public Int64 phoneNumber { get; set; }
+		public Int64 phonenumber { get; set; }
 		public string password { get; set; }
 	}
 
@@ -21,7 +21,7 @@ namespace WebApplication1.Models
 
 	public class RegisterRq
 	{
-		public Int64 phoneNumber { get; set;}
+		public Int64 phonenumber { get; set;}
 		public string password { get; set; }
 		public string state { get; set; }
 		public string address { get; set; }
@@ -37,27 +37,27 @@ namespace WebApplication1.Models
 	{
 		public string typeofpay { get; set; }
 		public Int64? registeredphonenumber { get; set; }
-		public string? partyName { get; set; }
+		public string? partyname { get; set; }
 		public string? GST { get; set; } = "";
-		public Int64 phoneNumber { get; set;}
+		public Int64 phonenumber { get; set;}
 		public string? partygroup { get; set; }
-		public string? gstType { get; set; }
+		public string? gsttype { get; set; }
 		public string? _state { get; set;}
-		public string? emailId { get; set; }
-		public string? billingAddress { get; set; }
-		public string? shippingAddress { get; set; }
-		public Int64 openingBalance { get; set; }
-		public string toPayOrReceive { get; set; }
-		public DateTime asOfDate { get; set;}
-		public Int64 creditLimit { get; set; }
-		public string? additionalFieldName1 { get; set; }
-		public string? additionalFieldName2 { get; set; }
-		public string? additionalFieldName3 { get; set;}
-		public string? additionalFieldName4 { get; set; }
-		public string? additionalFieldName1value { get; set; }
-		public string? additionalFieldName2value { get; set; }
-		public string? additionalFieldName3value { get; set; }
-		public DateTime? additionalFieldName4value { get; set; }
+		public string? emailid { get; set; }
+		public string? billingaddress { get; set; }
+		public string? shippingaddress { get; set; }
+		public Int64 openingbalance { get; set; }
+		public string topayorreceive { get; set; }
+		public DateTime asofdate { get; set;}
+		public Int64 creditlimit { get; set; }
+		public string? additionalfieldname1 { get; set; }
+		public string? additionalfieldname2 { get; set; }
+		public string? additionalfieldname3 { get; set;}
+		public string? additionalfieldname4 { get; set; }
+		public string? additionalfieldname1value { get; set; }
+		public string? additionalfieldname2value { get; set; }
+		public string? additionalfieldname3value { get; set; }
+		public DateTime? additionalfieldname4value { get; set; }
 		public Int64 partybalance { get; set; }
 	}
 
@@ -81,26 +81,26 @@ namespace WebApplication1.Models
 	public class GetAllPartyList
 	{
 		public string GST { get; set; }
-		public Int64 phoneNumber { get; set; }
+		public Int64 phonenumber { get; set; }
 		public string partygroup { get; set; }
-		public string gstType { get; set; }
+		public string gsttype { get; set; }
 		public string _state { get; set; }
-		public string emailId { get; set; }
-		public string billingAddress { get; set; }
-		public string shippingAddress { get; set; }
-		public Int64 openingBalance { get; set; }
-		public DateTime asOfDate { get; set; }
-		public Int64 creditLimit { get; set; }
-		public string additionalFieldName1 { get; set; }
-		public string additionalFieldName2 { get; set; }
-		public string additionalFieldName3 { get; set; }
-		public string additionalFieldName4 { get; set; }
-		public string additionalFieldName1Value { get; set; }
-		public string additionalFieldName2Value { get; set; }
-		public string additionalFieldName3Value { get; set; }
-		public string additionalFieldName4Value { get; set; }
+		public string emailid { get; set; }
+		public string billingaddress { get; set; }
+		public string shippingaddress { get; set; }
+		public Int64 openingbalance { get; set; }
+		public DateTime asofdate { get; set; }
+		public Int64 creditlimit { get; set; }
+		public string additionalfieldname1 { get; set; }
+		public string additionalfieldname2 { get; set; }
+		public string additionalfieldname3 { get; set; }
+		public string additionalfieldname4 { get; set; }
+		public string additionalfieldname1value { get; set; }
+		public string additionalfieldname2value { get; set; }
+		public string additionalfieldname3value { get; set; }
+		public string additionalfieldname4value { get; set; }
 		public string typeofpay { get; set; }
-		public string toPayOrReceive { get; set; }
+		public string topayorreceive { get; set; }
 		public Int64 partybalance { get; set; }
 	}
 

@@ -68,11 +68,11 @@ namespace WebApplication1.BL
 			return opartyRs;
 		}
 
-		public async Task<GetPartyRs> GetPartyDetails(Int64 registeredphonenumber, string partyName)
+		public async Task<GetPartyRs> GetPartyDetails(Int64 registeredphonenumber, string partyname)
 		{
 			GetPartyRs ogetPartyRs = new GetPartyRs();
 			LoginDL logindl = new LoginDL(this.config);
-			ogetPartyRs = logindl.GetPartyDetails(registeredphonenumber, partyName);
+			ogetPartyRs = logindl.GetPartyDetails(registeredphonenumber, partyname);
 			return ogetPartyRs;
 		}
 

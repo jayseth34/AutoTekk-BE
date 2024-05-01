@@ -273,7 +273,7 @@ namespace WebApplication1.DL
 								GetAllItemTransactionsList oGetAllItemTransactionsList = new GetAllItemTransactionsList();
 								oGetAllItemTransactionsList.invoicenumber = Convert.ToInt64(reader["invoicenumber"]);
 								oGetAllItemTransactionsList.typeofpay = Convert.ToString(reader["typeofpay"]);
-								oGetAllItemTransactionsList.partyName = Convert.ToString(reader["customername"]);
+								oGetAllItemTransactionsList.partyname = Convert.ToString(reader["customername"]);
 								oGetAllItemTransactionsList.invoicedate = Convert.ToDateTime(reader["invoicedate"]);
 								oGetAllItemTransactionsList.qty = Convert.ToInt64(reader["qty"]);
 								oGetAllItemTransactionsList.priceperunit = Convert.ToInt64(reader["priceperunit"]);

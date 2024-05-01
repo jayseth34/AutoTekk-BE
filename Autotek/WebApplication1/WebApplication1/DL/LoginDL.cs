@@ -29,7 +29,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT status, expirydate FROM registeragent WHERE phoneNumber = "+ ologinRq.phoneNumber + " AND _password = '" + ologinRq.password + "'";
+					cmd.CommandText = "SELECT status, expirydate FROM registeragent WHERE phonenumber = "+ ologinRq.phonenumber + " AND _password = '" + ologinRq.password + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					while (reader.Read())
 					{
@@ -57,7 +57,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT phonenumber FROM registeragent WHERE phoneNumber = " + oregisterRq.phoneNumber ;
+					cmd.CommandText = "SELECT phonenumber FROM registeragent WHERE phonenumber = " + oregisterRq.phonenumber ;
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					while (reader.Read())
 					{
@@ -75,8 +75,8 @@ namespace WebApplication1.DL
 							NpgsqlCommand cmd = new NpgsqlCommand();
 							cmd.Connection = conn;
 							cmd.CommandType = CommandType.Text;
-							cmd.CommandText = "INSERT INTO registeragent (phoneNumber, _password, _state, address) VALUES (@phonenumber, @_password, @_state, @address)";
-							cmd.Parameters.AddWithValue("@phonenumber", oregisterRq.phoneNumber);
+							cmd.CommandText = "INSERT INTO registeragent (phonenumber, _password, _state, address) VALUES (@phonenumber, @_password, @_state, @address)";
+							cmd.Parameters.AddWithValue("@phonenumber", oregisterRq.phonenumber);
 							cmd.Parameters.AddWithValue("@_password", oregisterRq.password);
 							cmd.Parameters.AddWithValue("@_state", oregisterRq.state);
 							cmd.Parameters.AddWithValue("@address", oregisterRq.address);
@@ -112,7 +112,7 @@ namespace WebApplication1.DL
 						NpgsqlCommand cmd = new NpgsqlCommand();
 						cmd.Connection = conn;
 						cmd.CommandType = CommandType.Text;
-						cmd.CommandText = "SELECT partyname FROM party WHERE registeredphonenumber = " + opartyRq.registeredphonenumber + " AND partyname = '" + opartyRq.partyName + "'";
+						cmd.CommandText = "SELECT partyname FROM party WHERE registeredphonenumber = " + opartyRq.registeredphonenumber + " AND partyname = '" + opartyRq.partyname + "'";
 						NpgsqlDataReader reader = cmd.ExecuteReader();
 						while (reader.Read())
 						{
@@ -141,27 +141,27 @@ namespace WebApplication1.DL
 
 							cmd.Parameters.AddWithValue("typeofpay", opartyRq.typeofpay);
 							cmd.Parameters.AddWithValue("registeredphonenumber", opartyRq.registeredphonenumber);
-							cmd.Parameters.AddWithValue("partyname", opartyRq.partyName);
+							cmd.Parameters.AddWithValue("partyname", opartyRq.partyname);
 							cmd.Parameters.AddWithValue("gst", opartyRq.GST);
-							cmd.Parameters.AddWithValue("phonenumber", opartyRq.phoneNumber);
+							cmd.Parameters.AddWithValue("phonenumber", opartyRq.phonenumber);
 							cmd.Parameters.AddWithValue("partygroup", opartyRq.partygroup);
-							cmd.Parameters.AddWithValue("gsttype", opartyRq.gstType);
+							cmd.Parameters.AddWithValue("gsttype", opartyRq.gsttype);
 							cmd.Parameters.AddWithValue("_state", opartyRq._state);
-							cmd.Parameters.AddWithValue("emailid", opartyRq.emailId);
-							cmd.Parameters.AddWithValue("billingaddress", opartyRq.billingAddress);
-							cmd.Parameters.AddWithValue("shippingaddress", opartyRq.shippingAddress);
-							cmd.Parameters.AddWithValue("openingbalance", opartyRq.openingBalance);
-							cmd.Parameters.AddWithValue("topayorreceive", opartyRq.toPayOrReceive);
-							cmd.Parameters.AddWithValue("asofdate", opartyRq.asOfDate);
-							cmd.Parameters.AddWithValue("creditlimit", opartyRq.creditLimit);
-							cmd.Parameters.AddWithValue("additionalfieldname1", opartyRq.additionalFieldName1);
-							cmd.Parameters.AddWithValue("additionalfieldname2", opartyRq.additionalFieldName2);
-							cmd.Parameters.AddWithValue("additionalfieldname3", opartyRq.additionalFieldName3);
-							cmd.Parameters.AddWithValue("additionalfieldname4", opartyRq.additionalFieldName4);
-							cmd.Parameters.AddWithValue("additionalfieldname1value", opartyRq.additionalFieldName1value);
-							cmd.Parameters.AddWithValue("additionalfieldname2value", opartyRq.additionalFieldName2value);
-							cmd.Parameters.AddWithValue("additionalfieldname3value", opartyRq.additionalFieldName3value);
-							cmd.Parameters.AddWithValue("additionalfieldname4value", opartyRq.additionalFieldName4value);
+							cmd.Parameters.AddWithValue("emailid", opartyRq.emailid);
+							cmd.Parameters.AddWithValue("billingaddress", opartyRq.billingaddress);
+							cmd.Parameters.AddWithValue("shippingaddress", opartyRq.shippingaddress);
+							cmd.Parameters.AddWithValue("openingbalance", opartyRq.openingbalance);
+							cmd.Parameters.AddWithValue("topayorreceive", opartyRq.topayorreceive);
+							cmd.Parameters.AddWithValue("asofdate", opartyRq.asofdate);
+							cmd.Parameters.AddWithValue("creditlimit", opartyRq.creditlimit);
+							cmd.Parameters.AddWithValue("additionalfieldname1", opartyRq.additionalfieldname1);
+							cmd.Parameters.AddWithValue("additionalfieldname2", opartyRq.additionalfieldname2);
+							cmd.Parameters.AddWithValue("additionalfieldname3", opartyRq.additionalfieldname3);
+							cmd.Parameters.AddWithValue("additionalfieldname4", opartyRq.additionalfieldname4);
+							cmd.Parameters.AddWithValue("additionalfieldname1value", opartyRq.additionalfieldname1value);
+							cmd.Parameters.AddWithValue("additionalfieldname2value", opartyRq.additionalfieldname2value);
+							cmd.Parameters.AddWithValue("additionalfieldname3value", opartyRq.additionalfieldname3value);
+							cmd.Parameters.AddWithValue("additionalfieldname4value", opartyRq.additionalfieldname4value);
 							cmd.Parameters.AddWithValue("partybalance", opartyRq.partybalance);
 
 							cmd.ExecuteNonQuery();
@@ -187,29 +187,29 @@ namespace WebApplication1.DL
 							cmd.CommandType = CommandType.Text;
 							cmd.CommandText = " UPDATE party SET typeofpay = @typeofpay, gst = @gst, phonenumber = @phonenumber, partygroup = @partygroup, gsttype = @gsttype, _state = @_state, emailid = @emailid, billingaddress = @billingaddress, " +
 											  "shippingaddress = @shippingaddress, openingbalance = @openingbalance, topayorreceive = @topayorreceive, asofdate = @asofdate, creditlimit = @creditlimit, additionalfieldname1 = @additionalfieldname1," +
-											  "additionalfieldname2 = @additionalfieldname2, additionalfieldname3 = @additionalfieldname3, additionalfieldname4 = @additionalfieldname4, partybalance = @partybalance, additionalfieldname1value = @additionalfieldname1value, additionalfieldname2value = @additionalfieldname2value, additionalfieldname3value = @additionalfieldname3value, additionalfieldname4value = @additionalfieldname4value WHERE registeredphonenumber = " + opartyRq.registeredphonenumber + " AND partyname = '" + opartyRq.partyName + "'";
+											  "additionalfieldname2 = @additionalfieldname2, additionalfieldname3 = @additionalfieldname3, additionalfieldname4 = @additionalfieldname4, partybalance = @partybalance, additionalfieldname1value = @additionalfieldname1value, additionalfieldname2value = @additionalfieldname2value, additionalfieldname3value = @additionalfieldname3value, additionalfieldname4value = @additionalfieldname4value WHERE registeredphonenumber = " + opartyRq.registeredphonenumber + " AND partyname = '" + opartyRq.partyname + "'";
 							cmd.Parameters.AddWithValue("@typeofpay", opartyRq.typeofpay);
 							cmd.Parameters.AddWithValue("@gst", opartyRq.GST);
-							cmd.Parameters.AddWithValue("@phonenumber", opartyRq.phoneNumber);
+							cmd.Parameters.AddWithValue("@phonenumber", opartyRq.phonenumber);
 							cmd.Parameters.AddWithValue("@partygroup", opartyRq.partygroup);
-							cmd.Parameters.AddWithValue("@gsttype", opartyRq.gstType);
+							cmd.Parameters.AddWithValue("@gsttype", opartyRq.gsttype);
 							cmd.Parameters.AddWithValue("@_state", opartyRq._state);
-							cmd.Parameters.AddWithValue("@emailid", opartyRq.emailId);
-							cmd.Parameters.AddWithValue("@billingaddress", opartyRq.billingAddress);
-							cmd.Parameters.AddWithValue("@shippingaddress", opartyRq.shippingAddress);
-							cmd.Parameters.AddWithValue("@openingbalance", opartyRq.openingBalance);
-							cmd.Parameters.AddWithValue("@topayorreceive", opartyRq.toPayOrReceive);
-							cmd.Parameters.AddWithValue("@asofdate", opartyRq.asOfDate);
-							cmd.Parameters.AddWithValue("@creditlimit", opartyRq.creditLimit);
-							cmd.Parameters.AddWithValue("@additionalfieldname1", opartyRq.additionalFieldName1);
-							cmd.Parameters.AddWithValue("@additionalfieldname2", opartyRq.additionalFieldName2);
-							cmd.Parameters.AddWithValue("@additionalfieldname3", opartyRq.additionalFieldName3);
-							cmd.Parameters.AddWithValue("@additionalfieldname4", opartyRq.additionalFieldName4);
+							cmd.Parameters.AddWithValue("@emailid", opartyRq.emailid);
+							cmd.Parameters.AddWithValue("@billingaddress", opartyRq.billingaddress);
+							cmd.Parameters.AddWithValue("@shippingaddress", opartyRq.shippingaddress);
+							cmd.Parameters.AddWithValue("@openingbalance", opartyRq.openingbalance);
+							cmd.Parameters.AddWithValue("@topayorreceive", opartyRq.topayorreceive);
+							cmd.Parameters.AddWithValue("@asofdate", opartyRq.asofdate);
+							cmd.Parameters.AddWithValue("@creditlimit", opartyRq.creditlimit);
+							cmd.Parameters.AddWithValue("@additionalfieldname1", opartyRq.additionalfieldname1);
+							cmd.Parameters.AddWithValue("@additionalfieldname2", opartyRq.additionalfieldname2);
+							cmd.Parameters.AddWithValue("@additionalfieldname3", opartyRq.additionalfieldname3);
+							cmd.Parameters.AddWithValue("@additionalfieldname4", opartyRq.additionalfieldname4);
 							cmd.Parameters.AddWithValue("@partybalance", opartyRq.partybalance);
-							cmd.Parameters.AddWithValue("@additionalfieldname1value", opartyRq.additionalFieldName1value);
-							cmd.Parameters.AddWithValue("@additionalfieldname2value", opartyRq.additionalFieldName2value);
-							cmd.Parameters.AddWithValue("@additionalfieldname3value", opartyRq.additionalFieldName3value);
-							cmd.Parameters.AddWithValue("@additionalfieldname4value", opartyRq.additionalFieldName4value);
+							cmd.Parameters.AddWithValue("@additionalfieldname1value", opartyRq.additionalfieldname1value);
+							cmd.Parameters.AddWithValue("@additionalfieldname2value", opartyRq.additionalfieldname2value);
+							cmd.Parameters.AddWithValue("@additionalfieldname3value", opartyRq.additionalfieldname3value);
+							cmd.Parameters.AddWithValue("@additionalfieldname4value", opartyRq.additionalfieldname4value);
 							cmd.ExecuteNonQuery();
 							opartyRs.status = "Party Updated Successfully";
 						}
@@ -233,11 +233,11 @@ namespace WebApplication1.DL
 								"paymentstatus) VALUES(@typeofpay, @invoicedate, @total, @balance, @customername, @phonenumber, @registeredphonenumber," +
 								"@paymentstatus) RETURNING transaction_id";
 							cmd.Parameters.AddWithValue("@typeofpay", opartyRq.typeofpay);
-							cmd.Parameters.AddWithValue("@invoicedate", opartyRq.asOfDate);
-							cmd.Parameters.AddWithValue("@total", opartyRq.openingBalance);
-							cmd.Parameters.AddWithValue("@balance", opartyRq.openingBalance);
-							cmd.Parameters.AddWithValue("@customername", opartyRq.partyName);
-							cmd.Parameters.AddWithValue("@phonenumber", opartyRq.phoneNumber);
+							cmd.Parameters.AddWithValue("@invoicedate", opartyRq.asofdate);
+							cmd.Parameters.AddWithValue("@total", opartyRq.openingbalance);
+							cmd.Parameters.AddWithValue("@balance", opartyRq.openingbalance);
+							cmd.Parameters.AddWithValue("@customername", opartyRq.partyname);
+							cmd.Parameters.AddWithValue("@phonenumber", opartyRq.phonenumber);
 							cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
 							cmd.Parameters.AddWithValue("@paymentstatus", "UNPAID");
 							int transactionId = (int)cmd.ExecuteScalar();
@@ -309,7 +309,7 @@ namespace WebApplication1.DL
 			return opartyRs;
 		}
 
-		public GetPartyRs GetPartyDetails(Int64 registeredphonenumber, string partyName)
+		public GetPartyRs GetPartyDetails(Int64 registeredphonenumber, string partyname)
 		{
 			GetPartyRs ogetPartyRs = new GetPartyRs();
 			try
@@ -322,7 +322,7 @@ namespace WebApplication1.DL
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT gst, phonenumber, partygroup, gsttype, _state, emailid, billingaddress, shippingaddress, openingbalance, asofdate, creditlimit," +
 						"additionalfieldname1, additionalfieldname2, additionalfieldname3, additionalfieldname4, typeofpay, topayorreceive, partybalance, additionalfieldname1value, additionalfieldname2value, additionalfieldname3value, additionalfieldname4value FROM party WHERE registeredphonenumber = " + registeredphonenumber + " AND partyname = '" +
-						partyName + "'";
+						partyname + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if(reader.HasRows)
 					{
@@ -332,27 +332,27 @@ namespace WebApplication1.DL
 							{
 								GetAllPartyList ogetallpartylist = new GetAllPartyList();
 								ogetallpartylist.GST = Convert.ToString(reader["gst"]);
-								ogetallpartylist.phoneNumber = Convert.ToInt64(reader["phonenumber"]);
+								ogetallpartylist.phonenumber = Convert.ToInt64(reader["phonenumber"]);
 								ogetallpartylist.partygroup = Convert.ToString(reader["partygroup"]);
-								ogetallpartylist.gstType = Convert.ToString(reader["gsttype"]);
+								ogetallpartylist.gsttype = Convert.ToString(reader["gsttype"]);
 								ogetallpartylist._state = Convert.ToString(reader["_state"]);
-								ogetallpartylist.emailId = Convert.ToString(reader["emailId"]);
-								ogetallpartylist.billingAddress = Convert.ToString(reader["billingAddress"]);
-								ogetallpartylist.shippingAddress = Convert.ToString(reader["shippingAddress"]);
-								ogetallpartylist.openingBalance = Convert.ToInt64(reader["openingbalance"]);
-								ogetallpartylist.asOfDate = reader["asofdate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["asofdate"]);
-								ogetallpartylist.creditLimit = Convert.ToInt64(reader["creditlimit"]);
-								ogetallpartylist.additionalFieldName1 = Convert.ToString(reader["additionalfieldname1"]);
-								ogetallpartylist.additionalFieldName2 = Convert.ToString(reader["additionalfieldname2"]);
-								ogetallpartylist.additionalFieldName3 = Convert.ToString(reader["additionalfieldname3"]);
-								ogetallpartylist.additionalFieldName4 = Convert.ToString(reader["additionalfieldname4"]);
+								ogetallpartylist.emailid = Convert.ToString(reader["emailid"]);
+								ogetallpartylist.billingaddress = Convert.ToString(reader["billingaddress"]);
+								ogetallpartylist.shippingaddress = Convert.ToString(reader["shippingaddress"]);
+								ogetallpartylist.openingbalance = Convert.ToInt64(reader["openingbalance"]);
+								ogetallpartylist.asofdate = reader["asofdate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["asofdate"]);
+								ogetallpartylist.creditlimit = Convert.ToInt64(reader["creditlimit"]);
+								ogetallpartylist.additionalfieldname1 = Convert.ToString(reader["additionalfieldname1"]);
+								ogetallpartylist.additionalfieldname2 = Convert.ToString(reader["additionalfieldname2"]);
+								ogetallpartylist.additionalfieldname3 = Convert.ToString(reader["additionalfieldname3"]);
+								ogetallpartylist.additionalfieldname4 = Convert.ToString(reader["additionalfieldname4"]);
 								ogetallpartylist.typeofpay = Convert.ToString(reader["typeofpay"]);
-								ogetallpartylist.toPayOrReceive = Convert.ToString(reader["topayorreceive"]);
+								ogetallpartylist.topayorreceive = Convert.ToString(reader["topayorreceive"]);
 								ogetallpartylist.partybalance = Convert.ToInt64(reader["partybalance"]);
-								ogetallpartylist.additionalFieldName1Value = Convert.ToString(reader["additionalfieldname4value"]);
-								ogetallpartylist.additionalFieldName2Value = Convert.ToString(reader["additionalfieldname4value"]);
-								ogetallpartylist.additionalFieldName3Value = Convert.ToString(reader["additionalfieldname4value"]);
-								ogetallpartylist.additionalFieldName4Value = Convert.ToString(reader["additionalfieldname4value"]);
+								ogetallpartylist.additionalfieldname1value = Convert.ToString(reader["additionalfieldname4value"]);
+								ogetallpartylist.additionalfieldname2value = Convert.ToString(reader["additionalfieldname4value"]);
+								ogetallpartylist.additionalfieldname3value = Convert.ToString(reader["additionalfieldname4value"]);
+								ogetallpartylist.additionalfieldname4value = Convert.ToString(reader["additionalfieldname4value"]);
 								ogetPartyRs.partyList.Add(ogetallpartylist);
 								ogetPartyRs.status = "SUCCESS";
 							}
