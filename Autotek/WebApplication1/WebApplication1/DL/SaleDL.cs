@@ -637,7 +637,7 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT * from transactions where(balance > 0 OR linkedaccount = 'LINKED') and customername = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber +
-						" AND typeofpay in ('SALE', 'ESTIMATE/ QUOTATION', 'DELIVERY CHALLAN','RECEIVABLE OPENING BALANCE');";
+						" AND typeofpay in ('SALE', 'DELIVERY CHALLAN','RECEIVABLE OPENING BALANCE');";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{

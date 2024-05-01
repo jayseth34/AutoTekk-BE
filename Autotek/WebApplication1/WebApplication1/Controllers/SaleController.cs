@@ -85,11 +85,9 @@ namespace WebApplication1.Controllers
 			SaleBL saleBl = new SaleBL(this.config);
 			oGetLinkedPaymentTransactionRs = await saleBl.GetLinkedPaymentTransaction(registeredphonenumber, customername);
 			return Ok(oGetLinkedPaymentTransactionRs);
-
-			//select* from transactions where(balance > 0 OR linkedaccount = 'LINKED') and customername = 'JAY' AND registeredphonenumber = 9920279905 AND typeofpay in ('SALE', 'ESTIMATE/ QUOTATION', 'DELIVERY CHALLAN','RECEIVABLE OPENING BALANCE');
 		}
 
-		//no need to use this api as of now
+		//no need to use this api as of nowS
 		[AllowAnonymous]
 		[HttpPost]
 		[Route("ConvertToSaleSaleOrder")]
