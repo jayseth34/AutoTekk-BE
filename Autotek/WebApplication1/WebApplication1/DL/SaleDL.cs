@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using NpgsqlTypes;
 using System.Collections.Generic;
@@ -622,6 +623,56 @@ namespace WebApplication1.DL
 				Console.WriteLine(ex.Message);
 			}
 			return oGetPartyTransactionDetailsRs;
+		}
+
+		public GetLinkedPaymentTransactionRs GetLinkedPaymentTransaction(Int64 registeredphonenumber, string customername)
+		{
+			GetLinkedPaymentTransactionRs oGetLinkedPaymentTransactionRs = new GetLinkedPaymentTransactionRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT * from transactions where(balance > 0 OR linkedaccount = 'LINKED') and customername = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber +
+						" AND typeofpay in ('SALE', 'ESTIMATE/ QUOTATION', 'DELIVERY CHALLAN','RECEIVABLE OPENING BALANCE');";
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+
+								GetLinkedPaymentTransactionList oGetLinkedPaymentTransactionList = new GetLinkedPaymentTransactionList();
+								oGetLinkedPaymentTransactionList.invoicenumber = Convert.ToInt64(reader["invoicenumber"]);
+								oGetLinkedPaymentTransactionList.typeofpay = Convert.ToString(reader["typeofpay"]);
+								oGetLinkedPaymentTransactionList.invoicedate = Convert.ToDateTime(reader["invoicedate"]);
+								oGetLinkedPaymentTransactionList.total = Convert.ToInt64(reader["total"]);
+								oGetLinkedPaymentTransactionList.linkedamount = Convert.ToInt64(reader["linkedamount"]);
+								oGetLinkedPaymentTransactionList.balance = Convert.ToInt64(reader["balance"]);
+								oGetLinkedPaymentTransactionRs.getLinkedPaymentTransactionList.Add(oGetLinkedPaymentTransactionList);
+							}
+							oGetLinkedPaymentTransactionRs.status = "SUCCESS";
+						}
+						catch (Exception ex)
+						{
+							oGetLinkedPaymentTransactionRs.status = "FAILED";
+						}
+					}
+					else
+					{
+						oGetLinkedPaymentTransactionRs.status = "No Recods Found";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oGetLinkedPaymentTransactionRs;
 		}
 	}
 }

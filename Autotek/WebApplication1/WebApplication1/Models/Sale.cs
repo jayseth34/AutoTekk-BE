@@ -160,6 +160,26 @@
 		public List<GetTypeOfPayTransactionsList> typeofpaytransactionlist { get; set; }
 	} 
 
+	public class GetLinkedPaymentTransactionRs
+	{
+		public string status { get; set; }
+		public GetLinkedPaymentTransactionRs()
+		{
+			getLinkedPaymentTransactionList = new List<GetLinkedPaymentTransactionList>();
+		}
+		public List<GetLinkedPaymentTransactionList> getLinkedPaymentTransactionList { get; set; }
+	}
+
+	public class GetLinkedPaymentTransactionList
+	{
+		public Int64 invoicenumber { get; set; }
+		public DateTime invoicedate { get; set; }
+		public string typeofpay { get; set; }
+		public Int64 total { get; set; }
+		public Int64 balance { get; set; }
+		public Int64 linkedamount { get; set; }
+	}
+
 	public class GetTypeOfPayTransactionsList
 	{
 		public Int64 invoicenumber { get; set; }

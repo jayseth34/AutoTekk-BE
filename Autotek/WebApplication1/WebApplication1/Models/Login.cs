@@ -117,6 +117,10 @@ namespace WebApplication1.Models
 	{
 		public string partyname { get; set; }
 		public Int64 partybalance { get; set; }
+		public Int64 phonenumber { get; set; }
+		public string billingaddress { get; set; }
+		public string shippingaddress { get; set; }
+
 	}
 
 	public class GetPartyGroupRs

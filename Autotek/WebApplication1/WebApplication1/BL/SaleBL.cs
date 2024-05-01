@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using WebApplication1.DL;
 using WebApplication1.Models;
 
@@ -90,6 +91,14 @@ namespace WebApplication1.BL
 			oGetItemTransactionsRs = saledl.GetItemHeaderDetails(oGetItemTransactionsRq, oGetItemTransactionsRs.itemTransactionsList);
 			return oGetItemTransactionsRs;
 		}
+		public async Task<GetLinkedPaymentTransactionRs> GetLinkedPaymentTransaction([FromQuery] Int64 registeredphonenumber, [FromQuery] string customername)
+		{
+			GetLinkedPaymentTransactionRs oGetLinkedPaymentTransactionRs = new GetLinkedPaymentTransactionRs();
+			SaleDL saledl = new SaleDL(this.config);
+			oGetLinkedPaymentTransactionRs = saledl.GetLinkedPaymentTransaction(registeredphonenumber, customername);
+			return oGetLinkedPaymentTransactionRs;
+		}
+
 		public async Task<GetTypeOfPayTransactionsRs> GetTypeOfPayTransactions(GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq)
 		{
 			GetTypeOfPayTransactionsRs oGetTypeOfPayTransactionsRs = new GetTypeOfPayTransactionsRs();

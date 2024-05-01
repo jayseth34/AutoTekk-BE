@@ -387,7 +387,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT partyname, partybalance from party where registeredphonenumber = " + registeredphonenumber ;
+					cmd.CommandText = "SELECT partyname, partybalance, shippingaddress, billingaddress, phonenumber from party where registeredphonenumber = " + registeredphonenumber ;
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -398,6 +398,9 @@ namespace WebApplication1.DL
 								GetPartyList oGetPartyList = new GetPartyList();
 								oGetPartyList.partyname = Convert.ToString(reader["partyname"]);
 								oGetPartyList.partybalance = Convert.ToInt64(reader["partybalance"]);
+								oGetPartyList.shippingaddress = Convert.ToString(reader["shippingaddress"]);
+								oGetPartyList.billingaddress = Convert.ToString(reader["billingaddress"]);
+								oGetPartyList.phonenumber = Convert.ToInt64(reader["phonenumber"]);
 								oGetPartyListRs.getPartyList.Add(oGetPartyList);
 							}
 						}

@@ -81,10 +81,12 @@ namespace WebApplication1.Controllers
 		[Route("GetLinkedPaymentTransaction")]
 		public async Task<ActionResult> GetLinkedPaymentTransaction([FromQuery] Int64 registeredphonenumber, [FromQuery] string customername)
 		{
-			GetTypeOfPayTransactionsRs oGetTypeOfPayTransactionsRs = new GetTypeOfPayTransactionsRs();
+			GetLinkedPaymentTransactionRs oGetLinkedPaymentTransactionRs = new GetLinkedPaymentTransactionRs();
 			SaleBL saleBl = new SaleBL(this.config);
-			//oGetTypeOfPayTransactionsRs = await saleBl.GetLinkedPaymentTransaction(registeredphonenumber, customername);
-			return Ok(oGetTypeOfPayTransactionsRs);
+			oGetLinkedPaymentTransactionRs = await saleBl.GetLinkedPaymentTransaction(registeredphonenumber, customername);
+			return Ok(oGetLinkedPaymentTransactionRs);
+
+			//select* from transactions where(balance > 0 OR linkedaccount = 'LINKED') and customername = 'JAY' AND registeredphonenumber = 9920279905 AND typeofpay in ('SALE', 'ESTIMATE/ QUOTATION', 'DELIVERY CHALLAN','RECEIVABLE OPENING BALANCE');
 		}
 
 		//no need to use this api as of now
