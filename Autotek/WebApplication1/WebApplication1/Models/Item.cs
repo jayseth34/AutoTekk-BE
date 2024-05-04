@@ -15,6 +15,7 @@
 		public string salewithorwithouttax { get; set; }
 		public Int64 discountonsaleprice { get; set; }
 		public Int64 percentageoramount { get; set; }
+		public string percentageoramounttype { get; set; }
 		public Int64 wholesaleprice { get; set; }
 		public string wholesalewithorwithouttax { get; set; }
 		public Int64 minimumwholesalequantity { get; set; }
@@ -47,6 +48,12 @@
 	{
 		public string itemname { get; set; }
 		public Int64 remainingquantity { get; set; }
+		public Int64 saleprice { get; set; }
+		public Int64 percentageoramount { get; set; }
+		public Int64 purchaseprice { get; set; }
+		public Int64 wholesaleprice { get; set; }
+		public Int64 minimumwholesalequantity { get; set; }
+		public string percentageoramounttype { get; set; }
 	}
 
 	public class GetItemRs
@@ -85,6 +92,7 @@
 		public DateTime asofdate { get; set; }
 		public Int64 minimumstocktomaintain { get; set; }
 		public string _location { get; set; }
+		public string percentageoramounttype { get; set; }
 	}
 
 	public class GetCategoryRs

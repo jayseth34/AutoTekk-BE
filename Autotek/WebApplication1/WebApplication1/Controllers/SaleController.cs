@@ -34,6 +34,20 @@ namespace WebApplication1.Controllers
 
 		[AllowAnonymous]
 		[HttpPost]
+		[Route("UpdateSale")]
+		public async Task<ActionResult> UpdateSale(TransactionRq otransactionRq)
+		{
+			SaleBL saleBl = new SaleBL(this.config);
+			TransactionRs otransactionRs = new TransactionRs();
+			if (ModelState.IsValid)
+			{
+				otransactionRs = await saleBl.UpdateSale(otransactionRq);
+			}
+			return Ok(otransactionRs);
+		}
+
+		[AllowAnonymous]
+		[HttpPost]
 		[Route("GetPartyTransactions")]
 		public async Task<ActionResult> GetPartyTransactions(GetPartyTransactionsRq oGetPartyTransactionsRq)
 		{

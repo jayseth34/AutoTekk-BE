@@ -120,6 +120,7 @@ namespace WebApplication1.Models
 		public Int64 phonenumber { get; set; }
 		public string billingaddress { get; set; }
 		public string shippingaddress { get; set; }
+		public Int64 creditlimit { get; set; }
 
 	}
 

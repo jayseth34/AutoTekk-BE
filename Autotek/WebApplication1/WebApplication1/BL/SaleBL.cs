@@ -26,7 +26,7 @@ namespace WebApplication1.BL
 			}
 			else
 			{
-				if(otransactionRq.isconvert && otransactionRq.isupdate && (otransactionRq.typeofpay == "SALE" || otransactionRq.typeofpay == "SALE ORDER"))
+				if (otransactionRq.isconvert && otransactionRq.isupdate && (otransactionRq.typeofpay == "SALE" || otransactionRq.typeofpay == "SALE ORDER"))
 				{
 					string typeofpay = string.Empty;
 					if (otransactionRq.typeofpay == "SALE ORDER")
@@ -37,11 +37,11 @@ namespace WebApplication1.BL
 					{
 						typeofpay = "SALE";
 					}
-					
+
 					result = saledl.FindOrInsertItem(otransactionRq);
 					Int64 invoicecount = saledl.GetInvoiceNumberCountDLChallan(otransactionRq.registeredphonenumber, typeofpay);
 					otransactionRs = saledl.SaveDeliveryChallan(otransactionRq, invoicecount);
-					saledl.UpdateDlChallan(otransactionRq.invoicenumber,otransactionRq.registeredphonenumber);
+					saledl.UpdateDlChallan(otransactionRq.invoicenumber, otransactionRq.registeredphonenumber);
 				}
 				else
 				{
@@ -64,11 +64,11 @@ namespace WebApplication1.BL
 		{
 			SaleDL saledl = new SaleDL(this.config);
 			GetPartyTransactionDetailsRs oGetPartyTransactionDetailsRs = new GetPartyTransactionDetailsRs();
-			
-			
+
+
 			oGetPartyTransactionDetailsRs = saledl.GetPartyTransactionDetails(oGetPartyTransactionDetailsRq);
 			GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq = new GetTypeOfPayTransactionsRq();
-			
+
 			oGetTypeOfPayTransactionsRq.registeredphonenumber = oGetPartyTransactionDetailsRq.registeredphonenumber;
 			if (oGetPartyTransactionDetailsRq.issaleconvert)
 			{
@@ -127,5 +127,31 @@ namespace WebApplication1.BL
 			return oConvertToSaleSaleOrderRs;
 		}
 
+		public async Task<TransactionRs> UpdateSale(TransactionRq otransactionRq)
+		{
+			TransactionRs otransactionRs = new TransactionRs();
+			SaleDL saledl = new SaleDL(this.config);
+			otransactionRs.status = saledl.UpdateTransactionDetails(otransactionRq);
+			if (otransactionRs.status == "SUCCESS")
+			{
+				foreach (var itemDetail in otransactionRq.itemdetailslist)
+				{
+					if (itemDetail.queryoperationtype == "UPDATE")
+					{
+
+					} 
+					else if (itemDetail.queryoperationtype == "INSERT")
+					{
+
+					}
+					else if (itemDetail.queryoperationtype == "DELETE")
+					{
+
+					}
+				}
+					
+			}
+			return otransactionRs;
+		}
 	}
 }

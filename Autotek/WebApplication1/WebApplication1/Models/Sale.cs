@@ -35,6 +35,12 @@
 		public string unit { get; set; }
 		public Int64 priceperunit { get; set; }
 		public Int64 remainingquantity { get; set; }
+		public string queryoperationtype { get; set; } = "";
+		public string taxrate { get; set; } = "NONE";
+		public Int64 taxrateamount { get; set; } = 0;
+		public Int64 transactionid { get; set; }
+		public Int64 discountpercent { get; set; }
+		public Int64 discountamount { get; set; }
 	}
 
 	public class TransactionRs
@@ -56,6 +62,7 @@
 		public string gst { get; set; }
 		public string billingaddress { get; set; }
 		public Int64 phonenumber { get; set; }
+		public Int64 creditlimit { get; set; }
 		public GetPartyTransactionsRs()
 		{
 			partyTransactionsList = new List<GetAllPartyTransactionsList>();
@@ -109,6 +116,11 @@
 		public Int64 qty { get; set; }
 		public string unit { get; set; }
 		public Int64 priceperunit { get; set; }
+		public Int64 transactionid { get; set; }
+		public string taxrate { get; set; }
+		public Int64 taxrateamount { get; set; }
+		public Int64 discountpercent { get; set; }
+		public Int64 discountamount { get; set; }
 	}
 
 	public class GetItemTransactionsRq

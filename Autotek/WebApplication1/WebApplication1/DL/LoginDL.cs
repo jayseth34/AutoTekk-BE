@@ -163,7 +163,6 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("additionalfieldname3value", opartyRq.additionalfieldname3value);
 							cmd.Parameters.AddWithValue("additionalfieldname4value", opartyRq.additionalfieldname4value);
 							cmd.Parameters.AddWithValue("partybalance", opartyRq.partybalance);
-
 							cmd.ExecuteNonQuery();
 							opartyRs.status = "Inserted Successfully";
 						}
@@ -185,7 +184,7 @@ namespace WebApplication1.DL
 							NpgsqlCommand cmd = new NpgsqlCommand();
 							cmd.Connection = conn;
 							cmd.CommandType = CommandType.Text;
-							cmd.CommandText = " UPDATE party SET typeofpay = @typeofpay, gst = @gst, phonenumber = @phonenumber, partygroup = @partygroup, gsttype = @gsttype, _state = @_state, emailid = @emailid, billingaddress = @billingaddress, " +
+							cmd.CommandText = "UPDATE party SET typeofpay = @typeofpay, gst = @gst, phonenumber = @phonenumber, partygroup = @partygroup, gsttype = @gsttype, _state = @_state, emailid = @emailid, billingaddress = @billingaddress, " +
 											  "shippingaddress = @shippingaddress, openingbalance = @openingbalance, topayorreceive = @topayorreceive, asofdate = @asofdate, creditlimit = @creditlimit, additionalfieldname1 = @additionalfieldname1," +
 											  "additionalfieldname2 = @additionalfieldname2, additionalfieldname3 = @additionalfieldname3, additionalfieldname4 = @additionalfieldname4, partybalance = @partybalance, additionalfieldname1value = @additionalfieldname1value, additionalfieldname2value = @additionalfieldname2value, additionalfieldname3value = @additionalfieldname3value, additionalfieldname4value = @additionalfieldname4value WHERE registeredphonenumber = " + opartyRq.registeredphonenumber + " AND partyname = '" + opartyRq.partyname + "'";
 							cmd.Parameters.AddWithValue("@typeofpay", opartyRq.typeofpay);
@@ -294,7 +293,6 @@ namespace WebApplication1.DL
 						{
 							Console.WriteLine(ex.Message);
 						}
-						
 					}
 					catch (Exception ex)
 					{
@@ -387,7 +385,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT partyname, partybalance, shippingaddress, billingaddress, phonenumber from party where registeredphonenumber = " + registeredphonenumber ;
+					cmd.CommandText = "SELECT partyname, partybalance, shippingaddress, billingaddress, phonenumber, creditlimit from party where registeredphonenumber = " + registeredphonenumber ;
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -398,6 +396,7 @@ namespace WebApplication1.DL
 								GetPartyList oGetPartyList = new GetPartyList();
 								oGetPartyList.partyname = Convert.ToString(reader["partyname"]);
 								oGetPartyList.partybalance = Convert.ToInt64(reader["partybalance"]);
+								oGetPartyList.creditlimit = Convert.ToInt64(reader["creditlimit"]);
 								oGetPartyList.shippingaddress = Convert.ToString(reader["shippingaddress"]);
 								oGetPartyList.billingaddress = Convert.ToString(reader["billingaddress"]);
 								oGetPartyList.phonenumber = Convert.ToInt64(reader["phonenumber"]);

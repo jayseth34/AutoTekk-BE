@@ -62,7 +62,8 @@ namespace WebApplication1.DL
 								NpgsqlCommand cmdd = new NpgsqlCommand();
 								cmdd.Connection = connn;
 								cmdd.CommandType = CommandType.Text;
-								cmdd.CommandText = "INSERT INTO item_details (transaction_id, item, qty, unit, priceperunit, registeredphonenumber, invoicenumber, customername, invoicedate, typeofpay, paymentstatus) VALUES (@transaction_id, @item, @qty, @unit, @priceperunit, @registeredphonenumber, @invoicenumber, @customername, @invoicedate, @typeofpay, @paymentstatus)";
+								cmdd.CommandText = "INSERT INTO item_details (transaction_id, item, qty, unit, priceperunit, registeredphonenumber, invoicenumber, customername, invoicedate, typeofpay, paymentstatus, taxrate, taxrateamount, discountpercent, discountamount) " +
+									"VALUES (@transaction_id, @item, @qty, @unit, @priceperunit, @registeredphonenumber, @invoicenumber, @customername, @invoicedate, @typeofpay, @paymentstatus, @taxrate, @taxrateamount, @discountpercent, @discountamount)";
 								cmdd.Parameters.AddWithValue("@transaction_id", transactionId);
 								cmdd.Parameters.AddWithValue("@item", itemDetail.item);
 								cmdd.Parameters.AddWithValue("@qty", itemDetail.qty);
@@ -74,6 +75,10 @@ namespace WebApplication1.DL
 								cmdd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
 								cmdd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
 								cmdd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
+								cmdd.Parameters.AddWithValue("@taxrate", itemDetail.taxrate);
+								cmdd.Parameters.AddWithValue("@taxrateamount", itemDetail.taxrateamount);
+								cmdd.Parameters.AddWithValue("@discountpercent", itemDetail.discountpercent);
+								cmdd.Parameters.AddWithValue("@discountamount", itemDetail.discountamount);
 								cmdd.ExecuteNonQuery();
 								otransactionrs.status = "SUCCESS";
 							}
@@ -141,7 +146,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT tr.invoicenumber, tr.typeofpay, tr.invoicedate, tr.total, tr.balance, tr.phonenumber, pr.emailid, pr.billingaddress, pr.creditlimit, pr.gst FROM transactions tr join party pr ON tr.customername = pr.partyname" +
+					cmd.CommandText = "SELECT tr.invoicenumber, tr.typeofpay, tr.invoicedate, tr.total, tr.balance, tr.phonenumber, pr.emailid, pr.billingaddress, pr.creditlimit, pr.gst, pr.creditlimit FROM transactions tr join party pr ON tr.customername = pr.partyname" +
 						" where tr.registeredphonenumber = " + oGetPartyTransactionsRq.registeredphonenumber + " AND " +
 						"tr.customername = '" + oGetPartyTransactionsRq.customername + "' AND tr.showtransaction = 'SHOW'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
@@ -155,6 +160,7 @@ namespace WebApplication1.DL
 								oGetPartyTransactionsRs.emailid = Convert.ToString(reader["emailid"]);
 								oGetPartyTransactionsRs.billingaddress = Convert.ToString(reader["billingaddress"]);
 								oGetPartyTransactionsRs.phonenumber = Convert.ToInt64(reader["phonenumber"]);
+								oGetPartyTransactionsRs.creditlimit = Convert.ToInt64(reader["creditlimit"]);
 								GetAllPartyTransactionsList oGetAllPartyTransactionsList = new GetAllPartyTransactionsList();
 								oGetAllPartyTransactionsList.typeofpay = Convert.ToString(reader["typeofpay"]);
 								oGetAllPartyTransactionsList.invoicenumber = Convert.ToInt64(reader["invoicenumber"]);
@@ -197,7 +203,7 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT tr.typeofpay, tr.invoicedate, tr.stateofsupply, tr.paymenttype, tr.total, tr.received, tr.balance, tr.customername," +
-						"tr.phonenumber, tr.billingaddress, tr.shippingaddress, ide.item, ide,qty, ide.unit, ide.priceperunit FROM transactions tr join item_details ide" +
+						"tr.phonenumber, tr.billingaddress, tr.shippingaddress, ide.item, ide,qty, ide.unit, ide.priceperunit, ide.transaction_id, ide.taxrate, ide.taxrateamount, ide.discountpercent, ide.discountamount FROM transactions tr join item_details ide" +
 						" ON tr.transaction_id = ide.transaction_id WHERE tr.invoicenumber = " + oGetPartyTransactionDetailsRq.invoicenumber + " AND tr.registeredphonenumber = " +
 						oGetPartyTransactionDetailsRq.registeredphonenumber + " AND tr.typeofpay = '" + oGetPartyTransactionDetailsRq.typeofpay + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
@@ -228,6 +234,11 @@ namespace WebApplication1.DL
 								oItemDetailsListRs.qty = Convert.ToInt64(reader["qty"]);
 								oItemDetailsListRs.unit = Convert.ToString(reader["unit"]);
 								oItemDetailsListRs.priceperunit = Convert.ToInt64(reader["priceperunit"]);
+								oItemDetailsListRs.transactionid = Convert.ToInt64(reader["transaction_id"]);
+								oItemDetailsListRs.taxrate = Convert.ToString(reader["taxrate"]);
+								oItemDetailsListRs.taxrateamount = Convert.ToInt64(reader["taxrateamount"]);
+								oItemDetailsListRs.discountpercent = Convert.ToInt64(reader["discountpercent"]);
+								oItemDetailsListRs.discountamount = Convert.ToInt64(reader["discountamount"]);
 								oGetPartyTransactionDetailsRs.itemdetailslist.Add(oItemDetailsListRs);
 							}
 							oGetPartyTransactionDetailsRs.status = "SUCCESS";
@@ -462,7 +473,8 @@ namespace WebApplication1.DL
 								NpgsqlCommand cmdd = new NpgsqlCommand();
 								cmdd.Connection = connn;
 								cmdd.CommandType = CommandType.Text;
-								cmdd.CommandText = "INSERT INTO item_details (transaction_id, item, qty, unit, priceperunit, registeredphonenumber, invoicenumber, customername, invoicedate, typeofpay, paymentstatus) VALUES (@transaction_id, @item, @qty, @unit, @priceperunit, @registeredphonenumber, @invoicenumber, @customername, @invoicedate, @typeofpay, @paymentstatus)";
+								cmdd.CommandText = "INSERT INTO item_details (transaction_id, item, qty, unit, priceperunit, registeredphonenumber, invoicenumber, customername, invoicedate, typeofpay, paymentstatus, taxrate, taxrateamount, discountpercent, discountamount) " +
+									"VALUES (@transaction_id, @item, @qty, @unit, @priceperunit, @registeredphonenumber, @invoicenumber, @customername, @invoicedate, @typeofpay, @paymentstatus, @taxrate, @taxrateamount, @discountpercent, @discountamount)";
 								cmdd.Parameters.AddWithValue("@transaction_id", transactionId);
 								cmdd.Parameters.AddWithValue("@item", itemDetail.item);
 								cmdd.Parameters.AddWithValue("@qty", itemDetail.qty);
@@ -474,6 +486,10 @@ namespace WebApplication1.DL
 								cmdd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
 								cmdd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
 								cmdd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
+								cmdd.Parameters.AddWithValue("@taxrate", itemDetail.taxrate);
+								cmdd.Parameters.AddWithValue("@taxrateamount", itemDetail.taxrateamount);
+								cmdd.Parameters.AddWithValue("@discountpercent", itemDetail.discountpercent);
+								cmdd.Parameters.AddWithValue("@discountamount", itemDetail.discountamount);
 								cmdd.ExecuteNonQuery();
 								otransactionrs.status = "SUCCESS";
 							}
@@ -673,6 +689,71 @@ namespace WebApplication1.DL
 				Console.WriteLine(ex.Message);
 			}
 			return oGetLinkedPaymentTransactionRs;
+		}
+		public string UpdateTransactionDetails(TransactionRq otransactionRq)
+		{
+			string status = string.Empty;
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "UPDATE transactions SET phonenumber = @phonenumber, billingaddress = @billingaddress, shippingaddress = @shippingaddress, invoicedate = @invoicedate, stateofsupply = @stateofsupply," +
+						" total = @total, received = @received, balance = @balance, paymenttype = @paymenttype where registeredphonenumber = " + otransactionRq.registeredphonenumber + " AND invoicenumber = " + otransactionRq.invoicenumber + " AND " +
+						" customername = '" + otransactionRq.customername + "'" ;
+					cmd.Parameters.AddWithValue("@phonenumber", otransactionRq.phonenumber);
+					cmd.Parameters.AddWithValue("@billingaddress", otransactionRq.billingaddress);
+					cmd.Parameters.AddWithValue("@shippingaddress", otransactionRq.shippingaddress);
+					cmd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
+					cmd.Parameters.AddWithValue("@stateofsupply", otransactionRq.stateofsupply);
+					cmd.Parameters.AddWithValue("@total", otransactionRq.total);
+					cmd.Parameters.AddWithValue("@received", otransactionRq.received);
+					cmd.Parameters.AddWithValue("@balance", otransactionRq.balance);
+					cmd.Parameters.AddWithValue("@paymenttype", otransactionRq.paymenttype);
+					cmd.ExecuteNonQuery();
+					status = "SUCCESS";
+				}
+			}
+			catch (Exception ex)
+			{
+				status = ex.Message;
+			}
+			return status;
+		}
+
+		public string UpdateTransactionDetailsList(TransactionRq otransactionRq)
+		{
+			string status = string.Empty;
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "UPDATE item_details SET  where registeredphonenumber = " + otransactionRq.registeredphonenumber;
+					cmd.Parameters.AddWithValue("@phonenumber", otransactionRq.phonenumber);
+					cmd.Parameters.AddWithValue("@billingaddress", otransactionRq.billingaddress);
+					cmd.Parameters.AddWithValue("@shippingaddress", otransactionRq.shippingaddress);
+					cmd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
+					cmd.Parameters.AddWithValue("@stateofsupply", otransactionRq.stateofsupply);
+					cmd.Parameters.AddWithValue("@total", otransactionRq.total);
+					cmd.Parameters.AddWithValue("@received", otransactionRq.received);
+					cmd.Parameters.AddWithValue("@balance", otransactionRq.balance);
+					cmd.Parameters.AddWithValue("@paymenttype", otransactionRq.paymenttype);
+					cmd.ExecuteNonQuery();
+					status = "SUCCESS";
+				}
+			}
+			catch (Exception ex)
+			{
+				status = ex.Message;
+			}
+			return status;
 		}
 	}
 }
