@@ -64,7 +64,14 @@ namespace WebApplication1.BL
 		{
 			PartyRs opartyRs = new PartyRs();
 			LoginDL logindl = new LoginDL(this.config);
-			opartyRs = logindl.Party(opartyRq);
+			if (opartyRq.ispartyupdate)
+			{
+				opartyRs = logindl.UpdateParty(opartyRq);
+			} 
+			else
+			{
+				opartyRs = logindl.Party(opartyRq);
+			}
 			return opartyRs;
 		}
 

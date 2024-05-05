@@ -35,9 +35,10 @@ namespace WebApplication1.Models
 
 	public class PartyRq
 	{
-		public string typeofpay { get; set; }
+		public string typeofpay { get; set; } = "";
 		public Int64? registeredphonenumber { get; set; }
 		public string? partyname { get; set; }
+		public string? oldpartyname { get; set; } = "";
 		public string? GST { get; set; } = "";
 		public Int64 phonenumber { get; set;}
 		public string? partygroup { get; set; }
@@ -58,7 +59,8 @@ namespace WebApplication1.Models
 		public string? additionalfieldname2value { get; set; }
 		public string? additionalfieldname3value { get; set; }
 		public DateTime? additionalfieldname4value { get; set; }
-		public Int64 partybalance { get; set; }
+		public Int64 partybalance { get; set; } = 0;
+		public bool ispartyupdate { get; set; }
 	}
 
 	public class PartyRs
