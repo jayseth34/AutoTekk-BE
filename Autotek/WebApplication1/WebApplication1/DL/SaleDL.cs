@@ -125,7 +125,6 @@ namespace WebApplication1.DL
 						}
 					}
 				}
-				
 			}
 			catch(Exception ex)
 			{
@@ -724,30 +723,58 @@ namespace WebApplication1.DL
 			return status;
 		}
 
-		public string UpdateTransactionDetailsList(TransactionRq otransactionRq)
+		public string UpdateInsertDeleteItemDetails(TransactionRq otransactionRq)
 		{
 			string status = string.Empty;
 			try
 			{
-				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				foreach (var itemDetail in otransactionRq.itemdetailslist)
 				{
-					conn.Open();
-					NpgsqlCommand cmd = new NpgsqlCommand();
-					cmd.Connection = conn;
-					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "UPDATE item_details SET  where registeredphonenumber = " + otransactionRq.registeredphonenumber;
-					cmd.Parameters.AddWithValue("@phonenumber", otransactionRq.phonenumber);
-					cmd.Parameters.AddWithValue("@billingaddress", otransactionRq.billingaddress);
-					cmd.Parameters.AddWithValue("@shippingaddress", otransactionRq.shippingaddress);
-					cmd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
-					cmd.Parameters.AddWithValue("@stateofsupply", otransactionRq.stateofsupply);
-					cmd.Parameters.AddWithValue("@total", otransactionRq.total);
-					cmd.Parameters.AddWithValue("@received", otransactionRq.received);
-					cmd.Parameters.AddWithValue("@balance", otransactionRq.balance);
-					cmd.Parameters.AddWithValue("@paymenttype", otransactionRq.paymenttype);
-					cmd.ExecuteNonQuery();
-					status = "SUCCESS";
+					string query = string.Empty;
+					if(itemDetail.queryoperationtype == "INSERT")
+					{
+						query = "INSERT INTO item_details (transaction_id, item, qty, unit, priceperunit, registeredphonenumber, invoicenumber, customername, invoicedate, typeofpay, paymentstatus, taxrate, taxrateamount, discountpercent, discountamount) " +
+							"VALUES (@transaction_id, @item, @qty, @unit, @priceperunit, @registeredphonenumber, @invoicenumber, @customername, @invoicedate, @typeofpay, @paymentstatus, @taxrate, @taxrateamount, @discountpercent, @discountamount)";
+					} 
+					else if (itemDetail.queryoperationtype == "UPDATE")
+					{
+						query = "UPDATE item_details SET item = @item, qty = @qty, unit = @unit, priceperunit = @priceperunit, invoicedate = @invoicedate, typeofpay = @typeofpay, paymentstatus = @paymentstatus," +
+							"taxrate = @taxrate, taxrateamount = @taxrateamount, discountpercent = @discountpercent, discountamount = @discountamount WHERE registeredphonenumber = " + otransactionRq.registeredphonenumber + " AND transaction_id = " + itemDetail.transactionid + " " +
+							"AND item = '" + itemDetail.item + "' AND invoicenumber = " + otransactionRq.invoicenumber;
+					}
+					else if ( itemDetail.queryoperationtype == "DELETE")
+					{
+						query = "DELETE FROM item_details WHERE registeredphonenumber = " + otransactionRq.registeredphonenumber + " AND transaction_id = " + itemDetail.transactionid + " AND item = '" + itemDetail.item + "' AND invoicenumber = " + otransactionRq.invoicenumber;
+					}
+					using (NpgsqlConnection connn = new NpgsqlConnection(this._connectionFactory))
+					{
+						connn.Open();
+						NpgsqlCommand cmdd = new NpgsqlCommand();
+						cmdd.Connection = connn;
+						cmdd.CommandType = CommandType.Text;
+						cmdd.CommandText = query;
+						if (itemDetail.queryoperationtype == "INSERT")
+						{
+							cmdd.Parameters.AddWithValue("@transaction_id", itemDetail.transactionid);
+							cmdd.Parameters.AddWithValue("@registeredphonenumber", otransactionRq.registeredphonenumber);
+							cmdd.Parameters.AddWithValue("@customername", otransactionRq.customername);
+							cmdd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
+						}
+						cmdd.Parameters.AddWithValue("@item", itemDetail.item);
+						cmdd.Parameters.AddWithValue("@qty", itemDetail.qty);
+						cmdd.Parameters.AddWithValue("@unit", itemDetail.unit);
+						cmdd.Parameters.AddWithValue("@priceperunit", itemDetail.priceperunit);
+						cmdd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
+						cmdd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
+						cmdd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
+						cmdd.Parameters.AddWithValue("@taxrate", itemDetail.taxrate);
+						cmdd.Parameters.AddWithValue("@taxrateamount", itemDetail.taxrateamount);
+						cmdd.Parameters.AddWithValue("@discountpercent", itemDetail.discountpercent);
+						cmdd.Parameters.AddWithValue("@discountamount", itemDetail.discountamount);
+						cmdd.ExecuteNonQuery();
+					}
 				}
+				status = "SUCCESS";
 			}
 			catch (Exception ex)
 			{
