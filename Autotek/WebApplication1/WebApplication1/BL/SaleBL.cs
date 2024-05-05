@@ -134,23 +134,10 @@ namespace WebApplication1.BL
 			otransactionRs.status = saledl.UpdateTransactionDetails(otransactionRq);
 			if (otransactionRs.status == "SUCCESS")
 			{
-				foreach (var itemDetail in otransactionRq.itemdetailslist)
-				{
-					if (itemDetail.queryoperationtype == "UPDATE")
-					{
-
-					} 
-					else if (itemDetail.queryoperationtype == "INSERT")
-					{
-
-					}
-					else if (itemDetail.queryoperationtype == "DELETE")
-					{
-
-					}
-				}
-					
+				_ = saledl.FindOrInsertItem(otransactionRq);
+				otransactionRs.status = saledl.UpdateInsertDeleteItemDetails(otransactionRq);
 			}
+
 			return otransactionRs;
 		}
 	}
