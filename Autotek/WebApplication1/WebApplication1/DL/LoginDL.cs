@@ -241,7 +241,7 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@phonenumber", opartyRq.phonenumber);
 							cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
 							cmd.Parameters.AddWithValue("@paymentstatus", "UNPAID");
-							int transactionId = (int)cmd.ExecuteScalar();
+							Int64 transactionId = (Int64)cmd.ExecuteScalar();
 						}
 					}
 					catch (Exception ex)

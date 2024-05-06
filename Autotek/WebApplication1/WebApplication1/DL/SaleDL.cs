@@ -51,7 +51,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@billingaddress", otransactionRq.billingaddress);
 					cmd.Parameters.AddWithValue("@shippingaddress", otransactionRq.shippingaddress);
 					cmd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
-					int transactionId = (int)cmd.ExecuteScalar();
+					Int64 transactionId = (Int64)cmd.ExecuteScalar();
 					if (otransactionRq.itemdetailslist.Count > 0)
 					{
 						foreach (var itemDetail in otransactionRq.itemdetailslist)
