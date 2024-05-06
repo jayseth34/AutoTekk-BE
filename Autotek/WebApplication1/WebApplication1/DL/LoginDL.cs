@@ -620,6 +620,7 @@ namespace WebApplication1.DL
 								oGetPartyList.phonenumber = Convert.ToInt64(reader["phonenumber"]);
 								oGetPartyListRs.getPartyList.Add(oGetPartyList);
 							}
+							oGetPartyListRs.status = "SUCCESS";
 						}
 						catch (Exception ex)
 						{

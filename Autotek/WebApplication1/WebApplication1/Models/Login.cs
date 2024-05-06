@@ -108,6 +108,7 @@ namespace WebApplication1.Models
 
 	public class GetPartyListRs
 	{
+		public string status {  get; set; }
 		public GetPartyListRs()
 		{
 			getPartyList = new List<GetPartyList>();
