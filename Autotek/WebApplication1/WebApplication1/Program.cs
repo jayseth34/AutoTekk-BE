@@ -6,6 +6,15 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddCors(options =>
+{
+	options.AddDefaultPolicy(policy =>
+	{
+		policy.AllowAnyOrigin();
+		policy.AllowAnyMethod();
+		policy.AllowAnyHeader();
+	});
+});
 
 builder.Services.AddControllers();
 
@@ -66,6 +75,8 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
     });
 }
+
+app.UseCors();
 
 app.UseAuthentication();
 
