@@ -46,9 +46,9 @@ namespace WebApplication1.DL
 							NpgsqlCommand cmd = new NpgsqlCommand();
 							cmd.Connection = conn;
 							cmd.CommandType = CommandType.Text;
-							cmd.CommandText = "INSERT INTO item (typeofpay, registeredphonenumber, itemname, itemhsn, baseunit, secondaryunit, conversionrates, category, itemcode, saleprice, salewithorwithouttax, discountonsaleprice, percentageoramount," +
+							cmd.CommandText = "INSERT INTO item (typeofpay, registeredphonenumber, itemname, itemhsn, baseunit, secondaryunit, conversionrates, category, itemcode, saleprice, salewithorwithouttax, discountonsaleprice," +
 								"wholesaleprice, wholesalewithorwithouttax, minimumwholesalequantity, purchaseprice, purchasewithorwithouttax, taxrate, openingquantity, remainingquantity, atprice, asofdate, minimumstocktomaintain, _location, percentageoramounttype) " +
-								"VALUES (@typeofpay, @registeredphonenumber, @itemname, @itemhsn, @baseunit, @secondaryunit, @conversionrates, @category, @itemcode, @saleprice, @salewithorwithouttax, @discountonsaleprice, @percentageoramount," +
+								"VALUES (@typeofpay, @registeredphonenumber, @itemname, @itemhsn, @baseunit, @secondaryunit, @conversionrates, @category, @itemcode, @saleprice, @salewithorwithouttax, @discountonsaleprice," +
 								" @wholesaleprice, @wholesalewithorwithouttax, @minimumwholesalequantity, @purchaseprice, @purchasewithorwithouttax, @taxrate, @openingquantity, @remainingquantity, @atprice, @asofdate, @minimumstocktomaintain, @_location, @percentageoramounttype)";
 							cmd.Parameters.AddWithValue("@typeofpay", oitemRq.typeofpay);
 							cmd.Parameters.AddWithValue("@registeredphonenumber", oitemRq.registeredphonenumber);
@@ -62,7 +62,6 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@saleprice", oitemRq.saleprice);
 							cmd.Parameters.AddWithValue("@salewithorwithouttax", oitemRq.salewithorwithouttax);
 							cmd.Parameters.AddWithValue("@discountonsaleprice", oitemRq.discountonsaleprice);
-							cmd.Parameters.AddWithValue("@percentageoramount", oitemRq.percentageoramount);
 							cmd.Parameters.AddWithValue("@wholesaleprice", oitemRq.wholesaleprice);
 							cmd.Parameters.AddWithValue("@wholesalewithorwithouttax", oitemRq.wholesalewithorwithouttax);
 							cmd.Parameters.AddWithValue("@minimumwholesalequantity", oitemRq.minimumwholesalequantity);
@@ -96,7 +95,7 @@ namespace WebApplication1.DL
 							cmd.Connection = conn;
 							cmd.CommandType = CommandType.Text;
 							cmd.CommandText = "Update item SET typeofpay = @typeofpay, itemname = @itemname, itemhsn = @itemhsn, baseunit = @baseunit, secondaryunit = @secondaryunit, conversionrates = @conversionrates, category = @category," +
-								"itemcode = @itemcode, saleprice = @saleprice, salewithorwithouttax = @salewithorwithouttax, discountonsaleprice = @discountonsaleprice, percentageoramount = @percentageoramount," +
+								"itemcode = @itemcode, saleprice = @saleprice, salewithorwithouttax = @salewithorwithouttax, discountonsaleprice = @discountonsaleprice," +
 								"wholesaleprice = @wholesaleprice, wholesalewithorwithouttax = @wholesalewithorwithouttax, minimumwholesalequantity = @minimumwholesalequantity, purchaseprice = @purchaseprice, purchasewithorwithouttax = @purchasewithorwithouttax," +
 								"taxrate = @taxrate, openingquantity = @openingquantity, remainingquantity = @remainingquantity, atprice = @atprice, asofdate = @asofdate, minimumstocktomaintain = @minimumstocktomaintain, _location = @_location, percentageoramounttype = @percentageoramounttype WHERE " +
 								"registeredphonenumber = " + oitemRq.registeredphonenumber + " AND itemname = '" + oitemRq.itemname + "'";
@@ -111,7 +110,6 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@saleprice", oitemRq.saleprice);
 							cmd.Parameters.AddWithValue("@salewithorwithouttax", oitemRq.salewithorwithouttax);
 							cmd.Parameters.AddWithValue("@discountonsaleprice", oitemRq.discountonsaleprice);
-							cmd.Parameters.AddWithValue("@percentageoramount", oitemRq.percentageoramount);
 							cmd.Parameters.AddWithValue("@wholesaleprice", oitemRq.wholesaleprice);
 							cmd.Parameters.AddWithValue("@wholesalewithorwithouttax", oitemRq.wholesalewithorwithouttax);
 							cmd.Parameters.AddWithValue("@minimumwholesalequantity", oitemRq.minimumwholesalequantity);
@@ -207,7 +205,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT itemname, remainingquantity, saleprice, purchaseprice, percentageoramount, wholesaleprice, minimumwholesalequantity, percentageoramounttype from item where registeredphonenumber = " + registeredphonenumber;
+					cmd.CommandText = "SELECT itemname, remainingquantity, saleprice, purchaseprice, wholesaleprice, minimumwholesalequantity, percentageoramounttype, discountonsaleprice from item where registeredphonenumber = " + registeredphonenumber;
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -220,9 +218,9 @@ namespace WebApplication1.DL
 								oGetItemList.remainingquantity = Convert.ToInt64(reader["remainingquantity"]);
 								oGetItemList.saleprice = Convert.ToInt64(reader["saleprice"]);
 								oGetItemList.purchaseprice = Convert.ToInt64(reader["purchaseprice"]);
-								oGetItemList.percentageoramount = Convert.ToInt64(reader["percentageoramount"]);
 								oGetItemList.wholesaleprice = Convert.ToInt64(reader["wholesaleprice"]);
 								oGetItemList.minimumwholesalequantity = Convert.ToInt64(reader["minimumwholesalequantity"]);
+								oGetItemList.discountonsaleprice = Convert.ToInt64(reader["discountonsaleprice"]);
 								oGetItemList.percentageoramounttype = Convert.ToString(reader["percentageoramounttype"]);
 								oGetItemListRs.getItemList.Add(oGetItemList);
 							}
@@ -252,7 +250,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT typeofpay, itemhsn, baseunit, secondaryunit, conversionrates, category, itemcode, saleprice, salewithorwithouttax, discountonsaleprice, percentageoramount, wholesaleprice, wholesalewithorwithouttax," +
+					cmd.CommandText = "SELECT typeofpay, itemhsn, baseunit, secondaryunit, conversionrates, category, itemcode, saleprice, salewithorwithouttax, discountonsaleprice, wholesaleprice, wholesalewithorwithouttax," +
 						"minimumwholesalequantity, purchaseprice, purchasewithorwithouttax, taxrate, openingquantity, remainingquantity, atprice, asofdate, minimumstocktomaintain, _location, percentageoramounttype FROM item WHERE registeredphonenumber = " + registeredphonenumber + " AND itemname = '" +
 						itemname + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
@@ -273,7 +271,6 @@ namespace WebApplication1.DL
 								oGetAllItemList.saleprice = Convert.ToInt64(reader["saleprice"]);
 								oGetAllItemList.salewithorwithouttax = Convert.ToString(reader["salewithorwithouttax"]);
 								oGetAllItemList.discountonsaleprice = Convert.ToInt64(reader["discountonsaleprice"]);
-								oGetAllItemList.percentageoramount = Convert.ToInt64(reader["percentageoramount"]);
 								oGetAllItemList.wholesaleprice = Convert.ToInt64(reader["wholesaleprice"]);
 								oGetAllItemList.wholesalewithorwithouttax = Convert.ToString(reader["wholesalewithorwithouttax"]);
 								oGetAllItemList.minimumwholesalequantity = Convert.ToInt64(reader["minimumwholesalequantity"]);
