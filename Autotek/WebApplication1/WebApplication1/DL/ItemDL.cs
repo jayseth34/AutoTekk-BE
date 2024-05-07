@@ -214,14 +214,15 @@ namespace WebApplication1.DL
 							while (reader.Read())
 							{
 								GetItemList oGetItemList = new GetItemList();
-								oGetItemList.itemname = Convert.ToString(reader["itemname"]);
-								oGetItemList.remainingquantity = Convert.ToInt64(reader["remainingquantity"]);
-								oGetItemList.saleprice = Convert.ToInt64(reader["saleprice"]);
-								oGetItemList.purchaseprice = Convert.ToInt64(reader["purchaseprice"]);
-								oGetItemList.wholesaleprice = Convert.ToInt64(reader["wholesaleprice"]);
-								oGetItemList.minimumwholesalequantity = Convert.ToInt64(reader["minimumwholesalequantity"]);
-								oGetItemList.discountonsaleprice = Convert.ToInt64(reader["discountonsaleprice"]);
-								oGetItemList.percentageoramounttype = Convert.ToString(reader["percentageoramounttype"]);
+								oGetItemList.itemname = reader["itemname"] == DBNull.Value ? null : Convert.ToString(reader["itemname"]);
+								oGetItemList.remainingquantity = reader["remainingquantity"] == DBNull.Value ? 0 : Convert.ToInt64(reader["remainingquantity"]);
+								oGetItemList.saleprice = reader["saleprice"] == DBNull.Value ? 0 : Convert.ToInt64(reader["saleprice"]);
+								oGetItemList.purchaseprice = reader["purchaseprice"] == DBNull.Value ? 0 : Convert.ToInt64(reader["purchaseprice"]);
+								oGetItemList.wholesaleprice = reader["wholesaleprice"] == DBNull.Value ? 0 : Convert.ToInt64(reader["wholesaleprice"]);
+								oGetItemList.minimumwholesalequantity = reader["minimumwholesalequantity"] == DBNull.Value ? 0 : Convert.ToInt64(reader["minimumwholesalequantity"]);
+								oGetItemList.discountonsaleprice = reader["discountonsaleprice"] == DBNull.Value ? 0 : Convert.ToInt64(reader["discountonsaleprice"]);
+								oGetItemList.percentageoramounttype = reader["percentageoramounttype"] == DBNull.Value ? null : Convert.ToString(reader["percentageoramounttype"]);
+
 								oGetItemListRs.getItemList.Add(oGetItemList);
 							}
 						}
@@ -261,29 +262,29 @@ namespace WebApplication1.DL
 							while (reader.Read())
 							{
 								GetAllItemList oGetAllItemList = new GetAllItemList();
-								oGetAllItemList.typeofpay = Convert.ToString(reader["typeofpay"]);
-								oGetAllItemList.itemhsn = Convert.ToString(reader["itemhsn"]);
-								oGetAllItemList.baseunit = Convert.ToString(reader["baseunit"]);
-								oGetAllItemList.secondaryunit = Convert.ToString(reader["secondaryunit"]);
-								oGetAllItemList.conversionrates = Convert.ToInt64(reader["conversionrates"]);
-								oGetAllItemList.category = Convert.ToString(reader["category"]);
-								oGetAllItemList.itemcode = Convert.ToString(reader["itemcode"]);
-								oGetAllItemList.saleprice = Convert.ToInt64(reader["saleprice"]);
-								oGetAllItemList.salewithorwithouttax = Convert.ToString(reader["salewithorwithouttax"]);
-								oGetAllItemList.discountonsaleprice = Convert.ToInt64(reader["discountonsaleprice"]);
-								oGetAllItemList.wholesaleprice = Convert.ToInt64(reader["wholesaleprice"]);
-								oGetAllItemList.wholesalewithorwithouttax = Convert.ToString(reader["wholesalewithorwithouttax"]);
-								oGetAllItemList.minimumwholesalequantity = Convert.ToInt64(reader["minimumwholesalequantity"]);
-								oGetAllItemList.purchaseprice = Convert.ToInt64(reader["purchaseprice"]);
-								oGetAllItemList.purchasewithorwithouttax = Convert.ToString(reader["purchasewithorwithouttax"]);
-								oGetAllItemList.taxrate = Convert.ToString(reader["taxrate"]);
-								oGetAllItemList.openingquantity = Convert.ToInt64(reader["openingquantity"]);
-								oGetAllItemList.remainingquantity = Convert.ToInt64(reader["remainingquantity"]);
-								oGetAllItemList.atprice = Convert.ToInt64(reader["atprice"]);
+								oGetAllItemList.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
+								oGetAllItemList.itemhsn = reader["itemhsn"] == DBNull.Value ? null : Convert.ToString(reader["itemhsn"]);
+								oGetAllItemList.baseunit = reader["baseunit"] == DBNull.Value ? null : Convert.ToString(reader["baseunit"]);
+								oGetAllItemList.secondaryunit = reader["secondaryunit"] == DBNull.Value ? null : Convert.ToString(reader["secondaryunit"]);
+								oGetAllItemList.conversionrates = reader["conversionrates"] == DBNull.Value ? 0 : Convert.ToInt64(reader["conversionrates"]);
+								oGetAllItemList.category = reader["category"] == DBNull.Value ? null : Convert.ToString(reader["category"]);
+								oGetAllItemList.itemcode = reader["itemcode"] == DBNull.Value ? null : Convert.ToString(reader["itemcode"]);
+								oGetAllItemList.saleprice = reader["saleprice"] == DBNull.Value ? 0 : Convert.ToInt64(reader["saleprice"]);
+								oGetAllItemList.salewithorwithouttax = reader["salewithorwithouttax"] == DBNull.Value ? null : Convert.ToString(reader["salewithorwithouttax"]);
+								oGetAllItemList.discountonsaleprice = reader["discountonsaleprice"] == DBNull.Value ? 0 : Convert.ToInt64(reader["discountonsaleprice"]);
+								oGetAllItemList.wholesaleprice = reader["wholesaleprice"] == DBNull.Value ? 0 : Convert.ToInt64(reader["wholesaleprice"]);
+								oGetAllItemList.wholesalewithorwithouttax = reader["wholesalewithorwithouttax"] == DBNull.Value ? null : Convert.ToString(reader["wholesalewithorwithouttax"]);
+								oGetAllItemList.minimumwholesalequantity = reader["minimumwholesalequantity"] == DBNull.Value ? 0 : Convert.ToInt64(reader["minimumwholesalequantity"]);
+								oGetAllItemList.purchaseprice = reader["purchaseprice"] == DBNull.Value ? 0 : Convert.ToInt64(reader["purchaseprice"]);
+								oGetAllItemList.purchasewithorwithouttax = reader["purchasewithorwithouttax"] == DBNull.Value ? null : Convert.ToString(reader["purchasewithorwithouttax"]);
+								oGetAllItemList.taxrate = reader["taxrate"] == DBNull.Value ? null : Convert.ToString(reader["taxrate"]);
+								oGetAllItemList.openingquantity = reader["openingquantity"] == DBNull.Value ? 0 : Convert.ToInt64(reader["openingquantity"]);
+								oGetAllItemList.remainingquantity = reader["remainingquantity"] == DBNull.Value ? 0 : Convert.ToInt64(reader["remainingquantity"]);
+								oGetAllItemList.atprice = reader["atprice"] == DBNull.Value ? 0 : Convert.ToInt64(reader["atprice"]);
 								oGetAllItemList.asofdate = reader["asofdate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["asofdate"]);
-								oGetAllItemList.minimumstocktomaintain = Convert.ToInt64(reader["minimumstocktomaintain"]);
-								oGetAllItemList._location = Convert.ToString(reader["_location"]);
-								oGetAllItemList.percentageoramounttype = Convert.ToString(reader["percentageoramounttype"]);
+								oGetAllItemList.minimumstocktomaintain = reader["minimumstocktomaintain"] == DBNull.Value ? 0 : Convert.ToInt64(reader["minimumstocktomaintain"]);
+								oGetAllItemList._location = reader["_location"] == DBNull.Value ? null : Convert.ToString(reader["_location"]);
+								oGetAllItemList.percentageoramounttype = reader["percentageoramounttype"] == DBNull.Value ? null : Convert.ToString(reader["percentageoramounttype"]);
 								oGetItemRs.itemList.Add(oGetAllItemList);
 								oGetItemRs.status = "SUCCESS";
 							}
@@ -367,8 +368,8 @@ namespace WebApplication1.DL
 							while (reader.Read())
 							{
 								GetItemList oGetItemList = new GetItemList();
-								oGetItemList.itemname = Convert.ToString(reader["itemname"]);
-								oGetItemList.remainingquantity = Convert.ToInt64(reader["remainingquantity"]);
+								oGetItemList.itemname = reader["itemname"] == DBNull.Value ? null : Convert.ToString(reader["itemname"]);
+								oGetItemList.remainingquantity = reader["remainingquantity"] == DBNull.Value ? 0 : Convert.ToInt64(reader["remainingquantity"]);
 								oGetItemByCategoryRs.getItemList.Add(oGetItemList);
 							}
 							oGetItemByCategoryRs.status = "SUCCESS";

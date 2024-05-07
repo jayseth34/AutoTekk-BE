@@ -547,28 +547,29 @@ namespace WebApplication1.DL
 							while (reader.Read())
 							{
 								GetAllPartyList ogetallpartylist = new GetAllPartyList();
-								ogetallpartylist.GST = Convert.ToString(reader["gst"]);
-								ogetallpartylist.phonenumber = Convert.ToInt64(reader["phonenumber"]);
-								ogetallpartylist.partygroup = Convert.ToString(reader["partygroup"]);
-								ogetallpartylist.gsttype = Convert.ToString(reader["gsttype"]);
-								ogetallpartylist._state = Convert.ToString(reader["_state"]);
-								ogetallpartylist.emailid = Convert.ToString(reader["emailid"]);
-								ogetallpartylist.billingaddress = Convert.ToString(reader["billingaddress"]);
-								ogetallpartylist.shippingaddress = Convert.ToString(reader["shippingaddress"]);
-								ogetallpartylist.openingbalance = Convert.ToInt64(reader["openingbalance"]);
+								ogetallpartylist.GST = reader["gst"] == DBNull.Value ? null : Convert.ToString(reader["gst"]);
+								ogetallpartylist.phonenumber = reader["phonenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["phonenumber"]);
+								ogetallpartylist.partygroup = reader["partygroup"] == DBNull.Value ? null : Convert.ToString(reader["partygroup"]);
+								ogetallpartylist.gsttype = reader["gsttype"] == DBNull.Value ? null : Convert.ToString(reader["gsttype"]);
+								ogetallpartylist._state = reader["_state"] == DBNull.Value ? null : Convert.ToString(reader["_state"]);
+								ogetallpartylist.emailid = reader["emailid"] == DBNull.Value ? null : Convert.ToString(reader["emailid"]);
+								ogetallpartylist.billingaddress = reader["billingaddress"] == DBNull.Value ? null : Convert.ToString(reader["billingaddress"]);
+								ogetallpartylist.shippingaddress = reader["shippingaddress"] == DBNull.Value ? null : Convert.ToString(reader["shippingaddress"]);
+								ogetallpartylist.openingbalance = reader["openingbalance"] == DBNull.Value ? 0 : Convert.ToInt64(reader["openingbalance"]);
 								ogetallpartylist.asofdate = reader["asofdate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["asofdate"]);
-								ogetallpartylist.creditlimit = Convert.ToInt64(reader["creditlimit"]);
-								ogetallpartylist.additionalfieldname1 = Convert.ToString(reader["additionalfieldname1"]);
-								ogetallpartylist.additionalfieldname2 = Convert.ToString(reader["additionalfieldname2"]);
-								ogetallpartylist.additionalfieldname3 = Convert.ToString(reader["additionalfieldname3"]);
-								ogetallpartylist.additionalfieldname4 = Convert.ToString(reader["additionalfieldname4"]);
-								ogetallpartylist.typeofpay = Convert.ToString(reader["typeofpay"]);
-								ogetallpartylist.topayorreceive = Convert.ToString(reader["topayorreceive"]);
-								ogetallpartylist.partybalance = Convert.ToInt64(reader["partybalance"]);
-								ogetallpartylist.additionalfieldname1value = Convert.ToString(reader["additionalfieldname4value"]);
-								ogetallpartylist.additionalfieldname2value = Convert.ToString(reader["additionalfieldname4value"]);
-								ogetallpartylist.additionalfieldname3value = Convert.ToString(reader["additionalfieldname4value"]);
-								ogetallpartylist.additionalfieldname4value = Convert.ToString(reader["additionalfieldname4value"]);
+								ogetallpartylist.creditlimit = reader["creditlimit"] == DBNull.Value ? 0 : Convert.ToInt64(reader["creditlimit"]);
+								ogetallpartylist.additionalfieldname1 = reader["additionalfieldname1"] == DBNull.Value ? null : Convert.ToString(reader["additionalfieldname1"]);
+								ogetallpartylist.additionalfieldname2 = reader["additionalfieldname2"] == DBNull.Value ? null : Convert.ToString(reader["additionalfieldname2"]);
+								ogetallpartylist.additionalfieldname3 = reader["additionalfieldname3"] == DBNull.Value ? null : Convert.ToString(reader["additionalfieldname3"]);
+								ogetallpartylist.additionalfieldname4 = reader["additionalfieldname4"] == DBNull.Value ? null : Convert.ToString(reader["additionalfieldname4"]);
+								ogetallpartylist.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
+								ogetallpartylist.topayorreceive = reader["topayorreceive"] == DBNull.Value ? null : Convert.ToString(reader["topayorreceive"]);
+								ogetallpartylist.partybalance = reader["partybalance"] == DBNull.Value ? 0 : Convert.ToInt64(reader["partybalance"]);
+								ogetallpartylist.additionalfieldname1value = reader["additionalfieldname1value"] == DBNull.Value ? null : Convert.ToString(reader["additionalfieldname1value"]);
+								ogetallpartylist.additionalfieldname2value = reader["additionalfieldname2value"] == DBNull.Value ? null : Convert.ToString(reader["additionalfieldname2value"]);
+								ogetallpartylist.additionalfieldname3value = reader["additionalfieldname3value"] == DBNull.Value ? null : Convert.ToString(reader["additionalfieldname3value"]);
+								ogetallpartylist.additionalfieldname4value = reader["additionalfieldname4value"] == DBNull.Value ? null : Convert.ToString(reader["additionalfieldname4value"]);
+
 								ogetPartyRs.partyList.Add(ogetallpartylist);
 								ogetPartyRs.status = "SUCCESS";
 							}
@@ -612,13 +613,14 @@ namespace WebApplication1.DL
 							while (reader.Read())
 							{
 								GetPartyList oGetPartyList = new GetPartyList();
-								oGetPartyList.partyname = Convert.ToString(reader["partyname"]);
-								oGetPartyList.partybalance = Convert.ToInt64(reader["partybalance"]);
-								oGetPartyList.creditlimit = Convert.ToInt64(reader["creditlimit"]);
-								oGetPartyList.shippingaddress = Convert.ToString(reader["shippingaddress"]);
-								oGetPartyList.billingaddress = Convert.ToString(reader["billingaddress"]);
-								oGetPartyList.phonenumber = Convert.ToInt64(reader["phonenumber"]);
+								oGetPartyList.partyname = reader["partyname"] == DBNull.Value ? null : Convert.ToString(reader["partyname"]);
+								oGetPartyList.partybalance = reader["partybalance"] == DBNull.Value ? 0 : Convert.ToInt64(reader["partybalance"]);
+								oGetPartyList.creditlimit = reader["creditlimit"] == DBNull.Value ? 0 : Convert.ToInt64(reader["creditlimit"]);
+								oGetPartyList.shippingaddress = reader["shippingaddress"] == DBNull.Value ? null : Convert.ToString(reader["shippingaddress"]);
+								oGetPartyList.billingaddress = reader["billingaddress"] == DBNull.Value ? null : Convert.ToString(reader["billingaddress"]);
+								oGetPartyList.phonenumber = reader["phonenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["phonenumber"]);
 								oGetPartyListRs.getPartyList.Add(oGetPartyList);
+
 							}
 							oGetPartyListRs.status = "SUCCESS";
 						}
