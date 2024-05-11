@@ -135,7 +135,7 @@ namespace WebApplication1.DL
 			return outputResult;
 		}
 
-		public GetPartyTransactionsRs GetPartyTransactions(GetPartyTransactionsRq oGetPartyTransactionsRq)
+		public GetPartyTransactionsRs GetPartyTransactions(Int64 registeredphonenumber, string customername)
 		{
 			GetPartyTransactionsRs oGetPartyTransactionsRs = new GetPartyTransactionsRs();
 			try
@@ -147,8 +147,8 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT tr.invoicenumber, tr.typeofpay, tr.invoicedate, tr.total, tr.balance, tr.phonenumber, pr.emailid, pr.billingaddress, pr.creditlimit, pr.gst, pr.creditlimit FROM transactions tr join party pr ON tr.customername = pr.partyname" +
-						" where tr.registeredphonenumber = " + oGetPartyTransactionsRq.registeredphonenumber + " AND " +
-						"tr.customername = '" + oGetPartyTransactionsRq.customername + "' AND tr.showtransaction = 'SHOW'";
+						" where tr.registeredphonenumber = " + registeredphonenumber + " AND " +
+						"tr.customername = '" + customername + "' AND tr.showtransaction = 'SHOW'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -262,7 +262,7 @@ namespace WebApplication1.DL
 			return oGetPartyTransactionDetailsRs;
 		}
 
-		public List<GetAllItemTransactionsList> GetItemTransactions(GetItemTransactionsRq oGetItemTransactionsRq)
+		public List<GetAllItemTransactionsList> GetItemTransactions(Int64 registeredphonenumber, string itemname)
 		{
 			GetItemTransactionsRs oGetItemTransactionsRs = new GetItemTransactionsRs();
 			try
@@ -274,7 +274,7 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT invoicenumber, typeofpay, customername, invoicedate, qty, priceperunit, paymentstatus " +
-						"FROM item_details WHERE registeredphonenumber = " + oGetItemTransactionsRq.registeredphonenumber + " and item = '" + oGetItemTransactionsRq.itemname + "' AND showtransaction = 'SHOW'";
+						"FROM item_details WHERE registeredphonenumber = " + registeredphonenumber + " and item = '" + itemname + "' AND showtransaction = 'SHOW'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -312,7 +312,7 @@ namespace WebApplication1.DL
 			return oGetItemTransactionsRs.itemTransactionsList;
 		}
 
-		public GetItemTransactionsRs GetItemHeaderDetails(GetItemTransactionsRq oGetItemTransactionsRq, List<GetAllItemTransactionsList> oGetAllItemTransactionsList)
+		public GetItemTransactionsRs GetItemHeaderDetails(Int64 registeredphonenumber, string itemname, List<GetAllItemTransactionsList> oGetAllItemTransactionsList)
 		{
 			GetItemTransactionsRs oGetItemTransactionsRs = new GetItemTransactionsRs();
 			try
@@ -323,7 +323,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT saleprice, wholesaleprice, purchaseprice, remainingquantity from item WHERE registeredphonenumber = " + oGetItemTransactionsRq.registeredphonenumber + " and itemname = '" + oGetItemTransactionsRq.itemname + "'";
+					cmd.CommandText = "SELECT saleprice, wholesaleprice, purchaseprice, remainingquantity from item WHERE registeredphonenumber = " + registeredphonenumber + " and itemname = '" + itemname + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -335,6 +335,8 @@ namespace WebApplication1.DL
 								oGetItemTransactionsRs.wholesaleprice = reader["wholesaleprice"] == DBNull.Value ? 0 : Convert.ToInt64(reader["wholesaleprice"]);
 								oGetItemTransactionsRs.purchaseprice = reader["purchaseprice"] == DBNull.Value ? 0 : Convert.ToInt64(reader["purchaseprice"]);
 								oGetItemTransactionsRs.remainingquantity = reader["remainingquantity"] == DBNull.Value ? 0 : Convert.ToInt64(reader["remainingquantity"]);
+								oGetItemTransactionsRs.status = "SUCCESS";
+
 							}
 						}
 						catch(Exception ex)
@@ -356,7 +358,7 @@ namespace WebApplication1.DL
 			return oGetItemTransactionsRs;
 		}
 
-		public GetTypeOfPayTransactionsRs GetTypeOfPayTransactions(GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq)
+		public GetTypeOfPayTransactionsRs GetTypeOfPayTransactions(Int64 registeredphonenumber, string typeofpay)
 		{
 			GetTypeOfPayTransactionsRs oGetTypeOfPayTransactionsRs = new GetTypeOfPayTransactionsRs();
 			try
@@ -367,8 +369,8 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT invoicenumber, typeofpay, customername, invoicedate, paymentstatus, paymenttype, total, balance FROM transactions where registeredphonenumber = " + oGetTypeOfPayTransactionsRq.registeredphonenumber +
-						" AND typeofpay = '" + oGetTypeOfPayTransactionsRq.typeofpay + "'";
+					cmd.CommandText = "SELECT invoicenumber, typeofpay, customername, invoicedate, paymentstatus, paymenttype, total, balance FROM transactions where registeredphonenumber = " + registeredphonenumber +
+						" AND typeofpay = '" + typeofpay + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -408,7 +410,7 @@ namespace WebApplication1.DL
 			return oGetTypeOfPayTransactionsRs;
 		}
 
-		public Int64 GetInvoiceNumberCount(GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq)
+		public Int64 GetInvoiceNumberCount(Int64 registeredphonenumber, string typeofpay)
 		{
 			GetTypeOfPayTransactionsRs oGetTypeOfPayTransactionsRs = new GetTypeOfPayTransactionsRs();
 			try
@@ -419,7 +421,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT MAX(invoicenumber) FROM transactions WHERE typeofpay = '" + oGetTypeOfPayTransactionsRq.typeofpay + "' AND registeredphonenumber = " + oGetTypeOfPayTransactionsRq .registeredphonenumber + "" ;
+					cmd.CommandText = "SELECT MAX(invoicenumber) FROM transactions WHERE typeofpay = '" + typeofpay + "' AND registeredphonenumber = " + registeredphonenumber + "" ;
 					object result = cmd.ExecuteScalar();
 					if (result != DBNull.Value)
 					{

@@ -47,13 +47,13 @@ namespace WebApplication1.Controllers
 		}
 
 		[Authorize]
-		[HttpPost]
+		[HttpGet]
 		[Route("GetPartyTransactions")]
-		public async Task<ActionResult> GetPartyTransactions(GetPartyTransactionsRq oGetPartyTransactionsRq)
+		public async Task<ActionResult> GetPartyTransactions([FromQuery] Int64 registeredphonenumber, [FromQuery] string customername)
 		{
 			GetPartyTransactionsRs oGetPartyTransactionsRs = new GetPartyTransactionsRs();
 			SaleBL saleBl = new SaleBL(this.config);
-			oGetPartyTransactionsRs = await saleBl.GetPartyTransactions(oGetPartyTransactionsRq);
+			oGetPartyTransactionsRs = await saleBl.GetPartyTransactions(registeredphonenumber, customername);
 			return Ok(oGetPartyTransactionsRs);
 		}
 
@@ -69,24 +69,24 @@ namespace WebApplication1.Controllers
 		}
 
 		[Authorize]
-		[HttpPost]
+		[HttpGet]
 		[Route("GetItemTransactions")]
-		public async Task<ActionResult> GetItemTransactions(GetItemTransactionsRq oGetItemTransactionsRq)
+		public async Task<ActionResult> GetItemTransactions([FromQuery] Int64 registeredphonenumber, [FromQuery] string itemname)
 		{
 			GetItemTransactionsRs oGetItemTransactionsRs = new GetItemTransactionsRs();
 			SaleBL saleBl = new SaleBL(this.config);
-			oGetItemTransactionsRs = await saleBl.GetItemTransactions(oGetItemTransactionsRq);
+			oGetItemTransactionsRs = await saleBl.GetItemTransactions(registeredphonenumber, itemname);
 			return Ok(oGetItemTransactionsRs);
 		}
 
 		[Authorize]
-		[HttpPost]
+		[HttpGet]
 		[Route("GetTypeOfPayTransactions")]
-		public async Task<ActionResult> GetTypeOfPayTransactions(GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq)
+		public async Task<ActionResult> GetTypeOfPayTransactions([FromQuery] Int64 registeredphonenumber, [FromQuery] string typeofpay)
 		{
 			GetTypeOfPayTransactionsRs oGetTypeOfPayTransactionsRs = new GetTypeOfPayTransactionsRs();
 			SaleBL saleBl = new SaleBL(this.config);
-			oGetTypeOfPayTransactionsRs = await saleBl.GetTypeOfPayTransactions(oGetTypeOfPayTransactionsRq);
+			oGetTypeOfPayTransactionsRs = await saleBl.GetTypeOfPayTransactions(registeredphonenumber, typeofpay);
 			return Ok(oGetTypeOfPayTransactionsRs);
 		}
 

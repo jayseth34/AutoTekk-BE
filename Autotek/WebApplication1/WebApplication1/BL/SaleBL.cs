@@ -52,11 +52,11 @@ namespace WebApplication1.BL
 			return otransactionRs;
 		}
 
-		public async Task<GetPartyTransactionsRs> GetPartyTransactions(GetPartyTransactionsRq oGetPartyTransactionsRq)
+		public async Task<GetPartyTransactionsRs> GetPartyTransactions(Int64 registeredphonenumber, string customername)
 		{
 			GetPartyTransactionsRs oGetPartyTransactionsRqs = new GetPartyTransactionsRs();
 			SaleDL saledl = new SaleDL(this.config);
-			oGetPartyTransactionsRqs = saledl.GetPartyTransactions(oGetPartyTransactionsRq);
+			oGetPartyTransactionsRqs = saledl.GetPartyTransactions(registeredphonenumber, customername);
 			return oGetPartyTransactionsRqs;
 		}
 
@@ -73,22 +73,22 @@ namespace WebApplication1.BL
 			if (oGetPartyTransactionDetailsRq.issaleconvert)
 			{
 				oGetTypeOfPayTransactionsRq.typeofpay = "SALE";
-				oGetPartyTransactionDetailsRs.invoicenumbercount = saledl.GetInvoiceNumberCount(oGetTypeOfPayTransactionsRq);
+				oGetPartyTransactionDetailsRs.invoicenumbercount = saledl.GetInvoiceNumberCount(oGetTypeOfPayTransactionsRq.registeredphonenumber, oGetTypeOfPayTransactionsRq.typeofpay);
 			}
 			else if (oGetPartyTransactionDetailsRq.issaleorderconvert)
 			{
 				oGetTypeOfPayTransactionsRq.typeofpay = "SALE ORDER";
-				oGetPartyTransactionDetailsRs.invoicenumbercount = saledl.GetInvoiceNumberCount(oGetTypeOfPayTransactionsRq);
+				oGetPartyTransactionDetailsRs.invoicenumbercount = saledl.GetInvoiceNumberCount(oGetTypeOfPayTransactionsRq.registeredphonenumber, oGetTypeOfPayTransactionsRq.typeofpay);
 			}
 			return oGetPartyTransactionDetailsRs;
 		}
 
-		public async Task<GetItemTransactionsRs> GetItemTransactions(GetItemTransactionsRq oGetItemTransactionsRq)
+		public async Task<GetItemTransactionsRs> GetItemTransactions(Int64 registeredphonenumber, string itemname)
 		{
 			GetItemTransactionsRs oGetItemTransactionsRs = new GetItemTransactionsRs();
 			SaleDL saledl = new SaleDL(this.config);
-			oGetItemTransactionsRs.itemTransactionsList = saledl.GetItemTransactions(oGetItemTransactionsRq);
-			oGetItemTransactionsRs = saledl.GetItemHeaderDetails(oGetItemTransactionsRq, oGetItemTransactionsRs.itemTransactionsList);
+			oGetItemTransactionsRs.itemTransactionsList = saledl.GetItemTransactions(registeredphonenumber,itemname);
+			oGetItemTransactionsRs = saledl.GetItemHeaderDetails(registeredphonenumber,itemname, oGetItemTransactionsRs.itemTransactionsList);
 			return oGetItemTransactionsRs;
 		}
 		public async Task<GetLinkedPaymentTransactionRs> GetLinkedPaymentTransaction([FromQuery] Int64 registeredphonenumber, [FromQuery] string customername)
@@ -99,15 +99,15 @@ namespace WebApplication1.BL
 			return oGetLinkedPaymentTransactionRs;
 		}
 
-		public async Task<GetTypeOfPayTransactionsRs> GetTypeOfPayTransactions(GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq)
+		public async Task<GetTypeOfPayTransactionsRs> GetTypeOfPayTransactions(Int64 registeredphonenumber, string typeofpay)
 		{
 			GetTypeOfPayTransactionsRs oGetTypeOfPayTransactionsRs = new GetTypeOfPayTransactionsRs();
 			SaleDL saledl = new SaleDL(this.config);
-			oGetTypeOfPayTransactionsRs = saledl.GetTypeOfPayTransactions(oGetTypeOfPayTransactionsRq);
-			if (oGetTypeOfPayTransactionsRq.typeofpay == "SALE" || oGetTypeOfPayTransactionsRq.typeofpay == "ESTIMATION/ QUOTATION" || oGetTypeOfPayTransactionsRq.typeofpay == "PAYMENT IN" ||
-				oGetTypeOfPayTransactionsRq.typeofpay == "SALE ORDER" || oGetTypeOfPayTransactionsRq.typeofpay == "DELIVERY CHALLAN" || oGetTypeOfPayTransactionsRq.typeofpay == "SALE RETURN/ CR. NOTE" || oGetTypeOfPayTransactionsRq.typeofpay == "PURCHASE ORDER")
+			oGetTypeOfPayTransactionsRs = saledl.GetTypeOfPayTransactions(registeredphonenumber, typeofpay);
+			if (typeofpay == "SALE" || typeofpay == "ESTIMATION/ QUOTATION" || typeofpay == "PAYMENT IN" ||
+				typeofpay == "SALE ORDER" || typeofpay == "DELIVERY CHALLAN" || typeofpay == "SALE RETURN/ CR. NOTE" || typeofpay == "PURCHASE ORDER")
 			{
-				oGetTypeOfPayTransactionsRs.invoicenumbercount = saledl.GetInvoiceNumberCount(oGetTypeOfPayTransactionsRq);
+				oGetTypeOfPayTransactionsRs.invoicenumbercount = saledl.GetInvoiceNumberCount(registeredphonenumber, typeofpay);
 			}
 			return oGetTypeOfPayTransactionsRs;
 		}
@@ -122,7 +122,7 @@ namespace WebApplication1.BL
 			if (oConvertToSaleSaleOrderRq.isconvert && (oConvertToSaleSaleOrderRq.typeofpay == "SALE" || oConvertToSaleSaleOrderRq.typeofpay == "SALE ORDER"))
 			{
 				oConvertToSaleSaleOrderRs = saledl.ConvertToSaleSaleOrder(oConvertToSaleSaleOrderRq);
-				oConvertToSaleSaleOrderRs.invoicenumbercount = saledl.GetInvoiceNumberCount(oGetTypeOfPayTransactionsRq);
+				oConvertToSaleSaleOrderRs.invoicenumbercount = saledl.GetInvoiceNumberCount(oGetTypeOfPayTransactionsRq.registeredphonenumber, oGetTypeOfPayTransactionsRq.typeofpay);
 			}
 			return oConvertToSaleSaleOrderRs;
 		}

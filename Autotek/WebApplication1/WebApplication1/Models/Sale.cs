@@ -49,12 +49,6 @@
 		public string statusmessage {  get; set; }
 	}
 
-	public class GetPartyTransactionsRq
-	{
-		public Int64 registeredphonenumber { get; set; }
-		public string customername { get; set;}
-	}
-
 	public class GetPartyTransactionsRs
 	{
 		public string status { get; set;}
