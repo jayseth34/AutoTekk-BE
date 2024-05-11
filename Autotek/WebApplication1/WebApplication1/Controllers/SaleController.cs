@@ -18,7 +18,7 @@ namespace WebApplication1.Controllers
 			dbConn = config.GetValue<string>("ConnectionStrings");
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpPost]
 		[Route("AddSale")]
 		public async Task<ActionResult> AddSale(TransactionRq otransactionRq)
@@ -32,7 +32,7 @@ namespace WebApplication1.Controllers
 			return Ok(otransactionRs);	
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpPost]
 		[Route("UpdateSale")]
 		public async Task<ActionResult> UpdateSale(TransactionRq otransactionRq)
@@ -46,7 +46,7 @@ namespace WebApplication1.Controllers
 			return Ok(otransactionRs);
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpPost]
 		[Route("GetPartyTransactions")]
 		public async Task<ActionResult> GetPartyTransactions(GetPartyTransactionsRq oGetPartyTransactionsRq)
@@ -57,7 +57,7 @@ namespace WebApplication1.Controllers
 			return Ok(oGetPartyTransactionsRs);
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpPost]
 		[Route("GetPartyItemTransactionDetails")]
 		public async Task<ActionResult> GetPartyTransactionDetails(GetPartyTransactionDetailsRq oGetPartyTransactionDetailsRq)
@@ -68,7 +68,7 @@ namespace WebApplication1.Controllers
 			return Ok(oGetPartyTransactionDetailsRs);
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpPost]
 		[Route("GetItemTransactions")]
 		public async Task<ActionResult> GetItemTransactions(GetItemTransactionsRq oGetItemTransactionsRq)
@@ -79,7 +79,7 @@ namespace WebApplication1.Controllers
 			return Ok(oGetItemTransactionsRs);
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpPost]
 		[Route("GetTypeOfPayTransactions")]
 		public async Task<ActionResult> GetTypeOfPayTransactions(GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq)
@@ -90,7 +90,7 @@ namespace WebApplication1.Controllers
 			return Ok(oGetTypeOfPayTransactionsRs);
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpGet]
 		[Route("GetLinkedPaymentTransaction")]
 		public async Task<ActionResult> GetLinkedPaymentTransaction([FromQuery] Int64 registeredphonenumber, [FromQuery] string customername)
@@ -102,7 +102,7 @@ namespace WebApplication1.Controllers
 		}
 
 		//no need to use this api as of nowS
-		[AllowAnonymous]
+		[Authorize]
 		[HttpPost]
 		[Route("ConvertToSaleSaleOrder")]
 		public async Task<ActionResult> ConvertToSaleSaleOrder(ConvertToSaleSaleOrderRq oConvertToSaleSaleOrderRq)

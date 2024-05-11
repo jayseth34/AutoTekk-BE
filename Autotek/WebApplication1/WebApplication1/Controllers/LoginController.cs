@@ -66,7 +66,7 @@ namespace WebApplication1.Controllers
 			return BadRequest("Please Provide Valid Details");
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpGet]
 		[Route("GetPartyDetails")]
 		public async Task<ActionResult> GetPartyDetails([FromQuery] Int64 registeredphonenumber, [FromQuery] string partyname)
@@ -82,7 +82,7 @@ namespace WebApplication1.Controllers
 			return BadRequest("Please Provide Valid Details");
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpGet]
 		[Route("GetPartyList")]
 		public async Task<ActionResult> GetPartyList([FromQuery] Int64 registeredphonenumber)
@@ -98,7 +98,7 @@ namespace WebApplication1.Controllers
 			return BadRequest("Please Provide Valid Details");
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpGet]
 		[Route("GetPartyGroup")]
 		public async Task<ActionResult> GetPartyGroup([FromQuery] Int64 registeredphonenumber)
@@ -114,7 +114,7 @@ namespace WebApplication1.Controllers
 			return BadRequest("Please Provide Valid Details");
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpGet]
 		[Route("GetPartyByGroup")]
 		public async Task<ActionResult> GetPartyByGroup([FromQuery] Int64 registeredphonenumber, [FromQuery] string groupname)
@@ -130,7 +130,7 @@ namespace WebApplication1.Controllers
 			return BadRequest("Please Provide Valid Details");
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpPost]
 		[Route("AddUpdatePartyGroup")]
 		public async Task<ActionResult> AddUpdatePartyGroup(AddUpdatePartyGropRq oAddUpdatePartyGropRq)

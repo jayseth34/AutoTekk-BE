@@ -18,7 +18,7 @@ namespace WebApplication1.Controllers
 			dbConn = config.GetValue<string>("ConnectionStrings");
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpPost]
 		[Route("SaveOrUpdateItem")]
 		public async Task<ActionResult> AddItem(ItemRq oitemRq)
@@ -33,7 +33,7 @@ namespace WebApplication1.Controllers
 			return BadRequest("");
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpGet]
 		[Route("GetItemList")]
 		public async Task<ActionResult> GetItemList([FromQuery] Int64 registeredphonenumber)
@@ -49,7 +49,7 @@ namespace WebApplication1.Controllers
 			return BadRequest("Please Provide Valid Details");
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpGet]
 		[Route("GetItemDetails")]
 		public async Task<ActionResult> GetItemDetails([FromQuery] Int64 registeredphonenumber, [FromQuery] string itemname)
@@ -65,7 +65,7 @@ namespace WebApplication1.Controllers
 			return BadRequest("Please Provide Valid Details");
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpGet]
 		[Route("GetCategory")]
 		public async Task<ActionResult> GetCategory(Int64 registeredphonenumber)
@@ -81,7 +81,7 @@ namespace WebApplication1.Controllers
 			return BadRequest("Please Provide Valid Details");
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpGet]
 		[Route("GetItemByCategory")]
 		public async Task<ActionResult> GetItemByCategory([FromQuery] Int64 registeredphonenumber, [FromQuery] string category)
@@ -97,7 +97,7 @@ namespace WebApplication1.Controllers
 			return BadRequest("Please Provide Valid Details");
 		}
 
-		[AllowAnonymous]
+		[Authorize]
 		[HttpPost]
 		[Route("AddUpdateCategory")]
 		public async Task<ActionResult> AddUpdateCategory(AddUpdateCategoryRq oAddUpdateCategoryRq)

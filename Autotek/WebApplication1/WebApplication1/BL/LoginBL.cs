@@ -34,18 +34,26 @@ namespace WebApplication1.BL
 		public async Task<string> CreateToken()
 		{
 			var claims = new[]
-				{
-					new Claim(JwtRegisteredClaimNames.Sub, config["JwtSettings:Subject"]),
-					new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-				};
-			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("this is my custom Secret key for authentication:" + config["JwtSettings:SecretKey"]));
+			{
+				new Claim(JwtRegisteredClaimNames.Sub, config["JwtSettings:Subject"]),
+				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+			};
+			var secretKey = config["JwtSettings:SecretKey"];
+			if (secretKey.Length < 32)
+			{
+				// Pad the key with zeroes to ensure it meets the required size
+				secretKey = secretKey.PadRight(32, '\0');
+			}
 
+			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
 			var signature = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
 			// Generate token
 			var token = new JwtSecurityToken(
-				claims: claims,
-				expires: DateTime.Now.AddMinutes(720),
+				config["JwtSettings:Issuer"],
+				config["JwtSettings:Audience"],
+				claims,
+				expires: DateTime.UtcNow.AddHours(12), // Expiry set to 12 hours from now
 				signingCredentials: signature);
 
 			string _token = new JwtSecurityTokenHandler().WriteToken(token);

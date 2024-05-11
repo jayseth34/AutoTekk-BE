@@ -18,31 +18,33 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(x =>
-{
-	x.TokenValidationParameters = new TokenValidationParameters
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+	.AddJwtBearer(options =>
 	{
-		ValidateIssuer = true,
-		ValidateAudience = true,
-		ValidateLifetime = true,
-		ValidateIssuerSigningKey = true,
-		ValidIssuer = "localhost",
-		ValidAudience = "localhost",
-		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("JwtSettings:SecretKey")),
-		ClockSkew = TimeSpan.Zero
-	};
-});
+		options.TokenValidationParameters = new TokenValidationParameters
+		{
+			ValidateIssuer = true,
+			ValidateAudience = true,
+			ValidateLifetime = true,
+			ValidateIssuerSigningKey = true,
+			ValidIssuer = builder.Configuration["JwtSettings:Issuer"], // Use configuration
+			ValidAudience = builder.Configuration["JwtSettings:Audience"], // Use configuration
+			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"])), // Use configuration
+			ClockSkew = TimeSpan.Zero
+		};
+	});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-	c.SwaggerDoc("v1", new() { Title = "My API", Version = "v1" });
+	c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 
+	// Configure JWT bearer token authentication for Swagger
 	c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
 	{
 		Name = "Authorization",
-		Type = SecuritySchemeType.ApiKey,
-		Scheme = "Bearer",
+		Type = SecuritySchemeType.Http,
+		Scheme = "bearer",
 		BearerFormat = "JWT",
 		In = ParameterLocation.Header,
 		Description = "JWT Authorization header using the Bearer scheme."
@@ -71,16 +73,18 @@ if (app.Environment.IsDevelopment())
 {
 	app.UseSwagger();
 	app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-    });
+	{
+		c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+	});
 }
+
+app.UseHttpsRedirection();
+
+app.UseRouting();
 
 app.UseCors();
 
 app.UseAuthentication();
-
-app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
