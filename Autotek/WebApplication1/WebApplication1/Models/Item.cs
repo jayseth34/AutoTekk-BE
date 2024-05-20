@@ -41,6 +41,7 @@
 			getItemList = new List<GetItemList>();
 		}
 		public List<GetItemList> getItemList { get; set; }
+		public string status { get; set; }
 	}
 
 	public class GetItemList

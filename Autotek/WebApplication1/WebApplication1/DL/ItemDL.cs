@@ -225,6 +225,7 @@ namespace WebApplication1.DL
 
 								oGetItemListRs.getItemList.Add(oGetItemList);
 							}
+							oGetItemListRs.status = "SUCCESS";
 						}
 						catch (Exception ex)
 						{
