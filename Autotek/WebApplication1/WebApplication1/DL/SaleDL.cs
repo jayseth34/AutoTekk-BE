@@ -146,7 +146,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT tr.invoicenumber, tr.typeofpay, tr.invoicedate, tr.total, tr.balance, tr.phonenumber, pr.emailid, pr.billingaddress, pr.creditlimit, pr.gst, pr.creditlimit FROM transactions tr join party pr ON tr.customername = pr.partyname" +
+					cmd.CommandText = "SELECT tr.invoicenumber, tr.typeofpay, tr.invoicedate, tr.total, tr.balance, tr.phonenumber, tr.paymentstatus, pr.emailid, pr.billingaddress, pr.creditlimit, pr.gst, pr.creditlimit FROM transactions tr join party pr ON tr.customername = pr.partyname" +
 						" where tr.registeredphonenumber = " + registeredphonenumber + " AND " +
 						"tr.customername = '" + customername + "' AND tr.showtransaction = 'SHOW'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
@@ -168,6 +168,7 @@ namespace WebApplication1.DL
 								oGetAllPartyTransactionsList.invoicedate = reader["invoicedate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["invoicedate"]);
 								oGetAllPartyTransactionsList.total = reader["total"] == DBNull.Value ? 0 : Convert.ToInt64(reader["total"]);
 								oGetAllPartyTransactionsList.balance = reader["balance"] == DBNull.Value ? 0 : Convert.ToInt64(reader["balance"]);
+								oGetAllPartyTransactionsList.paymentstatus = reader["paymentstatus"] == DBNull.Value ? null : Convert.ToString(reader["paymentstatus"]);
 								oGetPartyTransactionsRs.partyTransactionsList.Add(oGetAllPartyTransactionsList);
 							}
 							oGetPartyTransactionsRs.status = "SUCCESS";

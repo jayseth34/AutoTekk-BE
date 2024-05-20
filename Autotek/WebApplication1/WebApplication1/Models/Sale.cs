@@ -66,6 +66,7 @@
 	public class GetAllPartyTransactionsList
 	{
 		public string typeofpay { get; set; }
+		public string paymentstatus { get; set; }
 		public Int64 invoicenumber { get; set; }
 		public Int64 creditlimit { get; set; }
 		public DateTime invoicedate { get; set; }
