@@ -33,6 +33,12 @@ namespace WebApplication1.Models
 		public Boolean exist { get; set; }
 	}
 
+	public class VerifyOtpRequest
+	{
+		public string SessionId { get; set; }
+		public string Otp { get; set; }
+	}
+
 	public class PartyRq
 	{
 		public string typeofpay { get; set; } = "";
@@ -59,8 +65,10 @@ namespace WebApplication1.Models
 		public string? additionalfieldname2value { get; set; }
 		public string? additionalfieldname3value { get; set; }
 		public DateTime? additionalfieldname4value { get; set; }
-		public Int64 partybalance { get; set; } = 0;
+		//public Int64 partybalance { get; set; } = 0;
 		public bool ispartyupdate { get; set; }
+		public Int64 topayparty {  get; set; }
+		public Int64 toreceivefromparty {  get; set; }
 	}
 
 	public class PartyRs
@@ -101,8 +109,6 @@ namespace WebApplication1.Models
 		public string additionalfieldname2value { get; set; }
 		public string additionalfieldname3value { get; set; }
 		public string additionalfieldname4value { get; set; }
-		public string typeofpay { get; set; }
-		public string topayorreceive { get; set; }
 		public Int64 partybalance { get; set; }
 	}
 

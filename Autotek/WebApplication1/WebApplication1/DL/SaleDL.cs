@@ -113,7 +113,8 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("v_registeredphonenumber", NpgsqlDbType.Numeric).Value = otransactionRq.registeredphonenumber;
 							cmd.Parameters.AddWithValue("v_billingaddress", NpgsqlDbType.Varchar).Value = otransactionRq.billingaddress;
 							cmd.Parameters.AddWithValue("v_shippingaddress", NpgsqlDbType.Varchar).Value = otransactionRq.shippingaddress;
-							cmd.Parameters.AddWithValue("v_partybalance", NpgsqlDbType.Numeric).Value = otransactionRq.partybalance;
+							cmd.Parameters.AddWithValue("v_topayparty", NpgsqlDbType.Numeric).Value = otransactionRq.topayparty;
+							cmd.Parameters.AddWithValue("v_toreceivefromparty", NpgsqlDbType.Numeric).Value = otransactionRq.toreceivefromparty;
 							cmd.Parameters.AddWithValue("v_item", NpgsqlDbType.Varchar).Value = itemDetails.item;
 							cmd.Parameters.AddWithValue("v_qty", NpgsqlDbType.Numeric).Value = itemDetails.qty;
 							cmd.Parameters.AddWithValue("v_remainingquantity", NpgsqlDbType.Numeric).Value = itemDetails.remainingquantity;

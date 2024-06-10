@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RestSharp;
 using WebApplication1.BL;
 using WebApplication1.Models;
 
@@ -11,6 +12,8 @@ namespace WebApplication1.Controllers
 	{
 		private readonly IConfiguration config;
 		private readonly string dbConn;
+		private readonly string _apiKey = "7fccc705-21c6-11ef-8b60-0200cd936042";
+
 		public LoginController(IConfiguration _config)
 		{
 			config = _config;
@@ -35,6 +38,40 @@ namespace WebApplication1.Controllers
 			}
 		}
 
+		[HttpPost("send-otp")]
+		public async Task<IActionResult> SendOtp([FromQuery] string phoneNumber)
+		{
+			var client = new RestClient();
+			var url = $"https://2factor.in/API/V1/{_apiKey}/SMS/{phoneNumber}/AUTOGEN";
+			var restRequest = new RestRequest(url, Method.Get);
+
+			var response = await client.ExecuteAsync(restRequest);
+
+			if (response.IsSuccessful)
+			{
+				return Ok(response.Content); // Return the response from 2Factor
+			}
+
+			return BadRequest("Failed to send OTP");
+		}
+
+		[HttpPost("verify-otp")]
+		public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
+		{
+			var client = new RestClient();
+			var url = $"https://2factor.in/API/V1/{_apiKey}/SMS/VERIFY/{request.SessionId}/{request.Otp}";
+			var restRequest = new RestRequest(url, Method.Get);
+
+			var response = await client.ExecuteAsync(restRequest);
+
+			if (response.IsSuccessful)
+			{
+				return Ok(response.Content); // Return the response from 2Factor
+			}
+
+			return BadRequest("Failed to verify OTP");
+		}
+
 		[AllowAnonymous]
 		[HttpPost]
 		[Route("RegisterUser")]
@@ -50,7 +87,6 @@ namespace WebApplication1.Controllers
 			return BadRequest("Please Provide Valid Details");
 		}
 
-		[AllowAnonymous]
 		[HttpPost]
 		[Route("SaveOrUpdateParty")]
 		public async Task<ActionResult> Party(PartyRq opartyRq)
