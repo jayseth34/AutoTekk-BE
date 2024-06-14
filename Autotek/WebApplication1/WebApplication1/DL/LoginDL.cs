@@ -374,7 +374,6 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@additionalfieldname2", opartyRq.additionalfieldname2);
 							cmd.Parameters.AddWithValue("@additionalfieldname3", opartyRq.additionalfieldname3);
 							cmd.Parameters.AddWithValue("@additionalfieldname4", opartyRq.additionalfieldname4);
-							//cmd.Parameters.AddWithValue("@partybalance", opartyRq.partybalance);
 							cmd.Parameters.AddWithValue("@additionalfieldname1value", opartyRq.additionalfieldname1value);
 							cmd.Parameters.AddWithValue("@additionalfieldname2value", opartyRq.additionalfieldname2value);
 							cmd.Parameters.AddWithValue("@additionalfieldname3value", opartyRq.additionalfieldname3value);
@@ -530,8 +529,6 @@ namespace WebApplication1.DL
 
 		public GetPartyRs GetPartyDetails(Int64 registeredphonenumber, string partyname)
 		{
-			Int64 topayparty = 0;
-			Int64 toreceivefromparty = 0;
 			GetPartyRs ogetPartyRs = new GetPartyRs();
 			try
 			{
@@ -569,9 +566,8 @@ namespace WebApplication1.DL
 								ogetallpartylist.additionalfieldname4 = reader["additionalfieldname4"] == DBNull.Value ? null : Convert.ToString(reader["additionalfieldname4"]);
 								ogetallpartylist.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
 								ogetallpartylist.topayorreceive = reader["topayorreceive"] == DBNull.Value ? null : Convert.ToString(reader["topayorreceive"]);
-								topayparty = reader["topayparty"] == DBNull.Value ? 0 : Convert.ToInt64(reader["topayparty"]);
-								toreceivefromparty = reader["toreceivefromparty"] == DBNull.Value ? 0 : Convert.ToInt64(reader["toreceivefromparty"]);
-								ogetallpartylist.partybalance = topayparty + toreceivefromparty;
+								ogetallpartylist.topayparty = reader["topayparty"] == DBNull.Value ? 0 : Convert.ToInt64(reader["topayparty"]);
+								ogetallpartylist.toreceivefromparty = reader["toreceivefromparty"] == DBNull.Value ? 0 : Convert.ToInt64(reader["toreceivefromparty"]);
 								ogetallpartylist.additionalfieldname1value = reader["additionalfieldname1value"] == DBNull.Value ? null : Convert.ToString(reader["additionalfieldname1value"]);
 								ogetallpartylist.additionalfieldname2value = reader["additionalfieldname2value"] == DBNull.Value ? null : Convert.ToString(reader["additionalfieldname2value"]);
 								ogetallpartylist.additionalfieldname3value = reader["additionalfieldname3value"] == DBNull.Value ? null : Convert.ToString(reader["additionalfieldname3value"]);
@@ -623,9 +619,8 @@ namespace WebApplication1.DL
 							{
 								GetPartyList oGetPartyList = new GetPartyList();
 								oGetPartyList.partyname = reader["partyname"] == DBNull.Value ? null : Convert.ToString(reader["partyname"]);
-								topayparty = reader["topayparty"] == DBNull.Value ? 0 : Convert.ToInt64(reader["topayparty"]);
-								toreceivefromparty = reader["toreceivefromparty"] == DBNull.Value ? 0 : Convert.ToInt64(reader["toreceivefromparty"]);
-								oGetPartyList.partybalance = toreceivefromparty + topayparty;
+								oGetPartyList.topayparty = reader["topayparty"] == DBNull.Value ? 0 : Convert.ToInt64(reader["topayparty"]);
+								oGetPartyList.toreceivefromparty = reader["toreceivefromparty"] == DBNull.Value ? 0 : Convert.ToInt64(reader["toreceivefromparty"]);
 								oGetPartyList.creditlimit = reader["creditlimit"] == DBNull.Value ? 0 : Convert.ToInt64(reader["creditlimit"]);
 								oGetPartyList.shippingaddress = reader["shippingaddress"] == DBNull.Value ? null : Convert.ToString(reader["shippingaddress"]);
 								oGetPartyList.billingaddress = reader["billingaddress"] == DBNull.Value ? null : Convert.ToString(reader["billingaddress"]);
@@ -711,9 +706,8 @@ namespace WebApplication1.DL
 							{
 								GetPartyList oGetPartyList = new GetPartyList();
 								oGetPartyList.partyname = Convert.ToString(reader["partyname"]);
-								topayparty = Convert.ToInt64(reader["topayparty"]);
-								toreceivefromparty = Convert.ToInt64(reader["toreceivefromparty"]);
-								oGetPartyList.partybalance = topayparty + toreceivefromparty;
+								oGetPartyList.topayparty = Convert.ToInt64(reader["topayparty"]);
+								oGetPartyList.toreceivefromparty = Convert.ToInt64(reader["toreceivefromparty"]);
 								oGetPartyByGroupRs.getPartyList.Add(oGetPartyList);
 							}
 						}

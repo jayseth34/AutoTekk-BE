@@ -656,7 +656,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT invoicenumber, typeofpay, invoicedate, total, linkedamount, balance from transactions where(balance > 0 OR linkedaccount = 'LINKED') and customername = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber +
+					cmd.CommandText = "SELECT invoicenumber, typeofpay, invoicedate, total, linkedamount, balance from transactions where (balance > 0 OR linkedaccount = 'LINKED') and customername = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber +
 						" AND typeofpay in ('SALE', 'DELIVERY CHALLAN','RECEIVABLE OPENING BALANCE');";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)

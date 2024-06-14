@@ -13,7 +13,6 @@
 		public string customername { get; set; }
 		public Int64 phonenumber { get; set; }
 		public Int64 registeredphonenumber { get; set; }
-		//public Int64 partybalance { get; set; }
 		public Int64 topayparty { get; set; }
 		public Int64 toreceivefromparty { get; set; }
 		//public Int64 remainingquantity { get; set; }
