@@ -51,7 +51,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@billingaddress", otransactionRq.billingaddress);
 					cmd.Parameters.AddWithValue("@shippingaddress", otransactionRq.shippingaddress);
 					cmd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
-					Int64 transactionId = (Int64)cmd.ExecuteScalar();
+					Int64 transactionId = Convert.ToInt64(cmd.ExecuteScalar());
 					if (otransactionRq.itemdetailslist.Count > 0)
 					{
 						foreach (var itemDetail in otransactionRq.itemdetailslist)
@@ -751,32 +751,35 @@ namespace WebApplication1.DL
 					{
 						query = "DELETE FROM item_details WHERE registeredphonenumber = " + otransactionRq.registeredphonenumber + " AND transaction_id = " + itemDetail.transactionid + " AND item = '" + itemDetail.item + "' AND invoicenumber = " + otransactionRq.invoicenumber;
 					}
-					using (NpgsqlConnection connn = new NpgsqlConnection(this._connectionFactory))
+					if(!string.IsNullOrEmpty(query))
 					{
-						connn.Open();
-						NpgsqlCommand cmdd = new NpgsqlCommand();
-						cmdd.Connection = connn;
-						cmdd.CommandType = CommandType.Text;
-						cmdd.CommandText = query;
-						if (itemDetail.queryoperationtype == "INSERT")
+						using (NpgsqlConnection connn = new NpgsqlConnection(this._connectionFactory))
 						{
-							cmdd.Parameters.AddWithValue("@transaction_id", itemDetail.transactionid);
-							cmdd.Parameters.AddWithValue("@registeredphonenumber", otransactionRq.registeredphonenumber);
-							cmdd.Parameters.AddWithValue("@customername", otransactionRq.customername);
-							cmdd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
+							connn.Open();
+							NpgsqlCommand cmdd = new NpgsqlCommand();
+							cmdd.Connection = connn;
+							cmdd.CommandType = CommandType.Text;
+							cmdd.CommandText = query;
+							if (itemDetail.queryoperationtype == "INSERT")
+							{
+								cmdd.Parameters.AddWithValue("@transaction_id", itemDetail.transactionid);
+								cmdd.Parameters.AddWithValue("@registeredphonenumber", otransactionRq.registeredphonenumber);
+								cmdd.Parameters.AddWithValue("@customername", otransactionRq.customername);
+								cmdd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
+							}
+							cmdd.Parameters.AddWithValue("@item", itemDetail.item);
+							cmdd.Parameters.AddWithValue("@qty", itemDetail.qty);
+							cmdd.Parameters.AddWithValue("@unit", itemDetail.unit);
+							cmdd.Parameters.AddWithValue("@priceperunit", itemDetail.priceperunit);
+							cmdd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
+							cmdd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
+							cmdd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
+							cmdd.Parameters.AddWithValue("@taxrate", itemDetail.taxrate);
+							cmdd.Parameters.AddWithValue("@taxrateamount", itemDetail.taxrateamount);
+							cmdd.Parameters.AddWithValue("@discountpercent", itemDetail.discountpercent);
+							cmdd.Parameters.AddWithValue("@discountamount", itemDetail.discountamount);
+							cmdd.ExecuteNonQuery();
 						}
-						cmdd.Parameters.AddWithValue("@item", itemDetail.item);
-						cmdd.Parameters.AddWithValue("@qty", itemDetail.qty);
-						cmdd.Parameters.AddWithValue("@unit", itemDetail.unit);
-						cmdd.Parameters.AddWithValue("@priceperunit", itemDetail.priceperunit);
-						cmdd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
-						cmdd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
-						cmdd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
-						cmdd.Parameters.AddWithValue("@taxrate", itemDetail.taxrate);
-						cmdd.Parameters.AddWithValue("@taxrateamount", itemDetail.taxrateamount);
-						cmdd.Parameters.AddWithValue("@discountpercent", itemDetail.discountpercent);
-						cmdd.Parameters.AddWithValue("@discountamount", itemDetail.discountamount);
-						cmdd.ExecuteNonQuery();
 					}
 				}
 				status = "SUCCESS";

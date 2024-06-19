@@ -37,7 +37,7 @@
 		public Int64 priceperunit { get; set; }
 		public Int64 remainingquantity { get; set; }
 		public string queryoperationtype { get; set; } = "";
-		public string taxrate { get; set; } = "NONE";
+		public Int64 taxrate { get; set; } = 0;
 		public Int64 taxrateamount { get; set; } = 0;
 		public Int64 transactionid { get; set; }
 		public Int64 discountpercent { get; set; }
