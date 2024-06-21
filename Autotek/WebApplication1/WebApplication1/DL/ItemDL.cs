@@ -205,7 +205,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT itemname, remainingquantity, saleprice, purchaseprice, wholesaleprice, minimumwholesalequantity, percentageoramounttype, discountonsaleprice from item where registeredphonenumber = " + registeredphonenumber;
+					cmd.CommandText = "SELECT itemname, remainingquantity, saleprice, purchaseprice, baseunit, wholesaleprice, minimumwholesalequantity, percentageoramounttype, discountonsaleprice from item where registeredphonenumber = " + registeredphonenumber;
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -222,6 +222,7 @@ namespace WebApplication1.DL
 								oGetItemList.minimumwholesalequantity = reader["minimumwholesalequantity"] == DBNull.Value ? 0 : Convert.ToInt64(reader["minimumwholesalequantity"]);
 								oGetItemList.discountonsaleprice = reader["discountonsaleprice"] == DBNull.Value ? 0 : Convert.ToInt64(reader["discountonsaleprice"]);
 								oGetItemList.percentageoramounttype = reader["percentageoramounttype"] == DBNull.Value ? null : Convert.ToString(reader["percentageoramounttype"]);
+								oGetItemList.baseunit = reader["baseunit"] == DBNull.Value ? null : Convert.ToString(reader["baseunit"]);
 
 								oGetItemListRs.getItemList.Add(oGetItemList);
 							}
