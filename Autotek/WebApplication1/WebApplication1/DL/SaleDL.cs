@@ -371,7 +371,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT invoicenumber, typeofpay, customername, invoicedate, paymentstatus, paymenttype, total, balance FROM transactions where registeredphonenumber = " + registeredphonenumber +
+					cmd.CommandText = "SELECT invoicenumber, typeofpay, customername, invoicedate, paymentstatus, paymenttype, total, balance, isconverted FROM transactions where registeredphonenumber = " + registeredphonenumber +
 						" AND typeofpay = '" + typeofpay + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
@@ -390,6 +390,7 @@ namespace WebApplication1.DL
 								oGetTypeOfPayTransactionsList.paymenttype = reader["paymenttype"] == DBNull.Value ? null : Convert.ToString(reader["paymenttype"]);
 								oGetTypeOfPayTransactionsList.total = reader["total"] == DBNull.Value ? 0 : Convert.ToInt64(reader["total"]);
 								oGetTypeOfPayTransactionsList.balance = reader["balance"] == DBNull.Value ? 0 : Convert.ToInt64(reader["balance"]);
+								oGetTypeOfPayTransactionsList.isconverted = reader["isconverted"] == DBNull.Value ? false : Convert.ToBoolean(reader["isconverted"]);
 								oGetTypeOfPayTransactionsRs.typeofpaytransactionlist.Add(oGetTypeOfPayTransactionsList);
 							}
 							oGetTypeOfPayTransactionsRs.status = "SUCCESS";
@@ -438,7 +439,7 @@ namespace WebApplication1.DL
 			return oGetTypeOfPayTransactionsRs.invoicenumbercount;
 		}
 
-		public TransactionRs SaveDeliveryChallan(TransactionRq otransactionRq, Int64 invoicecount, string typeofpay)
+		public TransactionRs SaveDeliveryChallan(TransactionRq otransactionRq, Int64 invoicecount, string typeofpay, bool isconverted)
 		{
 			TransactionRs otransactionrs = new TransactionRs();
 			try
@@ -450,8 +451,8 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "INSERT INTO transactions(typeofpay, invoicenumber, invoicedate, stateofsupply, paymenttype, total, received, balance, customername, phonenumber, registeredphonenumber, billingaddress," +
-						" shippingaddress, paymentstatus) VALUES(@typeofpay, @invoicenumber, @invoicedate, @stateofsupply, @paymenttype, @total, @received, @balance, @customername, @phonenumber, @registeredphonenumber, @billingaddress," +
-						" @shippingaddress, @paymentstatus) RETURNING transaction_id";
+						" shippingaddress, paymentstatus, isconverted) VALUES(@typeofpay, @invoicenumber, @invoicedate, @stateofsupply, @paymenttype, @total, @received, @balance, @customername, @phonenumber, @registeredphonenumber, @billingaddress," +
+						" @shippingaddress, @paymentstatus, @isconverted) RETURNING transaction_id";
 					cmd.Parameters.AddWithValue("@typeofpay", typeofpay);
 					cmd.Parameters.AddWithValue("@invoicenumber", invoicecount);
 					cmd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
@@ -466,6 +467,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@billingaddress", otransactionRq.billingaddress);
 					cmd.Parameters.AddWithValue("@shippingaddress", otransactionRq.shippingaddress);
 					cmd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
+					cmd.Parameters.AddWithValue("@isconverted",isconverted);
 					int transactionId = (int)cmd.ExecuteScalar();
 					if (otransactionRq.itemdetailslist.Count > 0)
 					{

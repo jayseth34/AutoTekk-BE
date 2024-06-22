@@ -204,6 +204,7 @@
 		public Int64 total { get; set; }
 		public Int64 balance { get; set; }
 		public string paymentstatus { get; set; }
+		public bool isconverted { get; set; }
 	}
 
 	public class ConvertToSaleSaleOrderRq

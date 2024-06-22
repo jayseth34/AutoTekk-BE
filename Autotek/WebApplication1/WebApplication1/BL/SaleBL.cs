@@ -20,6 +20,7 @@ namespace WebApplication1.BL
 			TransactionRs otransactionRs = new TransactionRs();
 			SaleDL saledl = new SaleDL(this.config);
 			string result = string.Empty;
+			bool isconverted = false;
 			if (otransactionRq.itemdetailslist == null || otransactionRq.itemdetailslist.Count == 0)
 			{
 				otransactionRs.status = "Kindly Insert Items.";
@@ -29,6 +30,7 @@ namespace WebApplication1.BL
 				if ((otransactionRq.issaleconvert || otransactionRq.issaleorderconvert || otransactionRq.ispurchaseconvert) && otransactionRq.isupdate)
 				{
 					string typeofpay = string.Empty;
+					isconverted = true;
 					if (otransactionRq.issaleconvert)
 					{
 						typeofpay = "SALE";
@@ -44,7 +46,7 @@ namespace WebApplication1.BL
 
 					result = saledl.FindOrInsertItem(otransactionRq);
 					Int64 invoicecount = saledl.GetInvoiceNumberCountDLChallan(otransactionRq.registeredphonenumber, typeofpay);
-					otransactionRs = saledl.SaveDeliveryChallan(otransactionRq, invoicecount, typeofpay);
+					otransactionRs = saledl.SaveDeliveryChallan(otransactionRq, invoicecount, typeofpay, isconverted);
 					saledl.UpdateDlChallan(otransactionRq.invoicenumber, otransactionRq.registeredphonenumber,otransactionRq.typeofpay);
 				}
 				else
