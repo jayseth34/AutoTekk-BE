@@ -47,6 +47,7 @@
 	public class GetItemList
 	{
 		public string itemname { get; set; }
+		public string baseunit { get; set; }
 		public Int64 remainingquantity { get; set; }
 		public Int64 saleprice { get; set; }
 		public Int64 purchaseprice { get; set; }
