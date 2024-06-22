@@ -26,22 +26,26 @@ namespace WebApplication1.BL
 			}
 			else
 			{
-				if (otransactionRq.isconvert && otransactionRq.isupdate && (otransactionRq.typeofpay == "SALE" || otransactionRq.typeofpay == "SALE ORDER"))
+				if ((otransactionRq.issaleconvert || otransactionRq.issaleorderconvert || otransactionRq.ispurchaseconvert) && otransactionRq.isupdate)
 				{
 					string typeofpay = string.Empty;
-					if (otransactionRq.typeofpay == "SALE ORDER")
+					if (otransactionRq.issaleconvert)
+					{
+						typeofpay = "SALE";
+					}
+					else if (otransactionRq.issaleorderconvert)
 					{
 						typeofpay = "SALE ORDER";
 					}
-					else if (otransactionRq.typeofpay == "SALE")
+					else if (otransactionRq.ispurchaseconvert)
 					{
-						typeofpay = "SALE";
+						typeofpay = "PURCHASE";
 					}
 
 					result = saledl.FindOrInsertItem(otransactionRq);
 					Int64 invoicecount = saledl.GetInvoiceNumberCountDLChallan(otransactionRq.registeredphonenumber, typeofpay);
-					otransactionRs = saledl.SaveDeliveryChallan(otransactionRq, invoicecount);
-					saledl.UpdateDlChallan(otransactionRq.invoicenumber, otransactionRq.registeredphonenumber);
+					otransactionRs = saledl.SaveDeliveryChallan(otransactionRq, invoicecount, typeofpay);
+					saledl.UpdateDlChallan(otransactionRq.invoicenumber, otransactionRq.registeredphonenumber,otransactionRq.typeofpay);
 				}
 				else
 				{
@@ -65,11 +69,17 @@ namespace WebApplication1.BL
 			SaleDL saledl = new SaleDL(this.config);
 			GetPartyTransactionDetailsRs oGetPartyTransactionDetailsRs = new GetPartyTransactionDetailsRs();
 
-
 			oGetPartyTransactionDetailsRs = saledl.GetPartyTransactionDetails(oGetPartyTransactionDetailsRq);
+			oGetPartyTransactionDetailsRs.invoicenumbercount = oGetPartyTransactionDetailsRq.invoicenumber;
 			GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq = new GetTypeOfPayTransactionsRq();
+			GetPartyAmounts oGetPartyAmounts = new GetPartyAmounts();
+			
 
 			oGetTypeOfPayTransactionsRq.registeredphonenumber = oGetPartyTransactionDetailsRq.registeredphonenumber;
+			oGetPartyAmounts = await saledl.GetTopaypartyreceiveparty(oGetTypeOfPayTransactionsRq.registeredphonenumber, oGetPartyTransactionDetailsRs.customername);
+			oGetPartyTransactionDetailsRs.topayparty = oGetPartyAmounts.topayparty;
+			oGetPartyTransactionDetailsRs.toreceivefromparty = oGetPartyAmounts.toreceivefromparty;
+
 			if (oGetPartyTransactionDetailsRq.issaleconvert)
 			{
 				oGetTypeOfPayTransactionsRq.typeofpay = "SALE";
@@ -139,6 +149,13 @@ namespace WebApplication1.BL
 			}
 
 			return otransactionRs;
+		}
+
+		public async Task<bool> UpdateLinkedPaymentTransaction(List<GetLinkedPaymentTransactionList> transactions)
+		{
+			SaleDL saledl = new SaleDL(this.config);
+			bool val = await saledl.UpdateLinkedPaymentTransaction(transactions);
+			return val;
 		}
 	}
 }

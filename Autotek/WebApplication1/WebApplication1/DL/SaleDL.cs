@@ -427,7 +427,7 @@ namespace WebApplication1.DL
 					object result = cmd.ExecuteScalar();
 					if (result != DBNull.Value)
 					{
-						oGetTypeOfPayTransactionsRs.invoicenumbercount = Convert.ToInt64(result);
+						oGetTypeOfPayTransactionsRs.invoicenumbercount = (Convert.ToInt64(result) + 1 );
 					}
 				}
 			}
@@ -438,7 +438,7 @@ namespace WebApplication1.DL
 			return oGetTypeOfPayTransactionsRs.invoicenumbercount;
 		}
 
-		public TransactionRs SaveDeliveryChallan(TransactionRq otransactionRq, Int64 invoicecount)
+		public TransactionRs SaveDeliveryChallan(TransactionRq otransactionRq, Int64 invoicecount, string typeofpay)
 		{
 			TransactionRs otransactionrs = new TransactionRs();
 			try
@@ -452,7 +452,7 @@ namespace WebApplication1.DL
 					cmd.CommandText = "INSERT INTO transactions(typeofpay, invoicenumber, invoicedate, stateofsupply, paymenttype, total, received, balance, customername, phonenumber, registeredphonenumber, billingaddress," +
 						" shippingaddress, paymentstatus) VALUES(@typeofpay, @invoicenumber, @invoicedate, @stateofsupply, @paymenttype, @total, @received, @balance, @customername, @phonenumber, @registeredphonenumber, @billingaddress," +
 						" @shippingaddress, @paymentstatus) RETURNING transaction_id";
-					cmd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
+					cmd.Parameters.AddWithValue("@typeofpay", typeofpay);
 					cmd.Parameters.AddWithValue("@invoicenumber", invoicecount);
 					cmd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
 					cmd.Parameters.AddWithValue("@stateofsupply", otransactionRq.stateofsupply);
@@ -524,7 +524,7 @@ namespace WebApplication1.DL
 					object result = cmd.ExecuteScalar();
 					if (result != DBNull.Value)
 					{
-						invoicecount = Convert.ToInt64(result);
+						invoicecount = (Convert.ToInt64(result) + 1 );
 					}
 				}
 			}
@@ -535,7 +535,7 @@ namespace WebApplication1.DL
 			return invoicecount;
 		}
 
-		public void UpdateDlChallan(Int64 invoicenumber,Int64 registeredphonenumber)
+		public void UpdateDlChallan(Int64 invoicenumber,Int64 registeredphonenumber, string typeofpay)
 		{
 			try
 			{
@@ -547,7 +547,7 @@ namespace WebApplication1.DL
 						NpgsqlCommand cmd = new NpgsqlCommand();
 						cmd.Connection = conn;
 						cmd.CommandType = CommandType.Text;
-						cmd.CommandText = "UPDATE transactions SET showtransaction = 'DONT SHOW' WHERE invoicenumber = '" + invoicenumber + "' AND registeredphonenumber = " + registeredphonenumber + "";
+						cmd.CommandText = "UPDATE transactions SET showtransaction = 'DONT SHOW' WHERE invoicenumber = '" + invoicenumber + "' AND registeredphonenumber = " + registeredphonenumber + " AND typeofpay = '" + typeofpay + "'";
 						cmd.ExecuteNonQuery();
 					}
 				}
@@ -656,8 +656,8 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT invoicenumber, typeofpay, invoicedate, total, linkedamount, balance from transactions where (balance > 0 OR linkedaccount = 'LINKED') and customername = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber +
-						" AND typeofpay in ('SALE', 'DELIVERY CHALLAN','RECEIVABLE OPENING BALANCE');";
+					cmd.CommandText = "SELECT invoicenumber, typeofpay, total, linkedamount, balance from transactions where balance > 0 and customername = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber +
+						" AND typeofpay in ('SALE','RECEIVABLE OPENING BALANCE');";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -665,11 +665,10 @@ namespace WebApplication1.DL
 						{
 							while (reader.Read())
 							{
-
 								GetLinkedPaymentTransactionList oGetLinkedPaymentTransactionList = new GetLinkedPaymentTransactionList();
 								oGetLinkedPaymentTransactionList.invoicenumber = reader["invoicenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["invoicenumber"]);
 								oGetLinkedPaymentTransactionList.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
-								oGetLinkedPaymentTransactionList.invoicedate = reader["invoicedate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["invoicedate"]);
+								oGetLinkedPaymentTransactionList.invoicedate = DateTime.Today; ;
 								oGetLinkedPaymentTransactionList.total = reader["total"] == DBNull.Value ? 0 : Convert.ToInt64(reader["total"]);
 								oGetLinkedPaymentTransactionList.linkedamount = reader["linkedamount"] == DBNull.Value ? 0 : Convert.ToInt64(reader["linkedamount"]);
 								oGetLinkedPaymentTransactionList.balance = reader["balance"] == DBNull.Value ? 0 : Convert.ToInt64(reader["balance"]);
@@ -790,6 +789,90 @@ namespace WebApplication1.DL
 			}
 			return status;
 		}
+		public async Task<bool> UpdateLinkedPaymentTransaction(List<GetLinkedPaymentTransactionList> transactions)
+		{
+			string paymentstatus = string.Empty;
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					using (var transaction = conn.BeginTransaction())
+					{
+						foreach (var item in transactions)
+						{
+							if (item.balance == 0)
+							{
+								paymentstatus = "PAID";
+							}
+							else if (item.balance > 0)
+							{
+								paymentstatus = "PARTIAL";
+							}
+							NpgsqlCommand cmd = new NpgsqlCommand();
+							cmd.Connection = conn;
+							cmd.CommandType = CommandType.Text;
+							cmd.CommandText = "UPDATE transactions SET linkedamount = @linkedAmount, balance = @balance, linkedaccount = 'LINKED', received = @received, " +
+								"paymentstatus = @paymentStatus, paymentinoutinvoicedate = @paymentinoutinvoicedate WHERE invoicenumber = @invoicenumber and registeredphonenumber = @registeredphonenumber and typeofpay = @typeofpay";
+							cmd.Parameters.AddWithValue("@linkedAmount", item.linkedamount);
+							cmd.Parameters.AddWithValue("@received", item.linkedamount);
+							cmd.Parameters.AddWithValue("@balance", item.balance);
+							cmd.Parameters.AddWithValue("@invoicenumber", item.invoicenumber);
+							cmd.Parameters.AddWithValue("@paymentStatus", paymentstatus);
+							cmd.Parameters.AddWithValue("@registeredphonenumber", item.registeredphonenumber);
+							cmd.Parameters.AddWithValue("@typeofpay", item.typeofpay);
+							cmd.Parameters.AddWithValue("@paymentinoutinvoicedate", DateTime.UtcNow);
+							await cmd.ExecuteNonQueryAsync();
+						}
+						await transaction.CommitAsync();
+					}
+				}
+				return true;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+				return false;
+			}
+		}
 
+		public async Task<GetPartyAmounts> GetTopaypartyreceiveparty(Int64 registeredphonenumber, string customername)
+		{
+			GetPartyAmounts oGetPartyAmounts = new GetPartyAmounts();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT topayparty, toreceivefromparty from party where partyname = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber;
+						
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+								oGetPartyAmounts.topayparty = reader["topayparty"] == DBNull.Value ? 0 : Convert.ToInt64(reader["topayparty"]);
+								oGetPartyAmounts.toreceivefromparty = reader["toreceivefromparty"] == DBNull.Value ? 0 : Convert.ToInt64(reader["toreceivefromparty"]);
+							}
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine(ex.Message);
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oGetPartyAmounts;
+
+		}
 	}
 }

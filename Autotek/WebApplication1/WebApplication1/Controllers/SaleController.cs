@@ -101,6 +101,23 @@ namespace WebApplication1.Controllers
 			return Ok(oGetLinkedPaymentTransactionRs);
 		}
 
+		[Authorize]
+		[HttpPost]
+		[Route("UpdateLinkedPaymentTransaction")]
+		public async Task<ActionResult> UpdateLinkedPaymentTransaction([FromBody] List<GetLinkedPaymentTransactionList> transactions)
+		{
+			SaleBL saleBl = new SaleBL(this.config);
+			bool result = await saleBl.UpdateLinkedPaymentTransaction(transactions);
+			if (result)
+			{
+				return Ok(new { status = "SUCCESS" });
+			}
+			else
+			{
+				return BadRequest(new { status = "FAILED" });
+			}
+		}
+
 		//no need to use this api as of nowS
 		[Authorize]
 		[HttpPost]

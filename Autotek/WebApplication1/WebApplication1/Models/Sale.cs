@@ -19,7 +19,9 @@
 		public string billingaddress { get; set; }
 		public string shippingaddress { get; set; }
 		public string paymentstatus { get; set; }
-		public bool isconvert { get; set; }
+		public bool ispurchaseconvert { get; set; }
+		public bool issaleconvert { get; set; }
+		public bool issaleorderconvert { get; set; }
 		public bool isupdate { get; set; }
 		public TransactionRq()
 		{
@@ -99,6 +101,9 @@
 		public string shippingaddress { get; set; }
 		public string status { get; set; }
 		public Int64 invoicenumbercount { get; set; }
+		public Int64 topayparty { get; set; }
+		public Int64 toreceivefromparty { get; set; }
+
 		public GetPartyTransactionDetailsRs()
 		{
 			itemdetailslist = new List<ItemDetailsListRs>();
@@ -186,6 +191,7 @@
 		public Int64 total { get; set; }
 		public Int64 balance { get; set; }
 		public Int64 linkedamount { get; set; }
+		public Int64 registeredphonenumber { get; set; }
 	}
 
 	public class GetTypeOfPayTransactionsList
@@ -213,5 +219,11 @@
 	{
 		public string status { get; set; }
 		public Int64 invoicenumbercount { get; set; }
+	}
+
+	public class GetPartyAmounts
+	{
+		public Int64 topayparty { get; set; }
+		public Int64 toreceivefromparty { get; set; }
 	}
 }
