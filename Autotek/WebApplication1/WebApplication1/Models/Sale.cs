@@ -192,6 +192,10 @@
 		public Int64 balance { get; set; }
 		public Int64 linkedamount { get; set; }
 		public Int64 registeredphonenumber { get; set; }
+		public Int64 topayparty { get; set; }
+		public Int64 toreceivefromparty { get; set; }
+		public string customername {  get; set; }
+		public Int64 unused {  get; set; }
 	}
 
 	public class GetTypeOfPayTransactionsList

@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.Common;
 using System.Transactions;
 using WebApplication1.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace WebApplication1.DL
@@ -658,7 +659,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT invoicenumber, typeofpay, total, linkedamount, balance from transactions where balance > 0 and customername = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber +
+					cmd.CommandText = "SELECT invoicenumber, typeofpay, total, linkedamount, balance, customername from transactions where balance > 0 and customername = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber +
 						" AND typeofpay in ('SALE','RECEIVABLE OPENING BALANCE');";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
@@ -670,6 +671,7 @@ namespace WebApplication1.DL
 								GetLinkedPaymentTransactionList oGetLinkedPaymentTransactionList = new GetLinkedPaymentTransactionList();
 								oGetLinkedPaymentTransactionList.invoicenumber = reader["invoicenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["invoicenumber"]);
 								oGetLinkedPaymentTransactionList.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
+								oGetLinkedPaymentTransactionList.customername = reader["customername"] == DBNull.Value ? null : Convert.ToString(reader["customername"]);
 								oGetLinkedPaymentTransactionList.invoicedate = DateTime.Today; ;
 								oGetLinkedPaymentTransactionList.total = reader["total"] == DBNull.Value ? 0 : Convert.ToInt64(reader["total"]);
 								oGetLinkedPaymentTransactionList.linkedamount = reader["linkedamount"] == DBNull.Value ? 0 : Convert.ToInt64(reader["linkedamount"]);
@@ -794,6 +796,10 @@ namespace WebApplication1.DL
 		public async Task<bool> UpdateLinkedPaymentTransaction(List<GetLinkedPaymentTransactionList> transactions)
 		{
 			string paymentstatus = string.Empty;
+			Int64 registeredphonenumber = 0;
+			Int64 topayparty = 0;
+			Int64 toreceivefromparty = 0;
+			string partyname = string.Empty;
 			try
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
@@ -803,6 +809,10 @@ namespace WebApplication1.DL
 					{
 						foreach (var item in transactions)
 						{
+							registeredphonenumber = item.registeredphonenumber;
+							topayparty = item.topayparty;
+							toreceivefromparty = item.toreceivefromparty;
+							partyname = item.customername;
 							if (item.balance == 0)
 							{
 								paymentstatus = "PAID";
@@ -814,10 +824,10 @@ namespace WebApplication1.DL
 							NpgsqlCommand cmd = new NpgsqlCommand();
 							cmd.Connection = conn;
 							cmd.CommandType = CommandType.Text;
-							cmd.CommandText = "UPDATE transactions SET linkedamount = @linkedAmount, balance = @balance, linkedaccount = 'LINKED', received = @received, " +
+							cmd.CommandText = "UPDATE transactions SET linkedamount = linkedamount + @linkedAmount, balance = @balance, linkedaccount = 'LINKED', received = received + @received, " +
 								"paymentstatus = @paymentStatus, paymentinoutinvoicedate = @paymentinoutinvoicedate WHERE invoicenumber = @invoicenumber and registeredphonenumber = @registeredphonenumber and typeofpay = @typeofpay";
-							cmd.Parameters.AddWithValue("@linkedAmount", item.linkedamount);
-							cmd.Parameters.AddWithValue("@received", item.linkedamount);
+							cmd.Parameters.AddWithValue("@linkedAmount", item.unused);
+							cmd.Parameters.AddWithValue("@received", item.unused);
 							cmd.Parameters.AddWithValue("@balance", item.balance);
 							cmd.Parameters.AddWithValue("@invoicenumber", item.invoicenumber);
 							cmd.Parameters.AddWithValue("@paymentStatus", paymentstatus);
@@ -829,7 +839,20 @@ namespace WebApplication1.DL
 						await transaction.CommitAsync();
 					}
 				}
-				return true;
+				using (NpgsqlConnection connn = new NpgsqlConnection(this._connectionFactory))
+				{
+					connn.Open();
+					NpgsqlCommand cmdd = new NpgsqlCommand();
+					cmdd.Connection = connn;
+					cmdd.CommandType = CommandType.Text;
+					cmdd.CommandText = "UPDATE party SET topayparty = @topayparty, toreceivefromparty = @toreceivefromparty WHERE partyname = @partyname and registeredphonenumber = " + registeredphonenumber;
+					cmdd.Parameters.AddWithValue("@topayparty", topayparty);
+					cmdd.Parameters.AddWithValue("@toreceivefromparty", toreceivefromparty);
+					cmdd.Parameters.AddWithValue("@partyname", partyname);
+					await cmdd.ExecuteNonQueryAsync();
+				}
+
+					return true;
 			}
 			catch (Exception ex)
 			{
