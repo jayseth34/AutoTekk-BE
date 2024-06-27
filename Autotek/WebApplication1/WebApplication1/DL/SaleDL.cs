@@ -403,7 +403,7 @@ namespace WebApplication1.DL
 					}
 					else
 					{
-						oGetTypeOfPayTransactionsRs.status = "No Recods Found";
+						oGetTypeOfPayTransactionsRs.status = "SUCCESS";
 					}
 				}
 			}
@@ -427,6 +427,7 @@ namespace WebApplication1.DL
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT MAX(invoicenumber) FROM transactions WHERE typeofpay = '" + typeofpay + "' AND registeredphonenumber = " + registeredphonenumber + "" ;
 					object result = cmd.ExecuteScalar();
+					oGetTypeOfPayTransactionsRs.invoicenumbercount = 1;
 					if (result != DBNull.Value)
 					{
 						oGetTypeOfPayTransactionsRs.invoicenumbercount = (Convert.ToInt64(result) + 1 );
