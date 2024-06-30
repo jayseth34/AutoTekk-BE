@@ -118,6 +118,17 @@ namespace WebApplication1.Controllers
 			}
 		}
 
+		[Authorize]
+		[HttpPost]
+		[Route("UpdatePaymentInOutTrnx")]
+		public async Task<ActionResult> UpdatePaymentInOutTrnx(UpadatePaymentInOutTrnxRq oUpadatePaymentInOutTrnxRq)
+		{
+			UpadatePaymentInOutTrnxRs oUpadatePaymentInOutTrnxRs = new UpadatePaymentInOutTrnxRs();
+			SaleBL saleBL = new SaleBL(this.config);
+			oUpadatePaymentInOutTrnxRs = await saleBL.UpdatePaymentInOutTrnx(oUpadatePaymentInOutTrnxRq);
+			return Ok(oUpadatePaymentInOutTrnxRs);
+		}
+
 		//no need to use this api as of nowS
 		[Authorize]
 		[HttpPost]

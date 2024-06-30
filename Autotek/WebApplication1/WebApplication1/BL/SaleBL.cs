@@ -159,5 +159,14 @@ namespace WebApplication1.BL
 			bool val = await saledl.UpdateLinkedPaymentTransaction(transactions);
 			return val;
 		}
+
+		public async Task<UpadatePaymentInOutTrnxRs> UpdatePaymentInOutTrnx(UpadatePaymentInOutTrnxRq oUpadatePaymentInOutTrnxRq)
+		{
+			UpadatePaymentInOutTrnxRs oUpadatePaymentInOutTrnxRs = new UpadatePaymentInOutTrnxRs();
+			SaleDL saledl = new SaleDL(this.config);
+			oUpadatePaymentInOutTrnxRs = await saledl.UpdatePaymentInOutTrnx(oUpadatePaymentInOutTrnxRq);
+			return oUpadatePaymentInOutTrnxRs;
+		}
+
 	}
 }

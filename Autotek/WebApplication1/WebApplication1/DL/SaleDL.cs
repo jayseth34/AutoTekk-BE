@@ -1,7 +1,9 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Npgsql;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure.Internal;
 using NpgsqlTypes;
 using System.Collections.Generic;
 using System.Data;
@@ -898,7 +900,41 @@ namespace WebApplication1.DL
 				Console.WriteLine(ex.Message);
 			}
 			return oGetPartyAmounts;
+		}
 
+		public async Task<UpadatePaymentInOutTrnxRs> UpdatePaymentInOutTrnx(UpadatePaymentInOutTrnxRq oUpadatePaymentInOutTrnxRq)
+		{
+			UpadatePaymentInOutTrnxRs oUpadatePaymentInOutTrnxRs = new UpadatePaymentInOutTrnxRs();
+			string sqlQuery = "INSERT INTO transactions (typeofpay, customername, paymenttype, invoicedate, invoicenumber, received, total, balance, paymentstatus, registeredphonenumber)" +
+				"VALUES(@typeofpay, @customername, @paymenttype, @invoicedate, @invoicenumber, @received, @total, @balance, @paymentstatus, @registeredphonenumber)";
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = sqlQuery;
+					cmd.Parameters.AddWithValue("@typeofpay", oUpadatePaymentInOutTrnxRq.typeofpay);
+					cmd.Parameters.AddWithValue("@registeredphonenumber", oUpadatePaymentInOutTrnxRq.registeredphonenumber);
+					cmd.Parameters.AddWithValue("@customername", oUpadatePaymentInOutTrnxRq.customername);
+					cmd.Parameters.AddWithValue("@paymenttype", oUpadatePaymentInOutTrnxRq.paymenttype);
+					cmd.Parameters.AddWithValue("@invoicedate", DateTime.UtcNow);
+					cmd.Parameters.AddWithValue("@invoicenumber", oUpadatePaymentInOutTrnxRq.invoicenumber);
+					cmd.Parameters.AddWithValue("@received", oUpadatePaymentInOutTrnxRq.received);
+					cmd.Parameters.AddWithValue("@total", oUpadatePaymentInOutTrnxRq.received);
+					cmd.Parameters.AddWithValue("@balance", 0);
+					cmd.Parameters.AddWithValue("@paymentstatus", "USED");
+					cmd.ExecuteNonQuery();
+					oUpadatePaymentInOutTrnxRs.status = "SUCCESS";
+				}
+			}
+			catch(Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oUpadatePaymentInOutTrnxRs;
 		}
 	}
 }

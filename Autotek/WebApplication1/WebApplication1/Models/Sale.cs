@@ -211,6 +211,22 @@
 		public bool isconverted { get; set; }
 	}
 
+	public class UpadatePaymentInOutTrnxRq
+	{
+		public Int64 invoicenumber { get; set; }
+		public DateTime invoicedate { get; set; }
+		public Int64 received { get; set; }
+		public Int64 registeredphonenumber { get; set; }
+		public string paymenttype { get; set; }
+		public string customername { get; set; }
+		public string typeofpay { get; set; }
+	}
+
+	public class UpadatePaymentInOutTrnxRs
+	{
+		public string status { get; set; }
+	}
+
 	public class ConvertToSaleSaleOrderRq
 	{
 		public string typeofpay { get; set; }
