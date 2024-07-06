@@ -69,6 +69,17 @@ namespace WebApplication1.Controllers
 		}
 
 		[Authorize]
+		[HttpPost]
+		[Route("GetPaymentInOutTransactionDetails")]
+		public async Task<ActionResult> GetPaymentInOutTransactionDetails(GetPartyTransactionDetailsRq oGetPartyTransactionDetailsRq)
+		{
+			PaymentInOutTrnxRs oPaymentInOutTrnxRs = new PaymentInOutTrnxRs();
+			SaleBL saleBl = new SaleBL(this.config);
+			oPaymentInOutTrnxRs = await saleBl.GetPaymentInOutTransactionDetails(oGetPartyTransactionDetailsRq);
+			return Ok(oPaymentInOutTrnxRs);
+		}
+
+		[Authorize]
 		[HttpGet]
 		[Route("GetItemTransactions")]
 		public async Task<ActionResult> GetItemTransactions([FromQuery] Int64 registeredphonenumber, [FromQuery] string itemname)

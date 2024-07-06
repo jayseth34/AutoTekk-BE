@@ -828,7 +828,7 @@ namespace WebApplication1.DL
 							cmd.Connection = conn;
 							cmd.CommandType = CommandType.Text;
 							cmd.CommandText = "UPDATE transactions SET linkedamount = linkedamount + @linkedAmount, balance = @balance, linkedaccount = 'LINKED', received = received + @received, " +
-								"paymentstatus = @paymentStatus, paymentinoutinvoicedate = @paymentinoutinvoicedate WHERE invoicenumber = @invoicenumber and registeredphonenumber = @registeredphonenumber and typeofpay = @typeofpay";
+								"paymentstatus = @paymentStatus, paymentinoutinvoicedate = @paymentinoutinvoicedate, paymentininvoicenumber = @paymentininvoicenumber WHERE invoicenumber = @invoicenumber and registeredphonenumber = @registeredphonenumber and typeofpay = @typeofpay";
 							cmd.Parameters.AddWithValue("@linkedAmount", item.unused);
 							cmd.Parameters.AddWithValue("@received", item.unused);
 							cmd.Parameters.AddWithValue("@balance", item.balance);
@@ -837,6 +837,7 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@registeredphonenumber", item.registeredphonenumber);
 							cmd.Parameters.AddWithValue("@typeofpay", item.typeofpay);
 							cmd.Parameters.AddWithValue("@paymentinoutinvoicedate", DateTime.UtcNow);
+							cmd.Parameters.AddWithValue("@paymentininvoicenumber",item.paymentininvoicenumber);
 							await cmd.ExecuteNonQueryAsync();
 						}
 						await transaction.CommitAsync();
@@ -935,6 +936,53 @@ namespace WebApplication1.DL
 				Console.WriteLine(ex.Message);
 			}
 			return oUpadatePaymentInOutTrnxRs;
+		}
+		public PaymentInOutTrnxRs GetPaymentInOutTransactionDetails(GetPartyTransactionDetailsRq oGetPartyTransactionDetailsRq)
+		{
+			PaymentInOutTrnxRs oPaymentInOutTrnxRs = new PaymentInOutTrnxRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT invoicenumber, typeofpay, invoicedate, linkedamount  FROM transactions where registeredphonenumber = " + oGetPartyTransactionDetailsRq.registeredphonenumber +
+						" AND paymentininvoicenumber = " + oGetPartyTransactionDetailsRq.invoicenumber + " AND linkedaccount = 'LINKED'";
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+
+								ListPaymentInOutTrnxRs oListPaymentInOutTrnxRs = new ListPaymentInOutTrnxRs();
+								oListPaymentInOutTrnxRs.invoicenumber = reader["invoicenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["invoicenumber"]);
+								oListPaymentInOutTrnxRs.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
+								oListPaymentInOutTrnxRs.invoicedate = reader["invoicedate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["invoicedate"]);
+								oListPaymentInOutTrnxRs.linkedamount = reader["linkedamount"] == DBNull.Value ? 0 : Convert.ToInt64(reader["linkedamount"]);
+								oPaymentInOutTrnxRs.inouttrnxlist.Add(oListPaymentInOutTrnxRs);
+							}
+							oPaymentInOutTrnxRs.status = "SUCCESS";
+						}
+						catch (Exception ex)
+						{
+							oPaymentInOutTrnxRs.status = "FAILED";
+						}
+					}
+					else
+					{
+						oPaymentInOutTrnxRs.status = "SUCCESS";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oPaymentInOutTrnxRs;
 		}
 	}
 }

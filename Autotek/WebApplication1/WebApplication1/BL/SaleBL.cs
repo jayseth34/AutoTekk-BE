@@ -95,6 +95,13 @@ namespace WebApplication1.BL
 			return oGetPartyTransactionDetailsRs;
 		}
 
+		public async Task<PaymentInOutTrnxRs> GetPaymentInOutTransactionDetails(GetPartyTransactionDetailsRq oGetPartyTransactionDetailsRq)
+		{
+			PaymentInOutTrnxRs oPaymentInOutTrnxRs = new PaymentInOutTrnxRs();
+			SaleDL saledl = new SaleDL(this.config);
+			oPaymentInOutTrnxRs = saledl.GetPaymentInOutTransactionDetails(oGetPartyTransactionDetailsRq);
+			return oPaymentInOutTrnxRs;
+		}
 		public async Task<GetItemTransactionsRs> GetItemTransactions(Int64 registeredphonenumber, string itemname)
 		{
 			GetItemTransactionsRs oGetItemTransactionsRs = new GetItemTransactionsRs();

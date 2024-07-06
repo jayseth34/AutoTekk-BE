@@ -111,6 +111,25 @@
 		public List<ItemDetailsListRs> itemdetailslist { get; set; }
 	}
 
+	public class PaymentInOutTrnxRs
+	{
+		public string status { get; set; }
+		public PaymentInOutTrnxRs()
+		{
+			inouttrnxlist = new List<ListPaymentInOutTrnxRs>();
+		}
+		public List<ListPaymentInOutTrnxRs> inouttrnxlist { get; set; }
+
+	}
+
+	public class ListPaymentInOutTrnxRs
+	{
+		public DateTime invoicedate { get; set; }
+		public Int64 invoicenumber { get; set; }
+		public Int64 linkedamount { get; set; }
+		public string typeofpay { get; set; }
+	}
+
 	public class ItemDetailsListRs
 	{
 		public string item { get; set; }
@@ -196,6 +215,7 @@
 		public Int64 toreceivefromparty { get; set; }
 		public string customername {  get; set; }
 		public Int64 unused {  get; set; }
+		public Int64 paymentininvoicenumber {  get; set; }
 	}
 
 	public class GetTypeOfPayTransactionsList
