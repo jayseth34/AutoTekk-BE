@@ -712,7 +712,7 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "UPDATE transactions SET phonenumber = @phonenumber, billingaddress = @billingaddress, shippingaddress = @shippingaddress, invoicedate = @invoicedate, stateofsupply = @stateofsupply," +
-						" total = @total, received = @received, balance = @balance, paymenttype = @paymenttype where registeredphonenumber = " + otransactionRq.registeredphonenumber + " AND invoicenumber = " + otransactionRq.invoicenumber + " AND " +
+						" total = @total, received = @received, balance = @balance, paymenttype = @paymenttype, paymentstatus = @paymentstatus where registeredphonenumber = " + otransactionRq.registeredphonenumber + " AND invoicenumber = " + otransactionRq.invoicenumber + " AND " +
 						" customername = '" + otransactionRq.customername + "'" ;
 					cmd.Parameters.AddWithValue("@phonenumber", otransactionRq.phonenumber);
 					cmd.Parameters.AddWithValue("@billingaddress", otransactionRq.billingaddress);
@@ -723,6 +723,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@received", otransactionRq.received);
 					cmd.Parameters.AddWithValue("@balance", otransactionRq.balance);
 					cmd.Parameters.AddWithValue("@paymenttype", otransactionRq.paymenttype);
+					cmd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
 					cmd.ExecuteNonQuery();
 					status = "SUCCESS";
 				}
