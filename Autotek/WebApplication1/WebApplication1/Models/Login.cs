@@ -11,12 +11,22 @@ namespace WebApplication1.Models
 		public string password { get; set; }
 	}
 
+	public class OtpRs
+	{
+		public string status { get; set; }
+		public string statusmessage { get; set; }
+		public string accessToken { get; set; }
+		public DateTime expiryDate { get; set; }
+		public string plantype { get; set; }
+	}
+
 	public class LoginRs
 	{
 		public string status { get; set; }
 		public string statusMessage { get; set; }
 		public string accessToken { get; set; }
 		public DateTime expiryDate { get; set; }
+		public string plantype { get; set; }
 	}
 
 	public class RegisterRq
@@ -37,6 +47,21 @@ namespace WebApplication1.Models
 	{
 		public string SessionId { get; set; }
 		public string Otp { get; set; }
+		public string registeredphonenumber { get; set; }
+	}
+
+	public class OrderRequest
+	{
+		public int Amount { get; set; }
+		public string Currency { get; set; }
+		public string PlanType { get; set; }
+		public Int64 registeredphonenumber { get; set; }
+	}
+
+	public class UpdateExpDate
+	{
+		public string PlanType { get; set; }
+		public Int64 registeredphonenumber { get; set; }
 	}
 
 	public class PartyRq

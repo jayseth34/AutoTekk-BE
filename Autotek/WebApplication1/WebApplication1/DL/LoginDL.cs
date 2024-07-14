@@ -31,13 +31,14 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT status, expirydate FROM registeragent WHERE phonenumber = "+ ologinRq.phonenumber + " AND _password = '" + ologinRq.password + "'";
+					cmd.CommandText = "SELECT status, expirydate, plantype FROM registeragent WHERE phonenumber = " + ologinRq.phonenumber + " AND _password = '" + ologinRq.password + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					while (reader.Read())
 					{
 						ologinrs.status = "SUCCESS";
 						ologinrs.statusMessage = reader["status"].ToString();
 						ologinrs.expiryDate = Convert.ToDateTime(reader["expirydate"]);
+						ologinrs.plantype =  reader["plantype"] == DBNull.Value ? null : Convert.ToString(reader["plantype"]);
 					}
 				}
 			}
@@ -46,6 +47,61 @@ namespace WebApplication1.DL
 				ologinrs.statusMessage = "Record Not Found";
 			}
 			return ologinrs;
+		}
+
+		public bool GetOtpLoginDetails(string phonenumber)
+		{
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT status, expirydate FROM registeragent WHERE phonenumber = " + Convert.ToInt64(phonenumber);
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					while (reader.Read())
+					{
+						return true;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				return false;
+			}
+			return false;
+		}
+
+		public OtpRs VerifyOtpser(VerifyOtpRequest request)
+		{
+			OtpRs otpRs = new OtpRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT status, expirydate, plantype FROM registeragent WHERE phonenumber = " + Convert.ToInt64(request.registeredphonenumber);
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					while (reader.Read())
+					{
+						otpRs.status = "SUCCESS";
+						otpRs.statusmessage = reader["status"].ToString();
+						otpRs.expiryDate = Convert.ToDateTime(reader["expirydate"]);
+						otpRs.plantype = reader["plantype"] == DBNull.Value ? null : Convert.ToString(reader["plantype"]);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				otpRs.status = "FAILED";
+				return otpRs;
+			}
+			return otpRs;
 		}
 
 		public RegisterRs RegisterUser(RegisterRq oregisterRq)
@@ -755,6 +811,29 @@ namespace WebApplication1.DL
 				Console.WriteLine(ex.Message);
 			}
 			return oAddUpdatePartyGropRs;
+		}
+
+		public bool UpdateExpiryDate(DateTime date, Int64 registeredphonenumber, string planType)
+		{
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "UPDATE registeragent set expirydate = @expirydate, plantype = @plantype WHERE phonenumber = " + registeredphonenumber ;
+					cmd.Parameters.AddWithValue("@expirydate", date);
+					cmd.Parameters.AddWithValue("@plantype", planType);
+					cmd.ExecuteNonQuery();
+				}
+			}
+			catch (Exception ex)
+			{
+				return false;
+			}
+			return true;
 		}
 	}
 }

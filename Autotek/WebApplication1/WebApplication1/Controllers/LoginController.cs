@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.Ocsp;
 using RestSharp;
 using WebApplication1.BL;
 using WebApplication1.Models;
@@ -38,9 +39,18 @@ namespace WebApplication1.Controllers
 			}
 		}
 
-		[HttpPost("send-otp")]
+		[HttpGet("send-otp")]
 		public async Task<IActionResult> SendOtp([FromQuery] string phoneNumber)
 		{
+			OtpRs otpRs = new OtpRs();
+			LoginBL loginBL = new LoginBL(this.config);
+			bool exist = await loginBL.ValidateOtpUser(phoneNumber);
+			if (!exist)
+			{
+				otpRs.status = "FAILED";
+				otpRs.statusmessage = "Kindly Register before Login";
+				return Ok(otpRs);
+			}
 			var client = new RestClient();
 			var url = $"https://2factor.in/API/V1/{_apiKey}/SMS/{phoneNumber}/AUTOGEN";
 			var restRequest = new RestRequest(url, Method.Get);
@@ -49,15 +59,26 @@ namespace WebApplication1.Controllers
 
 			if (response.IsSuccessful)
 			{
-				return Ok(response.Content); // Return the response from 2Factor
+				return Ok(response.Content);
 			}
-
-			return BadRequest("Failed to send OTP");
+			otpRs.status = "FAILED";
+			otpRs.statusmessage = "Failed to send otp";
+			return Ok(otpRs);
 		}
 
 		[HttpPost("verify-otp")]
 		public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
 		{
+			OtpRs otpRs = new OtpRs();
+			LoginBL loginBL = new LoginBL(this.config);
+			otpRs = await loginBL.VerifyOtpUser(request);
+			if (otpRs.status == "FAILED")
+			{
+				otpRs.status = "FAILED";
+				otpRs.statusmessage = "Kindly Register before Login";
+				otpRs.accessToken = "";
+				return Ok(otpRs);
+			}
 			var client = new RestClient();
 			var url = $"https://2factor.in/API/V1/{_apiKey}/SMS/VERIFY/{request.SessionId}/{request.Otp}";
 			var restRequest = new RestRequest(url, Method.Get);
@@ -66,10 +87,11 @@ namespace WebApplication1.Controllers
 
 			if (response.IsSuccessful)
 			{
-				return Ok(response.Content); // Return the response from 2Factor
+				return Ok(otpRs);
 			}
-
-			return BadRequest("Failed to verify OTP");
+			otpRs.status = "FAILED";
+			otpRs.statusmessage = "Failed To Verify OTP";
+			return Ok(otpRs);
 		}
 
 		[AllowAnonymous]
@@ -86,6 +108,76 @@ namespace WebApplication1.Controllers
 			}
 			return BadRequest("Please Provide Valid Details");
 		}
+
+		[AllowAnonymous]
+		[HttpPost("create-order")]
+		public IActionResult CreateOrder([FromBody] OrderRequest request)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+
+			LoginBL loginBL = new LoginBL(this.config);
+			if (request.PlanType == "free")
+			{
+				if (!User.Identity.IsAuthenticated)
+				{
+					return Unauthorized();
+				}
+				var val = loginBL.UpdateExpiryDate(DateTime.UtcNow.AddDays(7),request.registeredphonenumber, request.PlanType);
+				if (!val)
+				{
+					return Ok("Something went wrong");
+				}
+				return Ok(new { status = "SUCCESS", message = "Free trial activated" });
+			}
+
+			int validatedAmount = loginBL.ValidatePlanAmount(request.PlanType);
+			if (validatedAmount == -1)
+			{
+				return BadRequest("Invalid plan type.");
+			}
+
+			var order = loginBL.CreateOrder(validatedAmount, request.Currency);
+			if (order == null || string.IsNullOrEmpty(order.Attributes["id"].ToString()) || order.Attributes["amount"] == null)
+			{
+				return StatusCode(500, "Failed to create Razorpay order.");
+			}
+
+			int amount;
+			if (!int.TryParse(order.Attributes["amount"].ToString(), out amount))
+			{
+				return StatusCode(500, "Invalid amount in Razorpay order.");
+			}
+
+			return Ok(new { id = order.Attributes["id"].ToString(), amount = amount });
+		}
+
+		[HttpPost]
+		[Route("UpdateExpiryDate")]
+		public IActionResult UpdateExpiryDate([FromBody] UpdateExpDate request)
+		{
+			DateTime date = DateTime.UtcNow;
+			string statusm = "SUCCESS";
+			LoginBL loginBL = new LoginBL(this.config);
+			if(request.PlanType == "silver")
+			{
+				date = DateTime.UtcNow.AddMonths(6);
+			} 
+			else if (request.PlanType == "gold")
+			{
+				 date = DateTime.UtcNow.AddYears(1);
+			}
+			var val = loginBL.UpdateExpiryDate(date, request.registeredphonenumber, request.PlanType);
+			if (!val)
+			{
+				statusm = "FAILED";
+			}
+			return Ok( new { status = statusm });
+		}
+
+
 
 		[HttpPost]
 		[Route("SaveOrUpdateParty")]

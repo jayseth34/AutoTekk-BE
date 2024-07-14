@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Razorpay.Api;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -13,10 +14,14 @@ namespace WebApplication1.BL
 	{
 		private readonly IConfiguration config;
 		private readonly string dbConn;
+		private readonly string _keyId;
+		private readonly string _keySecret;
 		public LoginBL(IConfiguration _config)
 		{
 			config = _config;
 			dbConn = config.GetValue<string>("ConnectionStrings");
+			_keyId = config["Razorpay:KeyId"];
+			_keySecret = config["Razorpay:KeySecret"];
 		}
 		public async Task<LoginRs> ValidateLogin(LoginRq ologinRq)
 		{
@@ -29,6 +34,28 @@ namespace WebApplication1.BL
 				ologinRs.accessToken = _token;
 			}
 			return ologinRs;
+		}
+
+		public async Task<bool> ValidateOtpUser(string phonenumber)
+		{
+			LoginDL logindl = new LoginDL(this.config);
+			bool exist = logindl.GetOtpLoginDetails(phonenumber);
+			return exist;
+		}
+
+		public async Task<OtpRs> VerifyOtpUser(VerifyOtpRequest request)
+		{
+			OtpRs otpRs = new OtpRs();
+			otpRs.status = "FAILED";
+			LoginDL logindl = new LoginDL(this.config);
+			otpRs = logindl.VerifyOtpser(request);
+			if (otpRs.status == "SUCCESS")
+			{
+				string _token = await CreateToken();
+				otpRs.accessToken = _token;
+				otpRs.status = "SUCCESS";
+			}
+			return otpRs;
 		}
 
 		public async Task<string> CreateToken()
@@ -66,6 +93,44 @@ namespace WebApplication1.BL
 			LoginDL logindl = new LoginDL(this.config);
 			oregisterRs = logindl.RegisterUser(oregisterRq);
 			return oregisterRs;
+		}
+
+		public Order CreateOrder(int amount, string currency)
+		{
+			Dictionary<string, object> options = new Dictionary<string, object>();
+			options.Add("amount", amount);
+			options.Add("currency", currency);
+			options.Add("payment_capture", 1);
+
+			RazorpayClient client = new RazorpayClient(_keyId, _keySecret);
+			Order order = client.Order.Create(options);
+			if (order == null || string.IsNullOrEmpty(order.Attributes["id"].ToString()) || order.Attributes["amount"] == null)
+			{
+				throw new Exception("Failed to create Razorpay order.");
+			}
+
+			return order;
+		}
+		public int ValidatePlanAmount(string planType)
+		{
+			return planType switch
+			{
+				"silver" => 339900,
+				"gold" => 399900,
+				_ => -1
+			};
+		}
+
+		public bool UpdateExpiryDate(DateTime date, Int64 registeredphonenumber, string planType)
+		{
+			PartyRs opartyRs = new PartyRs();
+			LoginDL logindl = new LoginDL(this.config);
+			var val = logindl.UpdateExpiryDate(date, registeredphonenumber, planType);
+			if (!val)
+			{
+				return false;
+			}
+			return true;
 		}
 
 		public async Task<PartyRs> Party(PartyRq opartyRq)
