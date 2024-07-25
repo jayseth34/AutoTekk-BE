@@ -40,6 +40,7 @@ namespace WebApplication1.Models
 	public class RegisterRs
 	{
 		public string status { get; set; }
+		public string stat { get; set; }
 		public Boolean exist { get; set; }
 	}
 

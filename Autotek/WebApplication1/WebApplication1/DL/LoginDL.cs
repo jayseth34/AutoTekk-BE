@@ -120,6 +120,7 @@ namespace WebApplication1.DL
 					while (reader.Read())
 					{
 						oregisterrs.status = "Phone Number already exists.";
+						oregisterrs.stat = "Failed";
 						oregisterrs.exist = true;
 					}
 				}
@@ -140,11 +141,14 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@address", oregisterRq.address);
 							cmd.ExecuteNonQuery();
 							oregisterrs.status = "Inserted Successfully";
+							oregisterrs.stat = "Success";
+
 						}
 					}
 					catch (Exception ex)
 					{
 						oregisterrs.status = "Data Could Not Be Inserted";
+						oregisterrs.stat = "Failed";
 					}
 				}
 			}
