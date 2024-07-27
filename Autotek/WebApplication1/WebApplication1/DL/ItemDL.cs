@@ -321,7 +321,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT category, COUNT(*) AS categorycount FROM item WHERE registeredphonenumber = " + registeredphonenumber + " GROUP BY category";
+					cmd.CommandText = "SELECT cat.category, COUNT(cat.category) AS categorycount FROM category AS cat LEFT JOIN item AS it ON cat.category = it.category AND it.registeredphonenumber = " + registeredphonenumber + " GROUP BY cat.category";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{

@@ -1,7 +1,9 @@
 ﻿using Npgsql;
 using NpgsqlTypes;
+using Org.BouncyCastle.Tls.Crypto;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using WebApplication1.Models;
@@ -718,7 +720,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT partygroup, COUNT(*) AS partygroup_count FROM party WHERE registeredphonenumber = " + registeredphonenumber + " GROUP BY partygroup";
+					cmd.CommandText = "SELECT pg.partygroup, COUNT(par.partygroup) AS partygroup_count FROM partygroup AS pg LEFT JOIN party AS par ON pg.partygroup = par.partygroup AND par.registeredphonenumber = " + registeredphonenumber + " GROUP BY pg.partygroup";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
