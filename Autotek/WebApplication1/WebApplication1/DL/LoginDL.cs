@@ -440,7 +440,7 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@additionalfieldname1value", opartyRq.additionalfieldname1value);
 							cmd.Parameters.AddWithValue("@additionalfieldname2value", opartyRq.additionalfieldname2value);
 							cmd.Parameters.AddWithValue("@additionalfieldname3value", opartyRq.additionalfieldname3value);
-							cmd.Parameters.AddWithValue("@additionalfieldname4value", opartyRq.additionalfieldname4value);
+							cmd.Parameters.AddWithValue("@additionalfieldname4value", DateTime.UtcNow);
 							cmd.Parameters.AddWithValue("@topayparty", opartyRq.topayparty);
 							cmd.Parameters.AddWithValue("@toreceivefromparty", opartyRq.toreceivefromparty);
 							cmd.ExecuteNonQuery();
