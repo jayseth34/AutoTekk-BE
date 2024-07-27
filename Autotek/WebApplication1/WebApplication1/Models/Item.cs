@@ -32,6 +32,7 @@
 	public class ItemRs
 	{
 		public string status { get; set; }
+		public string statusmessage { get; set; }
 	}
 
 	public class GetItemListRs

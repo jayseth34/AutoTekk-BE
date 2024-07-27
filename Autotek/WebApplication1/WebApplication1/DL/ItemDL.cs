@@ -145,7 +145,7 @@ namespace WebApplication1.DL
 								NpgsqlCommand cmd = new NpgsqlCommand();
 								cmd.Connection = conn;
 								cmd.CommandType = CommandType.Text;
-								cmd.CommandText = "SELECT category FROM categorygroup WHERE registeredphonenumber = " + oitemRq.registeredphonenumber + " AND category = '" + oitemRq.category + "'";
+								cmd.CommandText = "SELECT category FROM category WHERE registeredphonenumber = " + oitemRq.registeredphonenumber + " AND category = '" + oitemRq.category + "'";
 								NpgsqlDataReader reader = cmd.ExecuteReader();
 								while (reader.Read())
 								{
@@ -167,7 +167,7 @@ namespace WebApplication1.DL
 									NpgsqlCommand cmd = new NpgsqlCommand();
 									cmd.Connection = conn;
 									cmd.CommandType = CommandType.Text;
-									cmd.CommandText = "INSERT INTO categorygroup(category, registeredphonenumber) VALUES(@category, @registeredphonenumber)";
+									cmd.CommandText = "INSERT INTO category (category, registeredphonenumber) VALUES(@category, @registeredphonenumber)";
 									cmd.Parameters.AddWithValue("@category", oitemRq.category);
 									cmd.Parameters.AddWithValue("@registeredphonenumber", oitemRq.registeredphonenumber);
 									cmd.ExecuteNonQuery();
@@ -321,7 +321,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT category, COUNT(*) AS categorycount FROM item WHERE registeredphonenumber = " + registeredphonenumber + " GROUP BY category";
+					cmd.CommandText = "SELECT category, COUNT(*) AS categorycount FROM category WHERE registeredphonenumber = " + registeredphonenumber + " GROUP BY category";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{

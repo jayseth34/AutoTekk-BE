@@ -178,7 +178,8 @@ namespace WebApplication1.DL
 						NpgsqlDataReader reader = cmd.ExecuteReader();
 						while (reader.Read())
 						{
-							opartyRs.status = "Party Name Already Exists";
+							opartyRs.status = "Failed";
+							opartyRs.statusmessage = "Party Name Already Exists";
 							return opartyRs;
 						}
 					}
@@ -227,7 +228,8 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("topayparty", opartyRq.topayparty);
 							cmd.Parameters.AddWithValue("toreceiveparty", opartyRq.toreceivefromparty);
 							cmd.ExecuteNonQuery();
-							opartyRs.status = "Inserted Successfully";
+							opartyRs.status = "Success";
+							opartyRs.statusmessage = "Inserted Successfully";
 						}
 
 					}
@@ -390,7 +392,8 @@ namespace WebApplication1.DL
 							NpgsqlDataReader reader = cmd.ExecuteReader();
 							while (reader.Read())
 							{
-								opartyRs.status = "Party Name Already Exists";
+								opartyRs.status = "Failed";
+								opartyRs.statusmessage = "Party Name Already Exists";
 								return opartyRs;
 							}
 						}
@@ -441,7 +444,8 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@topayparty", opartyRq.topayparty);
 							cmd.Parameters.AddWithValue("@toreceivefromparty", opartyRq.toreceivefromparty);
 							cmd.ExecuteNonQuery();
-							opartyRs.status = "Party Updated Successfully";
+							opartyRs.status = "Success";
+							opartyRs.statusmessage = "Party Updated Successfully";
 						}
 					}
 					catch (Exception ex)
@@ -577,7 +581,7 @@ namespace WebApplication1.DL
 				}
 				catch(Exception ex)
 				{
-					opartyRs.status = "SUCCESS";
+					opartyRs.status = "Failed";
 				}
 			}
 			catch (Exception ex)
