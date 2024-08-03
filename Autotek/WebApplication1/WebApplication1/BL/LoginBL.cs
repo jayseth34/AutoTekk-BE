@@ -171,7 +171,7 @@ namespace WebApplication1.BL
 			return oGetPartyGroupRs;
 		}
 
-		public async Task<GetPartyByGroupRs> GetPartyByGroup(Int64 registeredphonenumber, string groupname)
+        public async Task<GetPartyByGroupRs> GetPartyByGroup(Int64 registeredphonenumber, string groupname)
 		{
 			GetPartyByGroupRs oGetPartyByGroupRs = new GetPartyByGroupRs();
 			LoginDL logindl = new LoginDL(this.config);
@@ -186,5 +186,21 @@ namespace WebApplication1.BL
 			oAddUpdatePartyGropRs = logindl.AddUpdatePartyGroup(oAddUpdatePartyGropRq);
 			return oAddUpdatePartyGropRs;
 		}
-	}
+
+        public async Task<GetBusinessInfoRs> GetBusinessInfo(Int64 registeredphonenumber)
+        {
+            GetBusinessInfoRs oGetBusinessInfoRs = new GetBusinessInfoRs();
+            LoginDL logindl = new LoginDL(this.config);
+            oGetBusinessInfoRs = logindl.GetBusinessInfo(registeredphonenumber);
+            return oGetBusinessInfoRs;
+        }
+
+        public async Task<AddBusinessInformationRs> AddUpdateBusinessInformation(AddBusinessInformationRq oAddBusinessInformationRq)
+        {
+            AddBusinessInformationRs oAddBusinessInformationRs = new AddBusinessInformationRs();
+            LoginDL logindl = new LoginDL(this.config);
+            oAddBusinessInformationRs = logindl.AddUpdateBusinessInformation(oAddBusinessInformationRq);
+            return oAddBusinessInformationRs;
+        }
+    }
 }

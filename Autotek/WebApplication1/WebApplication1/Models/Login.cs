@@ -200,4 +200,51 @@ namespace WebApplication1.Models
 		public string status {  get; set; }
 		public string statusmessage {  get; set; }
 	}
+
+    public class GetBusinessInfoRs
+    {
+        public BusinessInfo businessInfo { get; set; }
+        public string status { get; set; }
+        public string statusmsg { get; set; }
+    }
+
+    public class BusinessInfo
+    {
+        public string businessName { get; set; }
+        public string gstin { get; set; }
+        public Int64 phoneNumber { get; set; }
+        public string emailId { get; set; }
+        public string businessAddress { get; set; }
+        public string businessType { get; set; }
+        public string businessCategory { get; set; }
+        public Int64 pincode { get; set; }
+        public string state { get; set; }
+        public string businessDescription { get; set; }
+
+    }
+
+    public class AddBusinessInformationRq
+    {
+        public Int64 registeredphonenumber { get; set; }
+        public string businessName { get; set; }
+        public string gstin { get; set; }
+        public Int64 phoneNumber { get; set; }
+        public string emailId { get; set; }
+        public string businessAddress { get; set; }
+        public string businessType { get; set; }
+        public string businessCategory { get; set; }
+        public Int64 pincode { get; set; }
+        public string state { get; set; }
+        public string businessDescription { get; set; }
+    }
+
+
+    public class AddBusinessInformationRs
+    {
+        public string status { get; set; }
+        public string statusmsg { get; set; }
+        public Boolean exist { get; set; }
+
+    }
+
 }
