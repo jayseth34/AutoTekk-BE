@@ -226,7 +226,7 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("additionalfieldname1value", opartyRq.additionalfieldname1value);
 							cmd.Parameters.AddWithValue("additionalfieldname2value", opartyRq.additionalfieldname2value);
 							cmd.Parameters.AddWithValue("additionalfieldname3value", opartyRq.additionalfieldname3value);
-							cmd.Parameters.AddWithValue("additionalfieldname4value", opartyRq.additionalfieldname4value);
+							cmd.Parameters.AddWithValue("additionalfieldname4value", DateTime.UtcNow);
 							cmd.Parameters.AddWithValue("topayparty", opartyRq.topayparty);
 							cmd.Parameters.AddWithValue("toreceiveparty", opartyRq.toreceivefromparty);
 							cmd.ExecuteNonQuery();
@@ -823,7 +823,160 @@ namespace WebApplication1.DL
 			return oAddUpdatePartyGropRs;
 		}
 
-		public bool UpdateExpiryDate(DateTime date, Int64 registeredphonenumber, string planType)
+        public GetBusinessInfoRs GetBusinessInfo(Int64 registeredphonenumber)
+        {
+            GetBusinessInfoRs oGetBusinessInfoRs = new GetBusinessInfoRs();
+            try
+            {
+                using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+                {
+                    conn.Open();
+                    NpgsqlCommand cmd = new NpgsqlCommand();
+                    cmd.Connection = conn;
+                    cmd.CommandType = CommandType.Text;
+                    cmd.CommandText = "SELECT * from AddBusinessInformation where registeredphonenumber = " + registeredphonenumber ;
+                    NpgsqlDataReader reader = cmd.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        try
+                        {
+                            while (reader.Read())
+                            {
+                                BusinessInfo businessInfo = new BusinessInfo
+                                {
+                                    businessName = Convert.ToString(reader["businessName"]),
+                                    gstin = Convert.ToString(reader["gstin"]),
+                                    phoneNumber = Convert.ToInt64(reader["phoneNumber"]),
+                                    emailId = Convert.ToString(reader["emailId"]),
+                                    businessAddress = Convert.ToString(reader["businessAddress"]),
+                                    businessType = Convert.ToString(reader["businessType"]),
+                                    businessCategory = Convert.ToString(reader["businessCategory"]),
+                                    pincode = Convert.ToInt64(reader["pincode"]),
+                                    state = Convert.ToString(reader["state"]),
+                                    businessDescription = Convert.ToString(reader["businessDescription"])
+                                };
+
+                                oGetBusinessInfoRs.businessInfo = businessInfo;
+                            }
+                            oGetBusinessInfoRs.status = "SUCCESS";
+							oGetBusinessInfoRs.statusmsg = "Record fetched successfully";
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return oGetBusinessInfoRs;
+        }
+
+        public AddBusinessInformationRs AddUpdateBusinessInformation(AddBusinessInformationRq OAddBusinessInformationRq)
+        {
+            AddBusinessInformationRs OAddBusinessInformationRs = new AddBusinessInformationRs();
+            try
+            {
+                using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+                {
+                    conn.Open();
+                    NpgsqlCommand cmd = new NpgsqlCommand();
+                    cmd.Connection = conn;
+                    cmd.CommandType = CommandType.Text;
+                    cmd.CommandText = "SELECT registeredphonenumber FROM AddBusinessInformation WHERE registeredphonenumber = " + OAddBusinessInformationRq.registeredphonenumber;
+                    NpgsqlDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        OAddBusinessInformationRs.statusmsg = "Phone Number already registered.";
+                        OAddBusinessInformationRs.exist = true;
+                    }
+                }
+                if (!OAddBusinessInformationRs.exist)
+                {
+                    try
+                    {
+                        using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+                        {
+                            conn.Open();
+                            NpgsqlCommand cmd = new NpgsqlCommand();
+                            cmd.Connection = conn;
+                            cmd.CommandType = CommandType.Text;
+                            cmd.CommandText = "INSERT INTO AddBusinessInformation(registeredphonenumber, businessName, gstin, phoneNumber, emailId, businessAddress, businessType, " +
+								"businessCategory, pincode, state, businessDescription) VALUES (@registeredphonenumber, @businessName, @gstin, @phoneNumber, @emailId, @businessAddress," +
+								" @businessType, @businessCategory, @pincode, @state, @businessDescription)";
+                            cmd.Parameters.AddWithValue("@registeredphonenumber", OAddBusinessInformationRq.registeredphonenumber);
+                            cmd.Parameters.AddWithValue("@businessName", OAddBusinessInformationRq.businessName);
+                            cmd.Parameters.AddWithValue("@gstin", OAddBusinessInformationRq.gstin);
+                            cmd.Parameters.AddWithValue("@phoneNumber", OAddBusinessInformationRq.phoneNumber);
+                            cmd.Parameters.AddWithValue("@emailId", OAddBusinessInformationRq.emailId);
+                            cmd.Parameters.AddWithValue("@businessAddress", OAddBusinessInformationRq.businessAddress);
+                            cmd.Parameters.AddWithValue("@businessType", OAddBusinessInformationRq.businessType);
+                            cmd.Parameters.AddWithValue("@businessCategory", OAddBusinessInformationRq.businessCategory);
+                            cmd.Parameters.AddWithValue("@pincode", OAddBusinessInformationRq.pincode);
+                            cmd.Parameters.AddWithValue("@state", OAddBusinessInformationRq.state);
+                            cmd.Parameters.AddWithValue("@businessDescription", OAddBusinessInformationRq.businessDescription);
+                            cmd.ExecuteNonQuery();
+                            OAddBusinessInformationRs.statusmsg = "Phone number registered Successfully";
+                            OAddBusinessInformationRs.status = "Success";
+                            OAddBusinessInformationRs.exist = false;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        OAddBusinessInformationRs.statusmsg = "Data could not be inserted";
+                        OAddBusinessInformationRs.status = "Failed";
+                    }
+                }
+                if (OAddBusinessInformationRs.exist)
+                {
+                    try
+                    {
+                        using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+                        {
+                            conn.Open();
+                            NpgsqlCommand cmd = new NpgsqlCommand();
+                            cmd.Connection = conn;
+                            cmd.CommandType = CommandType.Text;
+                            cmd.CommandText = "UPDATE AddBusinessInformation SET businessName = @businessName, gstin = @gstin, phoneNumber = @phoneNumber, emailId = @emailId, businessAddress = @businessAddress, " +
+                                              "businessType = @businessType, businessCategory = @businessCategory, pincode = @pincode, state = @state, businessDescription = @businessDescription " +
+                                              "WHERE registeredphonenumber = @registeredphonenumber";
+                            cmd.Parameters.AddWithValue("@registeredphonenumber", OAddBusinessInformationRq.registeredphonenumber);
+                            cmd.Parameters.AddWithValue("@businessName", OAddBusinessInformationRq.businessName);
+                            cmd.Parameters.AddWithValue("@gstin", OAddBusinessInformationRq.gstin);
+                            cmd.Parameters.AddWithValue("@phoneNumber", OAddBusinessInformationRq.phoneNumber);
+                            cmd.Parameters.AddWithValue("@emailId", OAddBusinessInformationRq.emailId);
+                            cmd.Parameters.AddWithValue("@businessAddress", OAddBusinessInformationRq.businessAddress);
+                            cmd.Parameters.AddWithValue("@businessType", OAddBusinessInformationRq.businessType);
+                            cmd.Parameters.AddWithValue("@businessCategory", OAddBusinessInformationRq.businessCategory);
+                            cmd.Parameters.AddWithValue("@pincode", OAddBusinessInformationRq.pincode);
+                            cmd.Parameters.AddWithValue("@state", OAddBusinessInformationRq.state);
+                            cmd.Parameters.AddWithValue("@businessDescription", OAddBusinessInformationRq.businessDescription);
+                            cmd.ExecuteNonQuery();
+                            OAddBusinessInformationRs.statusmsg = "Data Updated Successfully";
+                            OAddBusinessInformationRs.status = "Success";
+                            OAddBusinessInformationRs.exist = true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        OAddBusinessInformationRs.statusmsg = "Data could not be inserted";
+                        OAddBusinessInformationRs.status = "Failed";
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            return OAddBusinessInformationRs;
+        }
+
+        public bool UpdateExpiryDate(DateTime date, Int64 registeredphonenumber, string planType)
 		{
 			try
 			{

@@ -273,5 +273,38 @@ namespace WebApplication1.Controllers
 
 			return BadRequest("Please Provide Valid Details");
 		}
-	}
+
+        [Authorize]
+        [HttpGet]
+        [Route("GetBusinessInfo")]
+        public async Task<ActionResult> GetBusinessInfo([FromQuery] Int64 registeredphonenumber)
+        {
+            GetBusinessInfoRs oGetBusinessInfoRs = new GetBusinessInfoRs();
+            if (ModelState.IsValid)
+            {
+                LoginBL loginBL = new LoginBL(this.config);
+                oGetBusinessInfoRs = await loginBL.GetBusinessInfo(registeredphonenumber);
+                return Ok(oGetBusinessInfoRs);
+            }
+
+            return BadRequest("Please Provide Valid Details");
+        }
+
+        [Authorize]
+		[HttpPost]
+        [Route("AddUpdateBusinessInformation")]
+        public async Task<ActionResult> AddUpdateBusinessInformation(AddBusinessInformationRq oAddBusinessInformationRq)
+        {
+            AddBusinessInformationRs oAddBusinessInformationRs = new AddBusinessInformationRs();
+            if (ModelState.IsValid)
+            {
+                LoginBL loginBL = new LoginBL(this.config);
+                oAddBusinessInformationRs = await loginBL.AddUpdateBusinessInformation(oAddBusinessInformationRq);
+                return Ok(oAddBusinessInformationRs);
+            }
+
+            return BadRequest("Please Provide Valid Details");
+        }
+		}
+
 }
