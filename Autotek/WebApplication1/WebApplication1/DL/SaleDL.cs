@@ -160,19 +160,19 @@ namespace WebApplication1.DL
 						{
 							while (reader.Read())
 							{
-								oGetPartyTransactionsRs.gst = reader["gst"] == DBNull.Value ? null : Convert.ToString(reader["gst"]);
-								oGetPartyTransactionsRs.emailid = reader["emailid"] == DBNull.Value ? null : Convert.ToString(reader["emailid"]);
-								oGetPartyTransactionsRs.billingaddress = reader["billingaddress"] == DBNull.Value ? null : Convert.ToString(reader["billingaddress"]);
+								oGetPartyTransactionsRs.gst = reader["gst"] == DBNull.Value ? "" : Convert.ToString(reader["gst"]);
+								oGetPartyTransactionsRs.emailid = reader["emailid"] == DBNull.Value ? "" : Convert.ToString(reader["emailid"]);
+								oGetPartyTransactionsRs.billingaddress = reader["billingaddress"] == DBNull.Value ? "" : Convert.ToString(reader["billingaddress"]);
 								oGetPartyTransactionsRs.phonenumber = reader["phonenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["phonenumber"]);
 								oGetPartyTransactionsRs.creditlimit = reader["creditlimit"] == DBNull.Value ? 0 : Convert.ToInt64(reader["creditlimit"]);
 								GetAllPartyTransactionsList oGetAllPartyTransactionsList = new GetAllPartyTransactionsList(); 
-								oGetAllPartyTransactionsList.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
+								oGetAllPartyTransactionsList.typeofpay = reader["typeofpay"] == DBNull.Value ? "" : Convert.ToString(reader["typeofpay"]);
 								oGetAllPartyTransactionsList.invoicenumber = reader["invoicenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["invoicenumber"]);
 								oGetAllPartyTransactionsList.creditlimit = reader["creditlimit"] == DBNull.Value ? 0 : Convert.ToInt64(reader["creditlimit"]);
 								oGetAllPartyTransactionsList.invoicedate = reader["invoicedate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["invoicedate"]);
 								oGetAllPartyTransactionsList.total = reader["total"] == DBNull.Value ? 0 : Convert.ToInt64(reader["total"]);
 								oGetAllPartyTransactionsList.balance = reader["balance"] == DBNull.Value ? 0 : Convert.ToInt64(reader["balance"]);
-								oGetAllPartyTransactionsList.paymentstatus = reader["paymentstatus"] == DBNull.Value ? null : Convert.ToString(reader["paymentstatus"]);
+								oGetAllPartyTransactionsList.paymentstatus = reader["paymentstatus"] == DBNull.Value ? "" : Convert.ToString(reader["paymentstatus"]);
 								oGetPartyTransactionsRs.partyTransactionsList.Add(oGetAllPartyTransactionsList);
 							}
 							oGetPartyTransactionsRs.status = "SUCCESS";
@@ -185,7 +185,9 @@ namespace WebApplication1.DL
 					}
 					else
 					{
-						oGetPartyTransactionsRs.status = "No Recods Found";
+						oGetPartyTransactionsRs.status = "SUCCESS";
+						oGetPartyTransactionsRs.statusmessage = "No records found";
+
 					}
 				}
 			}
@@ -829,7 +831,8 @@ namespace WebApplication1.DL
 							cmd.Connection = conn;
 							cmd.CommandType = CommandType.Text;
 							cmd.CommandText = "UPDATE transactions SET linkedamount = linkedamount + @linkedAmount, balance = @balance, linkedaccount = 'LINKED', received = received + @received, " +
-								"paymentstatus = @paymentStatus, paymentinoutinvoicedate = @paymentinoutinvoicedate, paymentininvoicenumber = @paymentininvoicenumber WHERE invoicenumber = @invoicenumber and registeredphonenumber = @registeredphonenumber and typeofpay = @typeofpay";
+								"paymentstatus = @paymentStatus, paymentinoutinvoicedate = @paymentinoutinvoicedate, paymentininvoicenumber = @paymentininvoicenumber WHERE invoicenumber = @invoicenumber and registeredphonenumber = @registeredphonenumber and typeofpay = @typeofpay" +
+								" and customername = @customername";
 							cmd.Parameters.AddWithValue("@linkedAmount", item.unused);
 							cmd.Parameters.AddWithValue("@received", item.unused);
 							cmd.Parameters.AddWithValue("@balance", item.balance);
@@ -839,6 +842,7 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@typeofpay", item.typeofpay);
 							cmd.Parameters.AddWithValue("@paymentinoutinvoicedate", DateTime.UtcNow);
 							cmd.Parameters.AddWithValue("@paymentininvoicenumber",item.paymentininvoicenumber);
+							cmd.Parameters.AddWithValue("@customername",item.customername);
 							await cmd.ExecuteNonQueryAsync();
 						}
 						await transaction.CommitAsync();

@@ -90,7 +90,7 @@ namespace WebApplication1.Models
 		public string? additionalfieldname1value { get; set; }
 		public string? additionalfieldname2value { get; set; }
 		public string? additionalfieldname3value { get; set; }
-		public DateTime? additionalfieldname4value { get; set; }
+		public string? additionalfieldname4value { get; set; }
 		public bool ispartyupdate { get; set; }
 		public Int64 topayparty {  get; set; }
 		public Int64 toreceivefromparty {  get; set; }
@@ -198,5 +198,6 @@ namespace WebApplication1.Models
 	public class AddUpdatePartyGropRs
 	{
 		public string status {  get; set; }
+		public string statusmessage {  get; set; }
 	}
 }

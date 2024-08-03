@@ -18,7 +18,15 @@ namespace WebApplication1.BL
 		{
 			ItemRs oitemRs = new ItemRs();
 			ItemDL itemDL = new ItemDL(this.config);
-			oitemRs = itemDL.AddItem(oitemRq);
+			if (oitemRq.isitemupdate)
+			{
+				oitemRs = itemDL.UpdateItem(oitemRq);
+			} 
+			else
+			{
+				oitemRs = itemDL.AddItem(oitemRq);
+			}
+			
 			return oitemRs;
 		}
 

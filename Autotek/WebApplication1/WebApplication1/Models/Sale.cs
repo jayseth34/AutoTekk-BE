@@ -54,12 +54,13 @@
 
 	public class GetPartyTransactionsRs
 	{
-		public string status { get; set;}
-		public string emailid { get; set; }
-		public string gst { get; set; }
-		public string billingaddress { get; set; }
-		public Int64 phonenumber { get; set; }
-		public Int64 creditlimit { get; set; }
+		public string? status { get; set;}
+		public string? statusmessage { get; set;}
+		public string? emailid { get; set; } = "";
+		public string? gst { get; set; } = "";
+		public string? billingaddress { get; set; } = "";
+		public Int64? phonenumber { get; set; } = 0;
+		public Int64? creditlimit { get; set; } = 0;
 		public GetPartyTransactionsRs()
 		{
 			partyTransactionsList = new List<GetAllPartyTransactionsList>();

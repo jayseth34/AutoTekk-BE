@@ -5,6 +5,7 @@
 		public string typeofpay { get; set; }
 		public Int64 registeredphonenumber {  get; set; }
 		public string itemname { get; set; }
+		public string olditemname { get; set; }
 		public string itemhsn { get; set; }
 		public string baseunit { get; set; }
 		public string secondaryunit { get; set; }
@@ -27,6 +28,7 @@
 		public DateTime asofdate { get; set; }
 		public Int64 minimumstocktomaintain { get; set; }
 		public string _location { get; set; }
+		public bool isitemupdate { get; set; }
 	}
 
 	public class ItemRs
@@ -131,5 +133,6 @@
 	public class AddUpdateCategoryRs
 	{
 		public string status { get; set; }
+		public string statusmessage { get; set; }
 	}
 }
