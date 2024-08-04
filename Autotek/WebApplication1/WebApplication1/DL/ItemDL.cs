@@ -479,13 +479,16 @@ namespace WebApplication1.DL
 						catch (Exception ex)
 						{
 							Console.WriteLine(ex.Message);
+							oGetItemByCategoryRs.status = "FAILED";
 						}
 					}
 				}
+				oGetItemByCategoryRs.status = "SUCCESS";
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex.Message);
+				oGetItemByCategoryRs.status = "FAILED";
 			}
 			return oGetItemByCategoryRs;
 		}
