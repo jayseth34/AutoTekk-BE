@@ -47,7 +47,7 @@ namespace WebApplication1.BL
 					result = saledl.FindOrInsertItem(otransactionRq);
 					Int64 invoicecount = saledl.GetInvoiceNumberCountDLChallan(otransactionRq.registeredphonenumber, typeofpay);
 					otransactionRs = saledl.SaveDeliveryChallan(otransactionRq, invoicecount, typeofpay, isconverted);
-					saledl.UpdateDlChallan(otransactionRq.invoicenumber, otransactionRq.registeredphonenumber,otransactionRq.typeofpay);
+					saledl.UpdateDlChallan(otransactionRq.convertinvoicenumber, otransactionRq.registeredphonenumber,otransactionRq.typeofpay);
 				}
 				else
 				{

@@ -54,7 +54,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@billingaddress", otransactionRq.billingaddress);
 					cmd.Parameters.AddWithValue("@shippingaddress", otransactionRq.shippingaddress);
 					cmd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
-					Int64 transactionId = Convert.ToInt64(cmd.ExecuteScalar());
+					var transactionId = cmd.ExecuteScalar();
 					if (otransactionRq.itemdetailslist.Count > 0)
 					{
 						foreach (var itemDetail in otransactionRq.itemdetailslist)
@@ -460,7 +460,7 @@ namespace WebApplication1.DL
 						" shippingaddress, paymentstatus, isconverted) VALUES(@typeofpay, @invoicenumber, @invoicedate, @stateofsupply, @paymenttype, @total, @received, @balance, @customername, @phonenumber, @registeredphonenumber, @billingaddress," +
 						" @shippingaddress, @paymentstatus, @isconverted) RETURNING transaction_id";
 					cmd.Parameters.AddWithValue("@typeofpay", typeofpay);
-					cmd.Parameters.AddWithValue("@invoicenumber", invoicecount);
+					cmd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
 					cmd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
 					cmd.Parameters.AddWithValue("@stateofsupply", otransactionRq.stateofsupply);
 					cmd.Parameters.AddWithValue("@paymenttype", otransactionRq.paymenttype);
@@ -474,7 +474,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@shippingaddress", otransactionRq.shippingaddress);
 					cmd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
 					cmd.Parameters.AddWithValue("@isconverted",isconverted);
-					int transactionId = (int)cmd.ExecuteScalar();
+					var transactionId = cmd.ExecuteScalar();
 					if (otransactionRq.itemdetailslist.Count > 0)
 					{
 						foreach (var itemDetail in otransactionRq.itemdetailslist)

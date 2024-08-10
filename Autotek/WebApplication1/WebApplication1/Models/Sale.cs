@@ -4,6 +4,7 @@
 	{
 		public string typeofpay {  get; set; }
 		public Int64 invoicenumber { get; set; }
+		public Int64 convertinvoicenumber { get; set; }
 		public DateTime invoicedate { get; set; }
 		public string stateofsupply { get; set; }
 		public string paymenttype { get; set; }
