@@ -1,4 +1,6 @@
-﻿namespace WebApplication1.Models
+﻿using System;
+
+namespace WebApplication1.Models
 {
 	public class ItemRq
 	{
@@ -9,24 +11,24 @@
 		public string itemhsn { get; set; }
 		public string baseunit { get; set; }
 		public string secondaryunit { get; set; }
-		public Int64 conversionrates { get; set; }
+		public Decimal conversionrates { get; set; }
 		public string category { get; set; }
 		public string itemcode { get; set; }
-		public Int64 saleprice { get; set; }
+		public Decimal saleprice { get; set; }
 		public string salewithorwithouttax { get; set; }
-		public Int64 discountonsaleprice { get; set; }
+		public Decimal discountonsaleprice { get; set; }
 		public string percentageoramounttype { get; set; }
-		public Int64 wholesaleprice { get; set; }
+		public Decimal wholesaleprice { get; set; }
 		public string wholesalewithorwithouttax { get; set; }
-		public Int64 minimumwholesalequantity { get; set; }
-		public Int64 purchaseprice { get; set; }
+		public Decimal minimumwholesalequantity { get; set; }
+		public Decimal purchaseprice { get; set; }
 		public string purchasewithorwithouttax { get; set; }
 		public string taxrate { get; set; }
-		public Int64 openingquantity { get; set; }
-		public Int64 remainingquantity { get; set; }
-		public Int64 atprice { get; set; }
+		public Decimal openingquantity { get; set; }
+		public Decimal remainingquantity { get; set; }
+		public Decimal atprice { get; set; }
 		public DateTime asofdate { get; set; }
-		public Int64 minimumstocktomaintain { get; set; }
+		public Decimal minimumstocktomaintain { get; set; }
 		public string _location { get; set; }
 		public bool isitemupdate { get; set; }
 	}
@@ -51,12 +53,12 @@
 	{
 		public string itemname { get; set; }
 		public string baseunit { get; set; }
-		public Int64 remainingquantity { get; set; }
-		public Int64 saleprice { get; set; }
-		public Int64 purchaseprice { get; set; }
-		public Int64 wholesaleprice { get; set; }
-		public Int64 minimumwholesalequantity { get; set; }
-		public Int64 discountonsaleprice { get; set; }
+		public Decimal remainingquantity { get; set; }
+		public Decimal saleprice { get; set; }
+		public Decimal purchaseprice { get; set; }
+		public Decimal wholesaleprice { get; set; }
+		public Decimal minimumwholesalequantity { get; set; }
+		public Decimal discountonsaleprice { get; set; }
 		public string percentageoramounttype { get; set; }
 	}
 
@@ -77,23 +79,23 @@
 		public string itemhsn { get; set; }
 		public string baseunit { get; set; }
 		public string secondaryunit { get; set; }
-		public Int64 conversionrates { get; set; }
+		public Decimal conversionrates { get; set; }
 		public string category { get; set; }
 		public string itemcode { get; set; }
-		public Int64 saleprice { get; set; }
+		public Decimal saleprice { get; set; }
 		public string salewithorwithouttax { get; set; }
-		public Int64 discountonsaleprice { get; set; }
-		public Int64 wholesaleprice { get; set; }
+		public Decimal discountonsaleprice { get; set; }
+		public Decimal wholesaleprice { get; set; }
 		public string wholesalewithorwithouttax { get; set; }
-		public Int64 minimumwholesalequantity { get; set; }
-		public Int64 purchaseprice { get; set; }
+		public Decimal minimumwholesalequantity { get; set; }
+		public Decimal purchaseprice { get; set; }
 		public string purchasewithorwithouttax { get; set; }
 		public string taxrate { get; set; }
-		public Int64 openingquantity { get; set; }
-		public Int64 remainingquantity { get; set; }
-		public Int64 atprice { get; set; }
+		public Decimal openingquantity { get; set; }
+		public Decimal remainingquantity { get; set; }
+		public Decimal atprice { get; set; }
 		public DateTime asofdate { get; set; }
-		public Int64 minimumstocktomaintain { get; set; }
+		public Decimal minimumstocktomaintain { get; set; }
 		public string _location { get; set; }
 		public string percentageoramounttype { get; set; }
 	}

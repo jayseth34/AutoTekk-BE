@@ -1,6 +1,7 @@
 ﻿using Npgsql;
 using NpgsqlTypes;
 using Org.BouncyCastle.Tls.Crypto;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -613,7 +614,7 @@ namespace WebApplication1.DL
 										emailid = reader["emailid"] as string,
 										billingaddress = reader["billingaddress"] as string,
 										shippingaddress = reader["shippingaddress"] as string,
-										openingbalance = reader["openingbalance"] == DBNull.Value ? 0 : Convert.ToInt64(reader["openingbalance"]),
+										openingbalance = reader["openingbalance"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["openingbalance"]),
 										asofdate = reader["asofdate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["asofdate"]),
 										creditlimit = reader["creditlimit"] == DBNull.Value ? 0 : Convert.ToInt64(reader["creditlimit"]),
 										additionalfieldname1 = reader["additionalfieldname1"] as string,
@@ -622,8 +623,8 @@ namespace WebApplication1.DL
 										additionalfieldname4 = reader["additionalfieldname4"] as string,
 										typeofpay = reader["typeofpay"] as string,
 										topayorreceive = reader["topayorreceive"] as string,
-										topayparty = reader["topayparty"] == DBNull.Value ? 0 : Convert.ToInt64(reader["topayparty"]),
-										toreceivefromparty = reader["toreceivefromparty"] == DBNull.Value ? 0 : Convert.ToInt64(reader["toreceivefromparty"]),
+										topayparty = reader["topayparty"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["topayparty"]),
+										toreceivefromparty = reader["toreceivefromparty"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["toreceivefromparty"]),
 										additionalfieldname1value = reader["additionalfieldname1value"] as string,
 										additionalfieldname2value = reader["additionalfieldname2value"] as string,
 										additionalfieldname3value = reader["additionalfieldname3value"] as string,
@@ -656,8 +657,8 @@ namespace WebApplication1.DL
 		public GetPartyListRs GetPartyList(Int64 registeredphonenumber)
 		{
 			GetPartyListRs oGetPartyListRs = new GetPartyListRs();
-			Int64 topayparty = 0;
-			Int64 toreceivefromparty = 0;
+			Decimal topayparty = 0;
+			Decimal toreceivefromparty = 0;
 			try
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
@@ -676,9 +677,9 @@ namespace WebApplication1.DL
 							{
 								GetPartyList oGetPartyList = new GetPartyList();
 								oGetPartyList.partyname = reader["partyname"] == DBNull.Value ? null : Convert.ToString(reader["partyname"]);
-								oGetPartyList.topayparty = reader["topayparty"] == DBNull.Value ? 0 : Convert.ToInt64(reader["topayparty"]);
-								oGetPartyList.toreceivefromparty = reader["toreceivefromparty"] == DBNull.Value ? 0 : Convert.ToInt64(reader["toreceivefromparty"]);
-								oGetPartyList.creditlimit = reader["creditlimit"] == DBNull.Value ? 0 : Convert.ToInt64(reader["creditlimit"]);
+								oGetPartyList.topayparty = reader["topayparty"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["topayparty"]);
+								oGetPartyList.toreceivefromparty = reader["toreceivefromparty"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["toreceivefromparty"]);
+								oGetPartyList.creditlimit = reader["creditlimit"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["creditlimit"]);
 								oGetPartyList.shippingaddress = reader["shippingaddress"] == DBNull.Value ? null : Convert.ToString(reader["shippingaddress"]);
 								oGetPartyList.billingaddress = reader["billingaddress"] == DBNull.Value ? null : Convert.ToString(reader["billingaddress"]);
 								oGetPartyList.phonenumber = reader["phonenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["phonenumber"]);
@@ -749,8 +750,8 @@ namespace WebApplication1.DL
 		public GetPartyByGroupRs GetPartyByGroup(Int64 registeredphonenumber, string groupname)
 		{
 			GetPartyByGroupRs oGetPartyByGroupRs = new GetPartyByGroupRs();
-			Int64 topayparty = 0;
-			Int64 toreceivefromparty = 0;
+			Decimal topayparty = 0;
+			Decimal toreceivefromparty = 0;
 			try
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
@@ -855,7 +856,7 @@ namespace WebApplication1.DL
                                     businessAddress = Convert.ToString(reader["businessAddress"]),
                                     businessType = Convert.ToString(reader["businessType"]),
                                     businessCategory = Convert.ToString(reader["businessCategory"]),
-                                    pincode = Convert.ToInt64(reader["pincode"]),
+                                    pincode = Convert.ToDecimal(reader["pincode"]),
                                     state = Convert.ToString(reader["state"]),
                                     businessDescription = Convert.ToString(reader["businessDescription"])
                                 };

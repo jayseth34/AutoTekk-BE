@@ -79,10 +79,10 @@ namespace WebApplication1.Models
 		public string? emailid { get; set; }
 		public string? billingaddress { get; set; }
 		public string? shippingaddress { get; set; }
-		public Int64 openingbalance { get; set; }
+		public Decimal openingbalance { get; set; }
 		public string topayorreceive { get; set; }
 		public DateTime asofdate { get; set;}
-		public Int64 creditlimit { get; set; }
+		public Decimal creditlimit { get; set; }
 		public string? additionalfieldname1 { get; set; }
 		public string? additionalfieldname2 { get; set; }
 		public string? additionalfieldname3 { get; set;}
@@ -92,8 +92,8 @@ namespace WebApplication1.Models
 		public string? additionalfieldname3value { get; set; }
 		public string? additionalfieldname4value { get; set; }
 		public bool ispartyupdate { get; set; }
-		public Int64 topayparty {  get; set; }
-		public Int64 toreceivefromparty {  get; set; }
+		public Decimal topayparty {  get; set; }
+		public Decimal toreceivefromparty {  get; set; }
 	}
 
 	public class PartyRs
@@ -124,9 +124,9 @@ namespace WebApplication1.Models
 		public string emailid { get; set; }
 		public string billingaddress { get; set; }
 		public string shippingaddress { get; set; }
-		public Int64 openingbalance { get; set; }
+		public Decimal openingbalance { get; set; }
 		public DateTime asofdate { get; set; }
-		public Int64 creditlimit { get; set; }
+		public Decimal creditlimit { get; set; }
 		public string additionalfieldname1 { get; set; }
 		public string additionalfieldname2 { get; set; }
 		public string additionalfieldname3 { get; set; }
@@ -137,8 +137,8 @@ namespace WebApplication1.Models
 		public string additionalfieldname4value { get; set; }
 		public string typeofpay { get; set; }
 		public string topayorreceive { get; set; }
-		public Int64 topayparty { get; set; }
-		public Int64 toreceivefromparty { get; set; }
+		public Decimal topayparty { get; set; }
+		public Decimal toreceivefromparty { get; set; }
 
 	}
 
@@ -158,9 +158,9 @@ namespace WebApplication1.Models
 		public Int64 phonenumber { get; set; }
 		public string billingaddress { get; set; }
 		public string shippingaddress { get; set; }
-		public Int64 creditlimit { get; set; }
-		public Int64 topayparty { get; set; }
-		public Int64 toreceivefromparty { get; set; }
+		public Decimal creditlimit { get; set; }
+		public Decimal topayparty { get; set; }
+		public Decimal toreceivefromparty { get; set; }
 
 	}
 
@@ -217,7 +217,7 @@ namespace WebApplication1.Models
         public string businessAddress { get; set; }
         public string businessType { get; set; }
         public string businessCategory { get; set; }
-        public Int64 pincode { get; set; }
+        public Decimal pincode { get; set; }
         public string state { get; set; }
         public string businessDescription { get; set; }
 
@@ -233,7 +233,7 @@ namespace WebApplication1.Models
         public string businessAddress { get; set; }
         public string businessType { get; set; }
         public string businessCategory { get; set; }
-        public Int64 pincode { get; set; }
+        public Decimal pincode { get; set; }
         public string state { get; set; }
         public string businessDescription { get; set; }
     }

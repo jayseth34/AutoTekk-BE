@@ -8,14 +8,14 @@
 		public DateTime invoicedate { get; set; }
 		public string stateofsupply { get; set; }
 		public string paymenttype { get; set; }
-		public Int64 total {  get; set; }
-		public Int64 received { get; set; }
-		public Int64 balance { get; set; }
+		public Decimal total {  get; set; }
+		public Decimal received { get; set; }
+		public Decimal balance { get; set; }
 		public string customername { get; set; }
 		public Int64 phonenumber { get; set; }
 		public Int64 registeredphonenumber { get; set; }
-		public Int64 topayparty { get; set; }
-		public Int64 toreceivefromparty { get; set; }
+		public Decimal topayparty { get; set; }
+		public Decimal toreceivefromparty { get; set; }
 		//public Int64 remainingquantity { get; set; }
 		public string billingaddress { get; set; }
 		public string shippingaddress { get; set; }
@@ -35,16 +35,16 @@
 	public class ItemDetailsListRq
 	{
 		public string item {  get; set; }
-		public Int64 qty { get; set; }
+		public Decimal qty { get; set; }
 		public string unit { get; set; }
-		public Int64 priceperunit { get; set; }
+		public Decimal priceperunit { get; set; }
 		public Int64 remainingquantity { get; set; }
 		public string queryoperationtype { get; set; } = "";
-		public Int64 taxrate { get; set; } = 0;
-		public Int64 taxrateamount { get; set; } = 0;
+		public Decimal taxrate { get; set; } = 0;
+		public Decimal taxrateamount { get; set; } = 0;
 		public Int64 transactionid { get; set; }
-		public Int64 discountpercent { get; set; }
-		public Int64 discountamount { get; set; }
+		public Decimal discountpercent { get; set; }
+		public Decimal discountamount { get; set; }
 	}
 
 	public class TransactionRs
@@ -61,7 +61,7 @@
 		public string? gst { get; set; } = "";
 		public string? billingaddress { get; set; } = "";
 		public Int64? phonenumber { get; set; } = 0;
-		public Int64? creditlimit { get; set; } = 0;
+		public Decimal? creditlimit { get; set; } = 0;
 		public GetPartyTransactionsRs()
 		{
 			partyTransactionsList = new List<GetAllPartyTransactionsList>();
@@ -73,10 +73,10 @@
 		public string typeofpay { get; set; }
 		public string paymentstatus { get; set; }
 		public Int64 invoicenumber { get; set; }
-		public Int64 creditlimit { get; set; }
+		public Decimal creditlimit { get; set; }
 		public DateTime invoicedate { get; set; }
-		public Int64 total { get; set; }
-		public Int64 balance { get; set; }
+		public Decimal total { get; set; }
+		public Decimal balance { get; set; }
 	}
 
 	public class GetPartyTransactionDetailsRq
@@ -94,17 +94,17 @@
 		public DateTime invoicedate { get; set; }
 		public string stateofsupply { get; set; }
 		public string paymenttype { get; set; }
-		public Int64 total { get; set; }
-		public Int64 received { get; set; }
-		public Int64 balance { get; set; }
+		public Decimal total { get; set; }
+		public Decimal received { get; set; }
+		public Decimal balance { get; set; }
 		public string customername { get; set; }
 		public Int64 phonenumber { get; set; }
 		public string billingaddress { get; set; }
 		public string shippingaddress { get; set; }
 		public string status { get; set; }
 		public Int64 invoicenumbercount { get; set; }
-		public Int64 topayparty { get; set; }
-		public Int64 toreceivefromparty { get; set; }
+		public Decimal topayparty { get; set; }
+		public Decimal toreceivefromparty { get; set; }
 
 		public GetPartyTransactionDetailsRs()
 		{
@@ -128,21 +128,21 @@
 	{
 		public DateTime invoicedate { get; set; }
 		public Int64 invoicenumber { get; set; }
-		public Int64 linkedamount { get; set; }
+		public Decimal linkedamount { get; set; }
 		public string typeofpay { get; set; }
 	}
 
 	public class ItemDetailsListRs
 	{
 		public string item { get; set; }
-		public Int64 qty { get; set; }
+		public Decimal qty { get; set; }
 		public string unit { get; set; }
-		public Int64 priceperunit { get; set; }
+		public Decimal priceperunit { get; set; }
 		public Int64 transactionid { get; set; }
 		public string taxrate { get; set; }
-		public Int64 taxrateamount { get; set; }
-		public Int64 discountpercent { get; set; }
-		public Int64 discountamount { get; set; }
+		public Decimal taxrateamount { get; set; }
+		public Decimal discountpercent { get; set; }
+		public Decimal discountamount { get; set; }
 	}
 
 	public class GetItemTransactionsRq
@@ -154,10 +154,10 @@
 	public class GetItemTransactionsRs
 	{
 		public string status { get; set; }
-		public Int64 saleprice { get; set; }
-		public Int64 purchaseprice { get; set; }
-		public Int64 wholesaleprice { get; set; }
-		public Int64 remainingquantity { get; set; }
+		public Decimal saleprice { get; set; }
+		public Decimal purchaseprice { get; set; }
+		public Decimal wholesaleprice { get; set; }
+		public Decimal remainingquantity { get; set; }
 
 		public GetItemTransactionsRs()
 		{
@@ -172,10 +172,10 @@
 		public Int64 invoicenumber { get; set; }
 		public string partyname { get; set; }
 		public DateTime invoicedate { get; set; }
-		public Int64 qty { get; set; }
-		public Int64 priceperunit { get; set; }
+		public Decimal qty { get; set; }
+		public Decimal priceperunit { get; set; }
 		public string paymentstatus { get; set; }
-		public Int64 purchaseprice { get; set; }
+		public Decimal purchaseprice { get; set; }
 	}
 
 	public class GetTypeOfPayTransactionsRq
@@ -209,14 +209,14 @@
 		public Int64 invoicenumber { get; set; }
 		public DateTime invoicedate { get; set; }
 		public string typeofpay { get; set; }
-		public Int64 total { get; set; }
-		public Int64 balance { get; set; }
-		public Int64 linkedamount { get; set; }
+		public Decimal total { get; set; }
+		public Decimal balance { get; set; }
+		public Decimal linkedamount { get; set; }
 		public Int64 registeredphonenumber { get; set; }
-		public Int64 topayparty { get; set; }
-		public Int64 toreceivefromparty { get; set; }
+		public Decimal topayparty { get; set; }
+		public Decimal toreceivefromparty { get; set; }
 		public string customername {  get; set; }
-		public Int64 unused {  get; set; }
+		public Decimal unused {  get; set; }
 		public Int64 paymentininvoicenumber {  get; set; }
 	}
 
@@ -227,8 +227,8 @@
 		public string customername { get; set; }
 		public string typeofpay { get; set; }
 		public string paymenttype { get; set; }
-		public Int64 total { get; set; }
-		public Int64 balance { get; set; }
+		public Decimal total { get; set; }
+		public Decimal balance { get; set; }
 		public string paymentstatus { get; set; }
 		public bool isconverted { get; set; }
 	}
@@ -237,7 +237,7 @@
 	{
 		public Int64 invoicenumber { get; set; }
 		public DateTime invoicedate { get; set; }
-		public Int64 received { get; set; }
+		public Decimal received { get; set; }
 		public Int64 registeredphonenumber { get; set; }
 		public string paymenttype { get; set; }
 		public string customername { get; set; }
@@ -266,7 +266,7 @@
 
 	public class GetPartyAmounts
 	{
-		public Int64 topayparty { get; set; }
-		public Int64 toreceivefromparty { get; set; }
+		public Decimal topayparty { get; set; }
+		public Decimal toreceivefromparty { get; set; }
 	}
 }
