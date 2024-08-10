@@ -226,7 +226,7 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("additionalfieldname1value", opartyRq.additionalfieldname1value);
 							cmd.Parameters.AddWithValue("additionalfieldname2value", opartyRq.additionalfieldname2value);
 							cmd.Parameters.AddWithValue("additionalfieldname3value", opartyRq.additionalfieldname3value);
-							cmd.Parameters.AddWithValue("additionalfieldname4value", DateTime.UtcNow);
+							cmd.Parameters.AddWithValue("additionalfieldname4value", opartyRq.additionalfieldname4value);
 							cmd.Parameters.AddWithValue("topayparty", opartyRq.topayparty);
 							cmd.Parameters.AddWithValue("toreceiveparty", opartyRq.toreceivefromparty);
 							cmd.ExecuteNonQuery();
@@ -429,7 +429,7 @@ namespace WebApplication1.DL
 									cmd.CommandType = CommandType.Text;
 
 									cmd.CommandText = "UPDATE transactions SET typeofpay = @typeofpay, invoicedate = @invoicedate, total = @total, balance = @balance, customername = @customername, phonenumber = @phonenumber, invoicenumber = 1" +
-													  " WHERE registeredphonenumber = @registeredphonenumber AND customername = @oldpartyname";
+													  " WHERE registeredphonenumber = @registeredphonenumber AND customername = @oldpartyname and typeofpay = @typeofpay";
 									cmd.Parameters.AddWithValue("@typeofpay", opartyRq.typeofpay);
 									cmd.Parameters.AddWithValue("@invoicedate", DateTime.UtcNow);
 									cmd.Parameters.AddWithValue("@total", opartyRq.openingbalance);

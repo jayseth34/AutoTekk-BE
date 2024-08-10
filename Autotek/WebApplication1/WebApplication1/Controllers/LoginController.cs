@@ -305,6 +305,5 @@ namespace WebApplication1.Controllers
 
             return BadRequest("Please Provide Valid Details");
         }
-		}
-
+	}
 }

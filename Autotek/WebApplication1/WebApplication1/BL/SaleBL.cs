@@ -51,8 +51,14 @@ namespace WebApplication1.BL
 				}
 				else
 				{
-					result = saledl.FindOrInsertItem(otransactionRq);
+					
 					otransactionRs = saledl.SaveTransaction(otransactionRq);
+					if(otransactionRq.typeofpay == "SALE ORDER" || otransactionRq.typeofpay == "PURCHASE ORDER")
+					{
+						foreach(var i in otransactionRq.itemdetailslist)
+						i.qty = 0;
+					}
+					result = saledl.FindOrInsertItem(otransactionRq);
 				}
 			}
 			return otransactionRs;
