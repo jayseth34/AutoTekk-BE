@@ -38,7 +38,7 @@
 		public Decimal qty { get; set; }
 		public string unit { get; set; }
 		public Decimal priceperunit { get; set; }
-		public Int64 remainingquantity { get; set; }
+		public Decimal remainingquantity { get; set; }
 		public string queryoperationtype { get; set; } = "";
 		public Decimal taxrate { get; set; } = 0;
 		public Decimal taxrateamount { get; set; } = 0;
