@@ -121,6 +121,7 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("v_item", NpgsqlDbType.Varchar).Value = itemDetails.item;
 							cmd.Parameters.AddWithValue("v_qty", NpgsqlDbType.Numeric).Value = itemDetails.qty;
 							cmd.Parameters.AddWithValue("v_remainingquantity", NpgsqlDbType.Numeric).Value = itemDetails.remainingquantity;
+							cmd.Parameters.AddWithValue("v_typeofpay", NpgsqlDbType.Varchar).Value = otransactionRq.typeofpay;
 							var outputParameter = new NpgsqlParameter("output_result", NpgsqlDbType.Varchar);
 							outputParameter.Direction = ParameterDirection.Output;
 							cmd.Parameters.Add(outputParameter);
@@ -150,7 +151,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT tr.invoicenumber, tr.typeofpay, tr.invoicedate, tr.total, tr.balance, tr.phonenumber, tr.paymentstatus, pr.emailid, pr.billingaddress, pr.creditlimit, pr.gst, pr.creditlimit FROM transactions tr join party pr ON tr.customername = pr.partyname" +
+					cmd.CommandText = "SELECT tr.invoicenumber, tr.typeofpay, tr.invoicedate, tr.total, tr.balance, tr.phonenumber, tr.paymentstatus, pr.emailid, pr.billingaddress, pr.creditlimit, pr.gst, pr.creditlimit FROM transactions tr join party pr ON tr.registeredphonenumber = pr.registeredphonenumber" +
 						" where tr.registeredphonenumber = " + registeredphonenumber + " AND " +
 						"tr.customername = '" + customername + "' AND tr.showtransaction = 'SHOW'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
@@ -715,7 +716,7 @@ namespace WebApplication1.DL
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "UPDATE transactions SET phonenumber = @phonenumber, billingaddress = @billingaddress, shippingaddress = @shippingaddress, invoicedate = @invoicedate, stateofsupply = @stateofsupply," +
 						" total = @total, received = @received, balance = @balance, paymenttype = @paymenttype, paymentstatus = @paymentstatus where registeredphonenumber = " + otransactionRq.registeredphonenumber + " AND invoicenumber = " + otransactionRq.invoicenumber + " AND " +
-						" customername = '" + otransactionRq.customername + "'" ;
+						" customername = '" + otransactionRq.customername + "' AND typeofpay = '" + otransactionRq.typeofpay + "'";
 					cmd.Parameters.AddWithValue("@phonenumber", otransactionRq.phonenumber);
 					cmd.Parameters.AddWithValue("@billingaddress", otransactionRq.billingaddress);
 					cmd.Parameters.AddWithValue("@shippingaddress", otransactionRq.shippingaddress);
@@ -726,6 +727,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@balance", otransactionRq.balance);
 					cmd.Parameters.AddWithValue("@paymenttype", otransactionRq.paymenttype);
 					cmd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
+					cmd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
 					cmd.ExecuteNonQuery();
 					status = "SUCCESS";
 				}
