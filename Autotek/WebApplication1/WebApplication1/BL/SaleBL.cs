@@ -53,7 +53,7 @@ namespace WebApplication1.BL
 				{
 					
 					otransactionRs = saledl.SaveTransaction(otransactionRq);
-					if(otransactionRq.typeofpay == "SALE ORDER" || otransactionRq.typeofpay == "PURCHASE ORDER")
+					if(otransactionRq.typeofpay == "SALE ORDER" || otransactionRq.typeofpay == "PURCHASE ORDER" || otransactionRq.typeofpay == "DELIVERY CHALLAN" || otransactionRq.typeofpay == "ESTIMATE QUOTATION")
 					{
 						foreach(var i in otransactionRq.itemdetailslist)
 						i.qty = 0;

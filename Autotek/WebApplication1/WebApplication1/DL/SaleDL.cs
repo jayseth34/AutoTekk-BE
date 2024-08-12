@@ -573,7 +573,7 @@ namespace WebApplication1.DL
 						NpgsqlCommand cmd = new NpgsqlCommand();
 						cmd.Connection = conn;
 						cmd.CommandType = CommandType.Text;
-						cmd.CommandText = "UPDATE item_details SET showtransaction = 'DONT SHOW' WHERE invoicenumber = '" + invoicenumber + "' AND registeredphonenumber = " + registeredphonenumber + "";
+						cmd.CommandText = "UPDATE item_details SET showtransaction = 'DONT SHOW' WHERE invoicenumber = '" + invoicenumber + "' AND registeredphonenumber = " + registeredphonenumber + " AND typeofpay = '" + typeofpay + "'";
 						cmd.ExecuteNonQuery();
 					}
 				}
