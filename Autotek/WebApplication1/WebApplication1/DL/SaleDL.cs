@@ -59,6 +59,8 @@ namespace WebApplication1.DL
 					{
 						foreach (var itemDetail in otransactionRq.itemdetailslist)
 						{
+							if (otransactionRq.typeofpay == "PURCHASE")
+								itemDetail.qty = itemDetail.qty * (-1);
 							using (NpgsqlConnection connn = new NpgsqlConnection(this._connectionFactory))
 							{
 								connn.Open();
@@ -83,6 +85,8 @@ namespace WebApplication1.DL
 								cmdd.Parameters.AddWithValue("@discountpercent", itemDetail.discountpercent);
 								cmdd.Parameters.AddWithValue("@discountamount", itemDetail.discountamount);
 								cmdd.ExecuteNonQuery();
+								if (otransactionRq.typeofpay == "PURCHASE" || otransactionRq.typeofpay == "PURCHASE ORDER")
+									itemDetail.qty = itemDetail.qty * (-1);
 								otransactionrs.status = "SUCCESS";
 							}
 						}
@@ -121,7 +125,9 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("v_item", NpgsqlDbType.Varchar).Value = itemDetails.item;
 							cmd.Parameters.AddWithValue("v_qty", NpgsqlDbType.Numeric).Value = itemDetails.qty;
 							cmd.Parameters.AddWithValue("v_remainingquantity", NpgsqlDbType.Numeric).Value = itemDetails.remainingquantity;
+							cmd.Parameters.AddWithValue("v_invoicenumber", NpgsqlDbType.Numeric).Value = otransactionRq.invoicenumber;
 							cmd.Parameters.AddWithValue("v_typeofpay", NpgsqlDbType.Varchar).Value = otransactionRq.typeofpay;
+							cmd.Parameters.AddWithValue("v_isupdate", NpgsqlDbType.Boolean).Value = otransactionRq.isupdate;
 							var outputParameter = new NpgsqlParameter("output_result", NpgsqlDbType.Varchar);
 							outputParameter.Direction = ParameterDirection.Output;
 							cmd.Parameters.Add(outputParameter);
@@ -419,31 +425,39 @@ namespace WebApplication1.DL
 			return oGetTypeOfPayTransactionsRs;
 		}
 
-		public Int64 GetInvoiceNumberCount(Int64 registeredphonenumber, string typeofpay)
+		public Int64 GetInvoiceNumberCount(Int64 registeredPhoneNumber, string typeOfPay)
 		{
-			GetTypeOfPayTransactionsRs oGetTypeOfPayTransactionsRs = new GetTypeOfPayTransactionsRs();
+			Int64 nextInvoiceNumber = 1;
+
 			try
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 				{
 					conn.Open();
-					NpgsqlCommand cmd = new NpgsqlCommand();
-					cmd.Connection = conn;
-					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT MAX(invoicenumber) FROM transactions WHERE typeofpay = '" + typeofpay + "' AND registeredphonenumber = " + registeredphonenumber + "" ;
-					object result = cmd.ExecuteScalar();
-					oGetTypeOfPayTransactionsRs.invoicenumbercount = 1;
-					if (result != DBNull.Value)
+
+					string query = "SELECT COALESCE(MAX(invoicenumber), 0) FROM transactions WHERE typeofpay = @TypeOfPay AND registeredphonenumber = @RegisteredPhoneNumber";
+
+					using (NpgsqlCommand cmd = new NpgsqlCommand(query, conn))
 					{
-						oGetTypeOfPayTransactionsRs.invoicenumbercount = (Convert.ToInt64(result) + 1 );
+						cmd.Parameters.AddWithValue("@TypeOfPay", typeOfPay);
+						cmd.Parameters.AddWithValue("@RegisteredPhoneNumber", registeredPhoneNumber);
+
+						object result = cmd.ExecuteScalar();
+
+						if (result != DBNull.Value && result != null)
+						{
+							nextInvoiceNumber = Convert.ToInt64(result) + 1;
+						}
 					}
 				}
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
-				Console.WriteLine (ex.Message);
+				Console.WriteLine($"Error occurred: {ex.Message}");
+				throw; 
 			}
-			return oGetTypeOfPayTransactionsRs.invoicenumbercount;
+
+			return nextInvoiceNumber;
 		}
 
 		public TransactionRs SaveDeliveryChallan(TransactionRq otransactionRq, Int64 invoicecount, string typeofpay, bool isconverted)
@@ -497,7 +511,7 @@ namespace WebApplication1.DL
 								cmdd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
 								cmdd.Parameters.AddWithValue("@customername", otransactionRq.customername);
 								cmdd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
-								cmdd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
+								cmdd.Parameters.AddWithValue("@typeofpay", typeofpay);
 								cmdd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
 								cmdd.Parameters.AddWithValue("@taxrate", itemDetail.taxrate);
 								cmdd.Parameters.AddWithValue("@taxrateamount", itemDetail.taxrateamount);

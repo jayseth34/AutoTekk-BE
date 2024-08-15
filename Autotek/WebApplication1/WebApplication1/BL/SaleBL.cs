@@ -56,7 +56,7 @@ namespace WebApplication1.BL
 					if(otransactionRq.typeofpay == "SALE ORDER" || otransactionRq.typeofpay == "PURCHASE ORDER" || otransactionRq.typeofpay == "DELIVERY CHALLAN" || otransactionRq.typeofpay == "ESTIMATE QUOTATION")
 					{
 						foreach(var i in otransactionRq.itemdetailslist)
-						i.qty = 0;
+							i.qty = 0;
 					}
 					result = saledl.FindOrInsertItem(otransactionRq);
 				}
@@ -130,7 +130,7 @@ namespace WebApplication1.BL
 			SaleDL saledl = new SaleDL(this.config);
 			oGetTypeOfPayTransactionsRs = saledl.GetTypeOfPayTransactions(registeredphonenumber, typeofpay);
 			if (typeofpay == "SALE" || typeofpay == "ESTIMATE QUOTATION" || typeofpay == "PAYMENT IN" ||
-				typeofpay == "SALE ORDER" || typeofpay == "DELIVERY CHALLAN" || typeofpay == "SALE RETURN" || typeofpay == "PURCHASE ORDER")
+				typeofpay == "SALE ORDER" || typeofpay == "DELIVERY CHALLAN" || typeofpay == "SALE RETURN" || typeofpay == "PURCHASE ORDER" || typeofpay == "PURCHASE")
 			{
 				oGetTypeOfPayTransactionsRs.invoicenumbercount = saledl.GetInvoiceNumberCount(registeredphonenumber, typeofpay);
 			}
