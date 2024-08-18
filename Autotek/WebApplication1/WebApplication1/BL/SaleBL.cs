@@ -21,6 +21,7 @@ namespace WebApplication1.BL
 			SaleDL saledl = new SaleDL(this.config);
 			string result = string.Empty;
 			bool isconverted = false;
+			string amtdeatils = string.Empty;
 			if (otransactionRq.itemdetailslist == null || otransactionRq.itemdetailslist.Count == 0)
 			{
 				otransactionRs.status = "Kindly Insert Items.";
@@ -60,6 +61,7 @@ namespace WebApplication1.BL
 					}
 					result = saledl.FindOrInsertItem(otransactionRq);
 				}
+				amtdeatils = await saledl.UpdateBankAmount(otransactionRq.amountdetailslist, otransactionRq.registeredphonenumber);
 			}
 			return otransactionRs;
 		}
@@ -156,11 +158,13 @@ namespace WebApplication1.BL
 		{
 			TransactionRs otransactionRs = new TransactionRs();
 			SaleDL saledl = new SaleDL(this.config);
+			string amtdeatils = string.Empty;
 			otransactionRs.status = saledl.UpdateTransactionDetails(otransactionRq);
 			if (otransactionRs.status == "SUCCESS")
 			{
 				_ = saledl.FindOrInsertItem(otransactionRq);
 				otransactionRs.status = saledl.UpdateInsertDeleteItemDetails(otransactionRq);
+				amtdeatils = await saledl.UpdateBankAmount(otransactionRq.amountdetailslist, otransactionRq.registeredphonenumber);
 			}
 
 			return otransactionRs;
@@ -181,5 +185,145 @@ namespace WebApplication1.BL
 			return oUpadatePaymentInOutTrnxRs;
 		}
 
+		public async Task<BankFormRs> SaveBankDetails(BankFormRq oBankFormRq)
+		{
+			BankFormRs oBankFormRs = new BankFormRs();
+			SaleDL saledl = new SaleDL(this.config);
+			bool inserttransaction = false;
+
+			bool bankExists = await saledl.IfBankExists(oBankFormRq);
+			if(bankExists && oBankFormRq.isbanksupdate && (oBankFormRq.newaccountdisplayname == oBankFormRq.oldaccountdisplayname))
+			{
+				bankExists = false;
+			}
+			if (bankExists && !oBankFormRq.isbanksupdate)
+			{
+				oBankFormRs.statusmessage = "Account Display Name already exists.";
+				oBankFormRs.status = "FAILED";
+			}
+			else if (bankExists && oBankFormRq.isbanksupdate)
+			{
+				oBankFormRs.statusmessage = "Account Display Name already exists.";
+				oBankFormRs.status = "FAILED";
+			}
+			else if (!bankExists && oBankFormRq.isbanksupdate)
+			{
+				oBankFormRs = await saledl.UpdateBankDetails(oBankFormRq);
+				inserttransaction = await saledl.UpdatetTrnx(oBankFormRq);
+
+			}
+			else if (!bankExists && !oBankFormRq.isbanksupdate)
+			{
+				oBankFormRs = await saledl.SaveBankDetails(oBankFormRq);
+				inserttransaction = await saledl.InsertTrnx(oBankFormRq);
+			}
+
+			return oBankFormRs;
+		}
+
+		public async Task<GetBankDetailsRs> GetBankDetails(GetBankDetailsRq oGetBankDetailsRq)
+		{
+			GetBankDetailsRs oGetBankDetailsRs = new GetBankDetailsRs();
+			SaleDL saledl = new SaleDL(this.config);
+			oGetBankDetailsRs = await saledl.GetBankDetailsAsync(oGetBankDetailsRq);
+			return oGetBankDetailsRs;
+		}
+
+		public async Task<GetBanksRs> GetBanks(GetBanksRq oGetBanksRq)
+		{
+			GetBanksRs oGetBanksRs = new GetBanksRs();
+			SaleDL saledl = new SaleDL(this.config);
+			oGetBanksRs = await saledl.GetBanks(oGetBanksRq);
+			return oGetBanksRs;
+		}
+
+		public async Task<GetBanksDetailsValuesRs> GetBanksDetailsValues(GetBanksDetailsValuesRq oGetBanksDetailsValuesRq)
+		{
+			GetBanksDetailsValuesRs oGetBanksDetailsValuesRs = new GetBanksDetailsValuesRs();
+			SaleDL saledl = new SaleDL(this.config);
+			oGetBanksDetailsValuesRs = await saledl.GetBanksDetailsValues(oGetBanksDetailsValuesRq);
+			return oGetBanksDetailsValuesRs;
+		}
+
+		public async Task<TransfersRs> Transfers(TransfersRq oTransfersRq)
+		{
+			TransfersRs oTransfersRs = new TransfersRs();
+			SaleDL saledl = new SaleDL(this.config);
+			string sqlquery = string.Empty;
+			string sqlquery1 = string.Empty;
+			List<AmountDetails> amounts = new List<AmountDetails>();
+			if(oTransfersRq.type == "bankToCash")
+			{
+				sqlquery = "UPDATE BankForm set amount = amount - @amount where accountdisplayname = @accountdisplayname and registeredphonenumber = @registeredphonenumber";
+				oTransfersRs = await saledl.Transfers(oTransfersRq,sqlquery,1);
+				sqlquery1 = "INSERT INTO transactions (typeofpay, customername, invoicedate, registeredphonenumber, showtransaction, total, paymenttype, amountdetails) " +
+							  "VALUES ('CASH WITHDRAW', '', @invoicedate, @registeredphonenumber, 'DONT SHOW', @amount, @paymenttype, @amountdetails)";
+				AmountDetails amountDetails = new AmountDetails();
+				amountDetails.type = oTransfersRq.fromAccount;
+				amountDetails.amount = oTransfersRq.amount;
+				amounts.Add(amountDetails);
+				oTransfersRs = await saledl.InsertTransfers(oTransfersRq, sqlquery1,amounts, 1);
+			}
+			else if(oTransfersRq.type == "cashToBank")
+			{
+				sqlquery = "UPDATE BankForm set amount = amount + @amount where accountdisplayname = @accountdisplayname and registeredphonenumber = @registeredphonenumber";
+				oTransfersRs = await saledl.Transfers(oTransfersRq, sqlquery, 1);
+				sqlquery1 = "INSERT INTO transactions (typeofpay, customername, invoicedate, registeredphonenumber, showtransaction, total, paymenttype, amountdetails) " +
+							  "VALUES ('CASH DEPOSIT', '', @invoicedate, @registeredphonenumber, 'DONT SHOW', @amount, @paymenttype, @amountdetails)";
+				AmountDetails amountDetails = new AmountDetails();
+				amountDetails.type = oTransfersRq.toAccount;
+				amountDetails.amount = oTransfersRq.amount;
+				amounts.Add(amountDetails);
+				oTransfersRs = await saledl.InsertTransfers(oTransfersRq, sqlquery1, amounts, 1);
+			}
+			else if(oTransfersRq.type == "bankToBank")
+			{
+				sqlquery = "UPDATE BankForm set amount = amount - @amount where accountdisplayname = @accountdisplayname and registeredphonenumber = @registeredphonenumber";
+				oTransfersRs = await saledl.Transfers(oTransfersRq, sqlquery, 1);
+				sqlquery = "UPDATE BankForm set amount = amount + @amount where accountdisplayname = @accountdisplayname and registeredphonenumber = @registeredphonenumber";
+				oTransfersRs = await saledl.Transfers(oTransfersRq, sqlquery, 2);
+				sqlquery1 = "INSERT INTO transactions (typeofpay, customername, invoicedate, registeredphonenumber, showtransaction, total, paymenttype, amountdetails) " +
+							  "VALUES ('BANK TO BANK', @customername, @invoicedate, @registeredphonenumber, 'DONT SHOW', @amount, @paymenttype, @amountdetails)";
+				AmountDetails amountDetails = new AmountDetails();
+				amountDetails.type = oTransfersRq.fromAccount;
+				amountDetails.amount = oTransfersRq.amount;
+				amounts.Add(amountDetails);
+				oTransfersRs = await saledl.InsertTransfers(oTransfersRq, sqlquery1, amounts, 1);
+				List<AmountDetails> amounts1 = new List<AmountDetails>();
+				AmountDetails amountDetails1 = new AmountDetails();
+				amountDetails1.type = oTransfersRq.toAccount;
+				amountDetails1.amount = oTransfersRq.amount;
+				amounts1.Add(amountDetails1);
+				oTransfersRs = await saledl.InsertTransfers(oTransfersRq, sqlquery1, amounts1, 2);
+			}
+			else if (oTransfersRq.type == "adjustBalance")
+			{
+				if(oTransfersRq.adjustmentType == "decrease")
+				{
+					sqlquery = "UPDATE BankForm set amount = amount - @amount where accountdisplayname = @accountdisplayname and registeredphonenumber = @registeredphonenumber";
+				}
+				else if (oTransfersRq.adjustmentType == "increase")
+				{
+					sqlquery = "UPDATE BankForm set amount = amount + @amount where accountdisplayname = @accountdisplayname and registeredphonenumber = @registeredphonenumber";
+				}
+				oTransfersRs = await saledl.Transfers(oTransfersRq, sqlquery, 1);
+				if (oTransfersRq.adjustmentType == "decrease")
+				{
+					sqlquery1 = "INSERT INTO transactions (typeofpay, customername, invoicedate, registeredphonenumber, showtransaction, total, paymenttype, amountdetails) " +
+							  "VALUES ('BANK ADJ DECREASE', '', @invoicedate, @registeredphonenumber, 'DONT SHOW', @amount, @paymenttype, @amountdetails)";
+				}
+				else if (oTransfersRq.adjustmentType == "increase")
+				{
+					sqlquery1 = "INSERT INTO transactions (typeofpay, customername, invoicedate, registeredphonenumber, showtransaction, total, paymenttype, amountdetails) " +
+							  "VALUES ('BANK ADJ INCREASE', '', @invoicedate, @registeredphonenumber, 'DONT SHOW', @amount, @paymenttype, @amountdetails)";
+				}
+				AmountDetails amountDetails = new AmountDetails();
+				amountDetails.type = oTransfersRq.accountName;
+				amountDetails.amount = oTransfersRq.amount;
+				amounts.Add(amountDetails);
+				oTransfersRs = await saledl.InsertTransfers(oTransfersRq, sqlquery1, amounts, 2);
+			}
+			return oTransfersRs;
+		}
 	}
 }

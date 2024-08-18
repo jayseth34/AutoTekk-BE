@@ -1003,5 +1003,31 @@ namespace WebApplication1.DL
 			}
 			return true;
 		}
+
+		public DashboardDetailsRs DashBoardDetails(Int64 registeredphonenumber)
+		{
+			DashboardDetailsRs oDashboardDetailsRs = new DashboardDetailsRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "";
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					while (reader.Read())
+					{
+						
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+
+			}
+			return oDashboardDetailsRs;
+		}
 	}
 }

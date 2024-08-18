@@ -27,9 +27,18 @@
 		public TransactionRq()
 		{
 			itemdetailslist = new List<ItemDetailsListRq>();
+			amountdetailslist = new List<AmountDetails>();
 		}
 		public List<ItemDetailsListRq> itemdetailslist { get; set; }
+		public List<AmountDetails>? amountdetailslist { get; set; }
 
+	}
+
+	public class AmountDetails
+	{
+		public string type { get; set; }
+		public decimal amount { get; set; }
+		public string? refno { get; set; }
 	}
 
 	public class ItemDetailsListRq
@@ -268,5 +277,121 @@
 	{
 		public Decimal topayparty { get; set; }
 		public Decimal toreceivefromparty { get; set; }
+	}
+
+	public class BankFormRq
+	{
+		public string oldaccountdisplayname { get; set; }
+		public string newaccountdisplayname { get; set; }
+		public decimal newopeningbalance { get; set; }
+		public decimal oldopeningbalance { get; set; }
+		public DateTime asofdate { get; set; }
+		public decimal? amount { get; set; }
+		public string? typeofpay { get; set; }
+		public Int64 registeredphonenumber { get; set; }
+		public Boolean isbanksupdate { get; set; }
+	}
+
+	public class BankAdjustments
+	{
+		public string? transfertype { get; set; }
+		public string? fromaccount { get; set; }
+		public string? toaccount { get; set; }
+		public decimal? amount { get; set; }
+		public DateTime? adjustmentdate { get; set; }
+		public string? accountname { get; set; }
+		public string? adjustmenttype { get; set; }
+		public string? description { get; set; }
+		public string? typeofpay { get; set; }
+		public Int64 resgisteredphonenumber { get; set; }
+	}
+
+	public class BankFormRs
+	{
+		public string status { get; set; }
+		public string statusmessage { get; set; }
+	}
+
+	public class GetBankDetailsRq
+	{
+		public string accountdisplayname { get; set; }
+		public Int64 registeredphonenumber { get; set; }
+	}
+
+	public class GetBankDetailsRs
+	{
+		public string status { get; set; }
+		public string statusmessage { get; set; }
+		public GetBankDetailsRs()
+		{
+			bankTrnxDetails = new List<BankTrnxDetails>();
+		}
+		public List<BankTrnxDetails> bankTrnxDetails { get; set; }
+
+	}
+
+	public class BankTrnxDetails
+	{
+		public string? typeofpay { get; set; }
+		public string? customername { get; set; }
+		public DateTime? invoicedate { get; set; }
+		public Decimal amount { get; set; }
+		public Decimal transactionid { get; set; }
+	}
+
+	public class GetBanksRq
+	{
+		public Int64 registeredphonenumber { get; set; }
+	}
+
+	public class GetBanksRs
+	{
+		public string status { get; set; }
+		public string statusmessage { get; set; }
+		public GetBanksRs()
+		{
+			bankslist = new List<BanksList>();
+		}
+		public List<BanksList> bankslist { get; set; }
+	}
+
+	public class BanksList
+	{
+		public string accountdisplayname { get; set; }
+		public Decimal amount { get; set; }
+	}
+
+	public class GetBanksDetailsValuesRq
+	{
+		public Int64 registeredphonenumber { get; set; }
+		public string newaccountdisplayname {  get; set; }
+	}
+
+	public class GetBanksDetailsValuesRs
+	{
+		public string status { get; set; }
+		public string newaccountdisplayname { get; set; }
+		public Decimal newopeningbalance { get; set; }
+		public Decimal amount { get; set; }
+		public DateTime? asofDate { get; set; }
+	}
+
+	public class TransfersRq
+	{
+		public Int64 registeredphonenumber { get; set; }
+		public string type {  get; set; }
+		public string fromAccount {  get; set; }
+		public string toAccount {  get; set; }
+		public Decimal amount {  get; set; }
+		public DateTime adjustmentDate {  get; set; }
+		public string description { get; set; }
+		public string adjustmentType { get; set; }
+		public string accountName { get; set; }
+	}
+
+	public class TransfersRs
+	{
+		public string status { get; set; }
+		public string statusmessage { get; set; }
 	}
 }

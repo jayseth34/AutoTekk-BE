@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Newtonsoft.Json;
 using Npgsql;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure.Internal;
 using NpgsqlTypes;
@@ -38,8 +39,8 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "INSERT INTO transactions(typeofpay, invoicenumber, invoicedate, stateofsupply, paymenttype, total, received, balance, customername, phonenumber, registeredphonenumber, billingaddress," +
-						" shippingaddress, paymentstatus) VALUES(@typeofpay, @invoicenumber, @invoicedate, @stateofsupply, @paymenttype, @total, @received, @balance, @customername, @phonenumber, @registeredphonenumber, @billingaddress," +
-						" @shippingaddress, @paymentstatus) RETURNING transaction_id";
+						" shippingaddress, paymentstatus, amountdetails) VALUES(@typeofpay, @invoicenumber, @invoicedate, @stateofsupply, @paymenttype, @total, @received, @balance, @customername, @phonenumber, @registeredphonenumber, @billingaddress," +
+						" @shippingaddress, @paymentstatus, @amountdetails) RETURNING transaction_id";
 					cmd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
 					cmd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
 					cmd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
@@ -54,6 +55,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@billingaddress", otransactionRq.billingaddress);
 					cmd.Parameters.AddWithValue("@shippingaddress", otransactionRq.shippingaddress);
 					cmd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
+					cmd.Parameters.AddWithValue("@amountdetails", JsonConvert.SerializeObject(otransactionRq.amountdetailslist));
 					var transactionId = cmd.ExecuteScalar();
 					if (otransactionRq.itemdetailslist.Count > 0)
 					{
@@ -472,8 +474,8 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "INSERT INTO transactions(typeofpay, invoicenumber, invoicedate, stateofsupply, paymenttype, total, received, balance, customername, phonenumber, registeredphonenumber, billingaddress," +
-						" shippingaddress, paymentstatus, isconverted) VALUES(@typeofpay, @invoicenumber, @invoicedate, @stateofsupply, @paymenttype, @total, @received, @balance, @customername, @phonenumber, @registeredphonenumber, @billingaddress," +
-						" @shippingaddress, @paymentstatus, @isconverted) RETURNING transaction_id";
+						" shippingaddress, paymentstatus, isconverted, amountdetails) VALUES(@typeofpay, @invoicenumber, @invoicedate, @stateofsupply, @paymenttype, @total, @received, @balance, @customername, @phonenumber, @registeredphonenumber, @billingaddress," +
+						" @shippingaddress, @paymentstatus, @isconverted, @amountdetails) RETURNING transaction_id";
 					cmd.Parameters.AddWithValue("@typeofpay", typeofpay);
 					cmd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
 					cmd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
@@ -489,6 +491,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@shippingaddress", otransactionRq.shippingaddress);
 					cmd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
 					cmd.Parameters.AddWithValue("@isconverted",isconverted);
+					cmd.Parameters.AddWithValue("@amountdetails", JsonConvert.SerializeObject(otransactionRq.amountdetailslist));
 					var transactionId = cmd.ExecuteScalar();
 					if (otransactionRq.itemdetailslist.Count > 0)
 					{
@@ -729,7 +732,7 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "UPDATE transactions SET phonenumber = @phonenumber, billingaddress = @billingaddress, shippingaddress = @shippingaddress, invoicedate = @invoicedate, stateofsupply = @stateofsupply," +
-						" total = @total, received = @received, balance = @balance, paymenttype = @paymenttype, paymentstatus = @paymentstatus where registeredphonenumber = " + otransactionRq.registeredphonenumber + " AND invoicenumber = " + otransactionRq.invoicenumber + " AND " +
+						" total = @total, received = @received, balance = @balance, paymenttype = @paymenttype, paymentstatus = @paymentstatus, amountdetails = @amountdetails where registeredphonenumber = " + otransactionRq.registeredphonenumber + " AND invoicenumber = " + otransactionRq.invoicenumber + " AND " +
 						" customername = '" + otransactionRq.customername + "' AND typeofpay = '" + otransactionRq.typeofpay + "'";
 					cmd.Parameters.AddWithValue("@phonenumber", otransactionRq.phonenumber);
 					cmd.Parameters.AddWithValue("@billingaddress", otransactionRq.billingaddress);
@@ -742,6 +745,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@paymenttype", otransactionRq.paymenttype);
 					cmd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
 					cmd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
+					cmd.Parameters.AddWithValue("@amountdetails", JsonConvert.SerializeObject(otransactionRq.amountdetailslist));
 					cmd.ExecuteNonQuery();
 					status = "SUCCESS";
 				}
@@ -1004,6 +1008,527 @@ namespace WebApplication1.DL
 				Console.WriteLine(ex.Message);
 			}
 			return oPaymentInOutTrnxRs;
+		}
+
+		public async Task<BankFormRs> SaveBankDetails(BankFormRq oBankFormRq)
+		{
+			BankFormRs oBankFormRs = new BankFormRs();
+			string sqlQuery = "INSERT INTO BankForm (accountdisplayname, openingbalance, asofdate, registeredphonenumber, amount) " +
+							  "VALUES (@accountdisplayname, @openingbalance, @asofdate, @registeredphonenumber, @amount)";
+
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					using (NpgsqlCommand cmd = new NpgsqlCommand())
+					{
+						cmd.Connection = conn;
+						cmd.CommandType = CommandType.Text;
+						cmd.CommandText = sqlQuery;
+						cmd.Parameters.AddWithValue("@accountdisplayname", oBankFormRq.newaccountdisplayname);
+						cmd.Parameters.AddWithValue("@openingbalance", oBankFormRq.newopeningbalance);
+						cmd.Parameters.AddWithValue("@asofdate", oBankFormRq.asofdate);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", oBankFormRq.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@amount", oBankFormRq.newopeningbalance);
+
+						cmd.ExecuteNonQuery();
+						oBankFormRs.status = "SUCCESS";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				oBankFormRs.status = "FAILED";
+				Console.WriteLine("Error occurred: " + ex.Message);
+			}
+			return oBankFormRs;
+		}
+
+		public async Task<bool> IfBankExists(BankFormRq oBankFormRq)
+		{
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					await conn.OpenAsync();
+					using (NpgsqlCommand cmd = new NpgsqlCommand())
+					{
+						cmd.Connection = conn;
+						cmd.CommandType = CommandType.Text;
+						cmd.CommandText = "SELECT accountdisplayname FROM BankForm WHERE registeredphonenumber = @registeredphonenumber AND accountdisplayname = @accountdisplayname";
+						cmd.Parameters.AddWithValue("@registeredphonenumber", oBankFormRq.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@accountdisplayname", oBankFormRq.newaccountdisplayname);
+
+						var exists = await cmd.ExecuteScalarAsync();
+
+						return exists != null;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return true;
+		}
+
+		public async Task<BankFormRs> UpdateBankDetails(BankFormRq oBankFormRq)
+		{
+			BankFormRs oBankFormRs = new BankFormRs();
+			Decimal amount = 0;
+			string sqlQuery = "UPDATE BankForm SET accountdisplayname = @accountdisplayname, openingbalance = @openingbalance, asofdate = @asofdate, amount = @amount " +
+				  "WHERE registeredphonenumber = @registeredphonenumber and accountdisplayname = @olddisplayname";
+			if(oBankFormRq.newopeningbalance > oBankFormRq.oldopeningbalance)
+			{
+				amount = oBankFormRq.newopeningbalance - oBankFormRq.oldopeningbalance;
+				oBankFormRq.amount = oBankFormRq.amount + amount;
+			}
+			else if (oBankFormRq.newopeningbalance < oBankFormRq.oldopeningbalance)
+			{
+				amount = oBankFormRq.oldopeningbalance - oBankFormRq.newopeningbalance;
+				oBankFormRq.amount = oBankFormRq.amount - amount;
+			}
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					using (NpgsqlCommand cmd = new NpgsqlCommand())
+					{
+						cmd.Connection = conn;
+						cmd.CommandType = CommandType.Text;
+						cmd.CommandText = sqlQuery;
+
+						cmd.Parameters.AddWithValue("@accountdisplayname", oBankFormRq.newaccountdisplayname);
+						cmd.Parameters.AddWithValue("@openingbalance", oBankFormRq.newopeningbalance);
+						cmd.Parameters.AddWithValue("@asofdate", oBankFormRq.asofdate);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", oBankFormRq.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@amount", oBankFormRq.amount);
+						cmd.Parameters.AddWithValue("@olddisplayname", oBankFormRq.oldaccountdisplayname);
+						cmd.ExecuteNonQuery();
+						oBankFormRs.status = "SUCCESS";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				oBankFormRs.status = "FAILED";
+				Console.WriteLine(ex.Message);
+			}
+			return oBankFormRs;
+		}
+
+		public async Task<GetBankDetailsRs> GetBankDetailsAsync(GetBankDetailsRq oGetBankDetailsRq)
+		{
+			GetBankDetailsRs oGetBankDetailsRs = new GetBankDetailsRs();
+			List<AmountDetails> amount = new List<AmountDetails>();
+			string result = "SUCCESS";
+
+			string sqlQuery = @"SELECT typeofpay, customername, invoicedate, amountdetails, paymenttype, transaction_id
+                        FROM transactions
+                        WHERE registeredphonenumber = @registeredphonenumber
+                        AND (paymenttype LIKE '%' || @customername || '%' 
+                        AND (paymenttype = @customername 
+                        OR paymenttype LIKE @customername || ',%' 
+                        OR paymenttype LIKE '%,' || @customername 
+                        OR paymenttype LIKE '%,' || @customername || ',%'))";
+
+			try
+			{
+				using (var conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					await conn.OpenAsync();
+					using (var cmd = new NpgsqlCommand(sqlQuery, conn))
+					{
+						cmd.CommandType = CommandType.Text;
+
+						// Define and add parameters
+						cmd.Parameters.AddWithValue("@registeredphonenumber", oGetBankDetailsRq.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@customername", oGetBankDetailsRq.accountdisplayname);
+
+						using (var reader = await cmd.ExecuteReaderAsync())
+						{
+							if (reader.HasRows)
+							{
+								while (await reader.ReadAsync())
+								{
+									BankTrnxDetails oBankTrnxDetails = new BankTrnxDetails();
+									oBankTrnxDetails.customername = reader["customername"] == DBNull.Value ? null : Convert.ToString(reader["customername"]);
+									oBankTrnxDetails.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
+									oBankTrnxDetails.invoicedate = reader["invoicedate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["invoicedate"]);
+									oBankTrnxDetails.transactionid = reader["transaction_id"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["transaction_id"]);
+									amount = reader["amountdetails"] == DBNull.Value ? null : JsonConvert.DeserializeObject<List<AmountDetails>>(Convert.ToString(reader["amountdetails"]));
+									if (amount != null)
+									{
+										foreach (var amountDetail in amount)
+										{
+											if (amountDetail.type == oGetBankDetailsRq.accountdisplayname)
+											{
+												oBankTrnxDetails.amount = amountDetail.amount;
+												Console.WriteLine($"Match found for account display name: {amountDetail.type}");
+												Console.WriteLine($"Amount: {amountDetail.amount}");
+											}
+										}
+									}
+									oGetBankDetailsRs.bankTrnxDetails.Add(oBankTrnxDetails);
+								}
+								oGetBankDetailsRs.status = "SUCCESS";
+							}
+							else
+							{
+								// Log the parameters and query for debugging
+								Console.WriteLine("Query executed but no rows were returned.");
+								Console.WriteLine($"Parameters: registeredphonenumber={oGetBankDetailsRq.registeredphonenumber}, customername={oGetBankDetailsRq.accountdisplayname}");
+								oGetBankDetailsRs.status = "SUCCESS";
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oGetBankDetailsRs;
+		}
+
+		public async Task<string> UpdateBankAmount(List<AmountDetails> oAmountDetails, Int64 registeredphonenumber)
+		{
+			string result = string.Empty;
+			string sqlQuery = "UPDATE BankForm " +
+								"SET amount = amount - @amount " +
+								"WHERE registeredphonenumber = @registeredphonenumber ";
+
+			try
+			{
+				using (var conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					await conn.OpenAsync();
+
+					foreach (var details in oAmountDetails)
+					{
+						using (var cmd = new NpgsqlCommand(sqlQuery, conn))
+						{
+							cmd.CommandType = CommandType.Text;
+
+							cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+							cmd.Parameters.AddWithValue("@amount", details.amount);
+							cmd.Parameters.AddWithValue("@type", details.type);
+							await cmd.ExecuteNonQueryAsync();
+						}
+					}
+					result = "SUCCESS";
+				}
+			}
+			catch (Exception ex)
+			{
+				result = "FAILED";
+				Console.WriteLine(ex.Message);
+			}
+			return result;
+		}
+
+		public async Task<GetBanksRs> GetBanks(GetBanksRq oGetBanksRq)
+		{
+			GetBanksRs oGetBanksRs = new GetBanksRs();
+			string sqlQuery = @"SELECT accountdisplayname, amount from BankForm where registeredphonenumber = @registeredphonenumber";
+
+			try
+			{
+				using (var conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					await conn.OpenAsync();
+					using (var cmd = new NpgsqlCommand(sqlQuery, conn))
+					{
+						cmd.CommandType = CommandType.Text;
+
+						// Define and add parameters
+						cmd.Parameters.AddWithValue("@registeredphonenumber", oGetBanksRq.registeredphonenumber);
+
+						using (var reader = await cmd.ExecuteReaderAsync())
+						{
+							if (reader.HasRows)
+							{
+								while (await reader.ReadAsync())
+								{
+									BanksList oBanksList = new BanksList();
+									oBanksList.accountdisplayname = reader["accountdisplayname"] == DBNull.Value ? null : Convert.ToString(reader["accountdisplayname"]);
+									oBanksList.amount = reader["amount"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["amount"]);
+									oGetBanksRs.bankslist.Add(oBanksList);
+								}
+								oGetBanksRs.status = "SUCCESS";
+							}
+							else
+							{
+								oGetBanksRs.status = "FAILED";
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oGetBanksRs;
+		}
+
+		public async Task<bool> InsertTrnx(BankFormRq oBankFormRq)
+		{
+			bool val = false;
+			string sqlQuery = "INSERT INTO transactions (typeofpay, customername, invoicedate, total, balance, registeredphonenumber, showtransaction, amountdetails, paymenttype) " +
+							  "VALUES (@typeofpay, @customername, @invoicedate, @total, @balance, @registeredphonenumber, 'DONT SHOW', @amountdetails, @paymenttype)";
+
+			try
+			{
+				List<AmountDetails> amounts = new List<AmountDetails>();
+				AmountDetails amountDetails = new AmountDetails();
+				amountDetails.type = oBankFormRq.newaccountdisplayname;
+				amountDetails.amount = oBankFormRq.newopeningbalance;
+				amounts.Add(amountDetails);
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					using (NpgsqlCommand cmd = new NpgsqlCommand())
+					{
+						cmd.Connection = conn;
+						cmd.CommandType = CommandType.Text;
+						cmd.CommandText = sqlQuery;
+						cmd.Parameters.AddWithValue("@typeofpay", oBankFormRq.typeofpay);
+						cmd.Parameters.AddWithValue("@customername", oBankFormRq.newaccountdisplayname);
+						cmd.Parameters.AddWithValue("@invoicedate", oBankFormRq.asofdate);
+						cmd.Parameters.AddWithValue("@total", oBankFormRq.newopeningbalance);
+						cmd.Parameters.AddWithValue("@balance", oBankFormRq.newopeningbalance);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", oBankFormRq.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@amountdetails", JsonConvert.SerializeObject(amounts));
+						cmd.Parameters.AddWithValue("@paymenttype", oBankFormRq.newaccountdisplayname);
+
+						cmd.ExecuteNonQuery();
+						val = true;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				val = false;
+				Console.WriteLine("Error occurred: " + ex.Message);
+			}
+			return val;
+		}
+
+		public async Task<bool> UpdatetTrnx(BankFormRq oBankFormRq)
+		{
+			bool val = false;
+			string sqlQuery = "update transactions set typeofpay = @typeofpay, customername = @customername, invoicedate = @invoicedate, total = @total, balance = @balance" +
+							  " where registeredphonenumber = @registeredphonenumber and customername = @customername";
+
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					using (NpgsqlCommand cmd = new NpgsqlCommand())
+					{
+						cmd.Connection = conn;
+						cmd.CommandType = CommandType.Text;
+						cmd.CommandText = sqlQuery;
+						cmd.Parameters.AddWithValue("@typeofpay", oBankFormRq.typeofpay);
+						cmd.Parameters.AddWithValue("@customername", oBankFormRq.newaccountdisplayname);
+						cmd.Parameters.AddWithValue("@invoicedate", oBankFormRq.asofdate);
+						cmd.Parameters.AddWithValue("@total", oBankFormRq.newopeningbalance);
+						cmd.Parameters.AddWithValue("@balance", oBankFormRq.newopeningbalance);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", oBankFormRq.registeredphonenumber);
+
+						cmd.ExecuteNonQuery();
+						val = true;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				val = false;
+				Console.WriteLine("Error occurred: " + ex.Message);
+			}
+			return val;
+		}
+
+		public async Task<GetBanksDetailsValuesRs> GetBanksDetailsValues(GetBanksDetailsValuesRq oGetBanksDetailsValuesRq)
+		{
+			GetBanksDetailsValuesRs oGetBanksDetailsValuesRs = new GetBanksDetailsValuesRs();
+			string sqlQuery = @"SELECT accountdisplayname, openingbalance, asofdate, amount from BankForm where registeredphonenumber = @registeredphonenumber and accountdisplayname = @accountdisplayname";
+
+			try
+			{
+				using (var conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					await conn.OpenAsync();
+					using (var cmd = new NpgsqlCommand(sqlQuery, conn))
+					{
+						cmd.CommandType = CommandType.Text;
+
+						// Define and add parameters
+						cmd.Parameters.AddWithValue("@registeredphonenumber", oGetBanksDetailsValuesRq.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@accountdisplayname", oGetBanksDetailsValuesRq.newaccountdisplayname);
+
+						using (var reader = await cmd.ExecuteReaderAsync())
+						{
+							if (reader.HasRows)
+							{
+								while (await reader.ReadAsync())
+								{
+									oGetBanksDetailsValuesRs.newaccountdisplayname = reader["accountdisplayname"] == DBNull.Value ? null : Convert.ToString(reader["accountdisplayname"]);
+									oGetBanksDetailsValuesRs.newopeningbalance = reader["openingbalance"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["openingbalance"]);
+									oGetBanksDetailsValuesRs.amount = reader["amount"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["amount"]);
+									oGetBanksDetailsValuesRs.asofDate = reader["asofdate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["asofdate"]);
+								}
+								oGetBanksDetailsValuesRs.status = "SUCCESS";
+							}
+							else
+							{
+								oGetBanksDetailsValuesRs.status = "FAILED";
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oGetBanksDetailsValuesRs;
+		}
+
+		public async Task<TransfersRs> Transfers(TransfersRq oTransfersRq, string sqlquery, int num)
+		{
+			TransfersRs oTransfersRs = new TransfersRs();
+
+			try
+			{
+				using (var conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					await conn.OpenAsync();
+					using (var cmd = new NpgsqlCommand(sqlquery, conn))
+					{
+						cmd.CommandType = CommandType.Text;
+
+						if(oTransfersRq.type == "bankToCash")
+						{
+							cmd.Parameters.AddWithValue("@registeredphonenumber", oTransfersRq.registeredphonenumber);
+							cmd.Parameters.AddWithValue("@accountdisplayname", oTransfersRq.fromAccount);
+							cmd.Parameters.AddWithValue("@amount", oTransfersRq.amount);
+						}
+						else if (oTransfersRq.type == "cashToBank")
+						{
+							cmd.Parameters.AddWithValue("@registeredphonenumber", oTransfersRq.registeredphonenumber);
+							cmd.Parameters.AddWithValue("@accountdisplayname", oTransfersRq.toAccount);
+							cmd.Parameters.AddWithValue("@amount", oTransfersRq.amount);
+						}
+						else if (oTransfersRq.type == "bankToBank")
+						{
+							if(num == 1)
+							{
+								cmd.Parameters.AddWithValue("@registeredphonenumber", oTransfersRq.registeredphonenumber);
+								cmd.Parameters.AddWithValue("@accountdisplayname", oTransfersRq.fromAccount);
+								cmd.Parameters.AddWithValue("@amount", oTransfersRq.amount);
+							}
+							else if (num == 2)
+							{
+								cmd.Parameters.AddWithValue("@registeredphonenumber", oTransfersRq.registeredphonenumber);
+								cmd.Parameters.AddWithValue("@accountdisplayname", oTransfersRq.toAccount);
+								cmd.Parameters.AddWithValue("@amount", oTransfersRq.amount);
+							}
+							
+						}
+						else if (oTransfersRq.type == "adjustBalance")
+						{
+							cmd.Parameters.AddWithValue("@registeredphonenumber", oTransfersRq.registeredphonenumber);
+							cmd.Parameters.AddWithValue("@accountdisplayname", oTransfersRq.accountName);
+							cmd.Parameters.AddWithValue("@amount", oTransfersRq.amount);
+						}
+						cmd.ExecuteNonQuery();
+						oTransfersRs.status = "SUCCESS";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+				oTransfersRs.status = "FAILED";
+			}
+			return oTransfersRs;
+		}
+
+		public async Task<TransfersRs> InsertTransfers(TransfersRq oTransfersRq, string sqlquery, List<AmountDetails> amtDetails, int num)
+		{
+			TransfersRs oTransfersRs = new TransfersRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					using (NpgsqlCommand cmd = new NpgsqlCommand())
+					{
+						cmd.Connection = conn;
+						cmd.CommandType = CommandType.Text;
+						cmd.CommandText = sqlquery;
+						if (oTransfersRq.type == "bankToCash")
+						{
+							cmd.Parameters.AddWithValue("@registeredphonenumber", oTransfersRq.registeredphonenumber);
+							cmd.Parameters.AddWithValue("@invoicedate", oTransfersRq.adjustmentDate);
+							cmd.Parameters.AddWithValue("@amount", oTransfersRq.amount);
+							cmd.Parameters.AddWithValue("@paymenttype", oTransfersRq.fromAccount);
+							cmd.Parameters.AddWithValue("@amountdetails", JsonConvert.SerializeObject(amtDetails));
+						}
+						else if (oTransfersRq.type == "cashToBank")
+						{
+							cmd.Parameters.AddWithValue("@registeredphonenumber", oTransfersRq.registeredphonenumber);
+							cmd.Parameters.AddWithValue("@invoicedate", oTransfersRq.adjustmentDate);
+							cmd.Parameters.AddWithValue("@amount", oTransfersRq.amount);
+							cmd.Parameters.AddWithValue("@paymenttype", oTransfersRq.toAccount);
+							cmd.Parameters.AddWithValue("@amountdetails", JsonConvert.SerializeObject(amtDetails));
+						}
+						else if (oTransfersRq.type == "bankToBank")
+						{
+							if (num == 1)
+							{
+								cmd.Parameters.AddWithValue("@registeredphonenumber", oTransfersRq.registeredphonenumber);
+								cmd.Parameters.AddWithValue("@invoicedate", oTransfersRq.adjustmentDate);
+								cmd.Parameters.AddWithValue("@amount", oTransfersRq.amount);
+								cmd.Parameters.AddWithValue("@paymenttype", oTransfersRq.fromAccount);
+								cmd.Parameters.AddWithValue("@amountdetails", JsonConvert.SerializeObject(amtDetails));
+								cmd.Parameters.AddWithValue("@customername", "TO: " + oTransfersRq.toAccount);
+							}
+							else if (num == 2)
+							{
+								cmd.Parameters.AddWithValue("@registeredphonenumber", oTransfersRq.registeredphonenumber);
+								cmd.Parameters.AddWithValue("@invoicedate", oTransfersRq.adjustmentDate);
+								cmd.Parameters.AddWithValue("@amount", oTransfersRq.amount);
+								cmd.Parameters.AddWithValue("@paymenttype", oTransfersRq.toAccount);
+								cmd.Parameters.AddWithValue("@amountdetails", JsonConvert.SerializeObject(amtDetails));
+								cmd.Parameters.AddWithValue("@customername", "FROM: " + oTransfersRq.fromAccount);
+							}
+						}
+						else if (oTransfersRq.type == "adjustBalance")
+						{
+							cmd.Parameters.AddWithValue("@registeredphonenumber", oTransfersRq.registeredphonenumber);
+							cmd.Parameters.AddWithValue("@invoicedate", oTransfersRq.adjustmentDate);
+							cmd.Parameters.AddWithValue("@amount", oTransfersRq.amount);
+							cmd.Parameters.AddWithValue("@paymenttype", oTransfersRq.accountName);
+							cmd.Parameters.AddWithValue("@amountdetails", JsonConvert.SerializeObject(amtDetails));
+						}
+
+						cmd.ExecuteNonQuery();
+						oTransfersRs.status = "SUCCESS";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("Error occurred: " + ex.Message);
+				oTransfersRs.status = "FAILED";
+			}
+			return oTransfersRs;
 		}
 	}
 }

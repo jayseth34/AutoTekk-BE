@@ -140,6 +140,61 @@ namespace WebApplication1.Controllers
 			return Ok(oUpadatePaymentInOutTrnxRs);
 		}
 
+		[Authorize]
+		[HttpPost]
+		[Route("SaveBankDetails")]
+		public async Task<ActionResult> SaveBankDetails(BankFormRq oBankFormRq)
+		{
+			BankFormRs oBankFormRs = new BankFormRs();
+			SaleBL saleBL = new SaleBL(this.config);
+			oBankFormRs = await saleBL.SaveBankDetails(oBankFormRq);
+			return Ok(oBankFormRs);
+		}
+
+		[Authorize]
+		[HttpPost]
+		[Route("GetBankDetails")]
+		public async Task<ActionResult> GetBankDetails(GetBankDetailsRq oGetBankDetailsRq)
+		{
+			GetBankDetailsRs oGetBankDetailsRs = new GetBankDetailsRs();
+			SaleBL saleBL = new SaleBL(this.config);
+			oGetBankDetailsRs = await saleBL.GetBankDetails(oGetBankDetailsRq);
+			return Ok(oGetBankDetailsRs);
+		}
+
+		[Authorize]
+		[HttpPost]
+		[Route("GetBanks")]
+		public async Task<ActionResult> GetBanks(GetBanksRq oGetBanksRq)
+		{
+			GetBanksRs oGetBanksRs = new GetBanksRs();
+			SaleBL saleBL = new SaleBL(this.config);
+			oGetBanksRs = await saleBL.GetBanks(oGetBanksRq);
+			return Ok(oGetBanksRs);
+		}
+
+		[Authorize]
+		[HttpPost]
+		[Route("GetBanksDetailsValues")]
+		public async Task<ActionResult> GetBanksDetailsValues(GetBanksDetailsValuesRq oGetBanksDetailsValuesRq)
+		{
+			GetBanksDetailsValuesRs oGetBanksDetailsValuesRs = new GetBanksDetailsValuesRs();
+			SaleBL saleBL = new SaleBL(this.config);
+			oGetBanksDetailsValuesRs = await saleBL.GetBanksDetailsValues(oGetBanksDetailsValuesRq);
+			return Ok(oGetBanksDetailsValuesRs);
+		}
+
+		[Authorize]
+		[HttpPost]
+		[Route("transfers")]
+		public async Task<ActionResult> Transfers(TransfersRq oTransfersRq)
+		{
+			TransfersRs oTransfersRs = new TransfersRs();
+			SaleBL saleBL = new SaleBL(this.config);
+			oTransfersRs = await saleBL.Transfers(oTransfersRq);
+			return Ok(oTransfersRs);
+		}
+
 		//no need to use this api as of nowS
 		[Authorize]
 		[HttpPost]

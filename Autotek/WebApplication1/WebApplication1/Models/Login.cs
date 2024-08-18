@@ -247,4 +247,50 @@ namespace WebApplication1.Models
 
     }
 
+	public class DashboardDetailsRs
+	{
+		public double totalsale { get; set; }
+		public double youllreceive { get; set; }
+		public double youllpay { get; set; }
+		public double totalpurchase { get; set; }
+		public double stockvalue { get; set; }
+		public double cashinhand { get; set; }
+		public double bankamount { get; set; }
+		public DashboardDetailsRs()
+		{
+			lowstocks = new List<Lowstocks>();
+			youllpayparty = new List<Youllpay>();
+			youllreceiveparty = new List<Youllreceive>();
+			bankaccounts = new List<Bankaccounts>();
+		}
+		public List<Lowstocks> lowstocks { get; set; }
+		public List<Youllpay> youllpayparty { get; set; }
+		public List<Youllreceive> youllreceiveparty { get; set; }
+		public List<Bankaccounts> bankaccounts { get; set; }
+	}
+
+	public class Lowstocks
+	{
+		public string item { get; set;}
+		public Int64 qty { get; set;}
+	}
+
+	public class Youllpay
+	{
+		public string partyname { get; set; }
+		public double partypay {  get; set; }
+	}
+
+	public class Youllreceive
+	{
+		public string partyname { get; set; }
+		public double partyreceive { get; set; }
+	}
+
+	public class Bankaccounts
+	{
+		public string bankname { get; set; }
+		public double bankamount { get; set; }
+	}
+
 }

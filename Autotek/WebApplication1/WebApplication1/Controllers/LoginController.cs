@@ -177,8 +177,6 @@ namespace WebApplication1.Controllers
 			return Ok( new { status = statusm });
 		}
 
-
-
 		[HttpPost]
 		[Route("SaveOrUpdateParty")]
 		public async Task<ActionResult> Party(PartyRq opartyRq)
@@ -305,5 +303,20 @@ namespace WebApplication1.Controllers
 
             return BadRequest("Please Provide Valid Details");
         }
+
+		[Authorize]
+		[HttpGet]
+		[Route("DashboardDetails")]
+		public async Task<IActionResult> DashboardDetails([FromQuery] Int64 registeredphonenumber)
+		{
+			DashboardDetailsRs oDashboardDetailsRs = new DashboardDetailsRs();
+			LoginBL loginBL = new LoginBL(this.config);
+			if (ModelState.IsValid)
+			{
+				oDashboardDetailsRs = await loginBL.DashBoardDetails(registeredphonenumber);
+				return Ok(oDashboardDetailsRs);
+			}
+			return BadRequest();
+		}
 	}
 }

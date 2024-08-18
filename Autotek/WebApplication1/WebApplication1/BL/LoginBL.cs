@@ -202,5 +202,14 @@ namespace WebApplication1.BL
             oAddBusinessInformationRs = logindl.AddUpdateBusinessInformation(oAddBusinessInformationRq);
             return oAddBusinessInformationRs;
         }
-    }
+
+		public async Task<DashboardDetailsRs> DashBoardDetails(Int64 registeredphonenumber)
+		{
+			DashboardDetailsRs oDashboardDetailsRs = new DashboardDetailsRs();
+			LoginDL logindl = new LoginDL(this.config);
+			oDashboardDetailsRs = logindl.DashBoardDetails(registeredphonenumber);
+			return oDashboardDetailsRs;
+		}
+
+	}
 }
