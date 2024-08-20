@@ -1015,17 +1015,177 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "";
+					cmd.CommandText = "select partyname, topayparty, toreceivefromparty from party where registeredphonenumber = @registeredphonenumber";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 					NpgsqlDataReader reader = cmd.ExecuteReader();
-					while (reader.Read())
+					if (reader.HasRows)
 					{
-						
+						try
+						{
+							while (reader.Read())
+							{
+								Youllpayreceive oYoullpayreceive = new Youllpayreceive();
+								oYoullpayreceive.partyname = Convert.ToString(reader["partyname"]);
+								oYoullpayreceive.partyreceive = Convert.ToDouble(reader["toreceivefromparty"]);
+								oYoullpayreceive.partypay = Convert.ToDouble(reader["topayparty"]);
+								oDashboardDetailsRs.youllpayreceiveparty.Add(oYoullpayreceive);
+								oDashboardDetailsRs.youllreceive += oYoullpayreceive.partyreceive;
+								oDashboardDetailsRs.youllpay += oYoullpayreceive.partypay;
+							}
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine(ex.Message);
+						}
 					}
 				}
 			}
 			catch (Exception ex)
 			{
+				Console.WriteLine(ex.Message);
+			}
 
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "select itemname, remainingquantity from item where minimumstocktomaintain < remainingquantity and registeredphonenumber = @registeredphonenumber";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+								Lowstocks oLowstocks = new Lowstocks();
+								oLowstocks.item = Convert.ToString(reader["itemname"]);
+								oLowstocks.qty = Convert.ToInt64(reader["remainingquantity"]);
+								oDashboardDetailsRs.lowstocks.Add(oLowstocks);
+							}
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine(ex.Message);
+						}
+					}
+				}
+			}
+			catch(Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "select remainingquantity * purchaseprice as stockvalue from item where registeredphonenumber = @registeredphonenumber";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+								oDashboardDetailsRs.stockvalue += Convert.ToDouble(reader["stockvalue"]);
+							}
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine(ex.Message);
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "select ide.typeofpay, ide.item, tr.total from item_details as ide left join transactions as tr on ide.transaction_id = tr.transaction_id where (ide.typeofpay = 'SALE' or ide.typeofpay = 'PURCHASE') and ide.registeredphonenumber = @registeredphonenumber";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+								PurchaseDash oPurchaseDash = new PurchaseDash();
+								oPurchaseDash.typeofpay = Convert.ToString(reader["typeofpay"]);
+								oPurchaseDash.item = Convert.ToString(reader["item"]);
+								oPurchaseDash.total = Convert.ToDouble(reader["total"]);
+								if(oPurchaseDash.typeofpay == "PURCHASE")
+								{
+									oDashboardDetailsRs.totalpurchase += oPurchaseDash.total;
+								}
+								oDashboardDetailsRs.purchasedash.Add(oPurchaseDash);
+							}
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine(ex.Message);
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "select accountdisplayname, amount from BankForm where registeredphonenumber = @registeredphonenumber";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+								Bankaccounts oBankaccounts = new Bankaccounts();
+								oBankaccounts.bankname = Convert.ToString(reader["accountdisplayname"]);
+								oBankaccounts.bankamount = Convert.ToDouble(reader["amount"]);
+								oDashboardDetailsRs.bankaccounts.Add(oBankaccounts);
+								oDashboardDetailsRs.bankamount += oBankaccounts.bankamount;
+							}
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine(ex.Message);
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
 			}
 			return oDashboardDetailsRs;
 		}

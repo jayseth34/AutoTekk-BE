@@ -249,24 +249,24 @@ namespace WebApplication1.Models
 
 	public class DashboardDetailsRs
 	{
-		public double totalsale { get; set; }
-		public double youllreceive { get; set; }
-		public double youllpay { get; set; }
-		public double totalpurchase { get; set; }
-		public double stockvalue { get; set; }
-		public double cashinhand { get; set; }
-		public double bankamount { get; set; }
+		public double totalsale { get; set; } = 0;
+		public double youllreceive { get; set; } = 0;
+		public double youllpay { get; set; } = 0;
+		public double totalpurchase { get; set; } = 0;
+		public double stockvalue { get; set; } = 0;
+		public double cashinhand { get; set; } = 0;
+		public double bankamount { get; set; } = 0;
 		public DashboardDetailsRs()
 		{
 			lowstocks = new List<Lowstocks>();
-			youllpayparty = new List<Youllpay>();
-			youllreceiveparty = new List<Youllreceive>();
+			youllpayreceiveparty = new List<Youllpayreceive>();
 			bankaccounts = new List<Bankaccounts>();
+			purchasedash = new List<PurchaseDash>();
 		}
 		public List<Lowstocks> lowstocks { get; set; }
-		public List<Youllpay> youllpayparty { get; set; }
-		public List<Youllreceive> youllreceiveparty { get; set; }
+		public List<Youllpayreceive> youllpayreceiveparty { get; set; }
 		public List<Bankaccounts> bankaccounts { get; set; }
+		public List<PurchaseDash> purchasedash { get; set; }
 	}
 
 	public class Lowstocks
@@ -275,22 +275,25 @@ namespace WebApplication1.Models
 		public Int64 qty { get; set;}
 	}
 
-	public class Youllpay
-	{
-		public string partyname { get; set; }
-		public double partypay {  get; set; }
-	}
-
-	public class Youllreceive
+	public class Youllpayreceive
 	{
 		public string partyname { get; set; }
 		public double partyreceive { get; set; }
+		public double partypay { get; set; }
 	}
 
 	public class Bankaccounts
 	{
 		public string bankname { get; set; }
 		public double bankamount { get; set; }
+	}
+
+	public class PurchaseDash
+	{
+		public string typeofpay { get; set; }
+		public string item { get; set; }
+		public Double total { get; set; }
+
 	}
 
 }
