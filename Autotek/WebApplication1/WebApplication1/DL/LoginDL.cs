@@ -1035,15 +1035,20 @@ namespace WebApplication1.DL
 						}
 						catch (Exception ex)
 						{
-							Console.WriteLine(ex.Message);
+                            oDashboardDetailsRs.statusmessage = "Something went wrong!";
+                            oDashboardDetailsRs.status = "Failed";
+                            Console.WriteLine(ex.Message);
 						}
 					}
-				}
+                    oDashboardDetailsRs.status = "Success";
+                }
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex.Message);
-			}
+                oDashboardDetailsRs.statusmessage = "Something went wrong!";
+                oDashboardDetailsRs.status = "Failed";
+            }
 
 			try
 			{
@@ -1070,14 +1075,19 @@ namespace WebApplication1.DL
 						}
 						catch (Exception ex)
 						{
-							Console.WriteLine(ex.Message);
+                            oDashboardDetailsRs.statusmessage = "Something went wrong!";
+                            oDashboardDetailsRs.status = "Failed";
+                            Console.WriteLine(ex.Message);
 						}
 					}
-				}
-			}
+                    oDashboardDetailsRs.status = "Success";
+                }
+            }
 			catch(Exception ex)
 			{
-				Console.WriteLine(ex.Message);
+                oDashboardDetailsRs.statusmessage = "Something went wrong!";
+                oDashboardDetailsRs.status = "Failed";
+                Console.WriteLine(ex.Message);
 			}
 
 			try
@@ -1102,14 +1112,19 @@ namespace WebApplication1.DL
 						}
 						catch (Exception ex)
 						{
-							Console.WriteLine(ex.Message);
+                            oDashboardDetailsRs.statusmessage = "Something went wrong!";
+                            oDashboardDetailsRs.status = "Failed";
+                            Console.WriteLine(ex.Message);
 						}
 					}
-				}
-			}
+                    oDashboardDetailsRs.status = "Success";
+                }
+            }
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex.Message);
+                oDashboardDetailsRs.statusmessage = "Something went wrong!";
+                oDashboardDetailsRs.status = "Failed";
+                Console.WriteLine(ex.Message);
 			}
 
 			try
@@ -1142,14 +1157,19 @@ namespace WebApplication1.DL
 						}
 						catch (Exception ex)
 						{
-							Console.WriteLine(ex.Message);
+                            oDashboardDetailsRs.statusmessage = "Something went wrong!";
+                            oDashboardDetailsRs.status = "Failed";
+                            Console.WriteLine(ex.Message);
 						}
 					}
-				}
-			}
+                    oDashboardDetailsRs.status = "Success";
+                }
+            }
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex.Message);
+                oDashboardDetailsRs.statusmessage = "Something went wrong!";
+                oDashboardDetailsRs.status = "Failed";
+                Console.WriteLine(ex.Message);
 			}
 
 			try
@@ -1178,14 +1198,19 @@ namespace WebApplication1.DL
 						}
 						catch (Exception ex)
 						{
-							Console.WriteLine(ex.Message);
+                            oDashboardDetailsRs.statusmessage = "Something went wrong!";
+                            oDashboardDetailsRs.status = "Failed";
+                            Console.WriteLine(ex.Message);
 						}
 					}
-				}
-			}
+                    oDashboardDetailsRs.status = "Success";
+                }
+            }
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex.Message);
+                oDashboardDetailsRs.statusmessage = "Something went wrong!";
+                oDashboardDetailsRs.status = "Failed";
+                Console.WriteLine(ex.Message);
 			}
 			return oDashboardDetailsRs;
 		}

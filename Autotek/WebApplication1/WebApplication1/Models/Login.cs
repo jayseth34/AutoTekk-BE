@@ -267,9 +267,12 @@ namespace WebApplication1.Models
 		public List<Youllpayreceive> youllpayreceiveparty { get; set; }
 		public List<Bankaccounts> bankaccounts { get; set; }
 		public List<PurchaseDash> purchasedash { get; set; }
-	}
+        public string status { get; set; }
+        public string statusmessage { get; set; }
 
-	public class Lowstocks
+    }
+
+    public class Lowstocks
 	{
 		public string item { get; set;}
 		public Int64 qty { get; set;}
