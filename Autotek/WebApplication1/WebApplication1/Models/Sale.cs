@@ -206,6 +206,7 @@
 	public class GetLinkedPaymentTransactionRs
 	{
 		public string status { get; set; }
+		public string statusmessage { get; set; }
 		public GetLinkedPaymentTransactionRs()
 		{
 			getLinkedPaymentTransactionList = new List<GetLinkedPaymentTransactionList>();
@@ -251,6 +252,7 @@
 		public string paymenttype { get; set; }
 		public string customername { get; set; }
 		public string typeofpay { get; set; }
+		public List<AmountDetails> amountdetails { get; set; }
 	}
 
 	public class UpadatePaymentInOutTrnxRs
@@ -393,5 +395,24 @@
 	{
 		public string status { get; set; }
 		public string statusmessage { get; set; }
+	}
+
+	public class GetUpdatedTrnxInOutValRq
+	{
+		public Int64 registeredphonenumber { get; set; }
+		public Int64 invoicenumber {  get; set; }
+		public string typeofpay {  get; set; }
+	}
+
+	public class GetUpdatedTrnxInOutValRs
+	{
+		public string status { get; set; }
+		public string statusmessage { get; set; }
+		public string partyname { get; set; }
+		public string typeofpay { get; set; }
+		public Int64 invoicenumber { get; set;}
+		public Decimal received { get; set;}
+		public DateTime invoicedate { get; set;}
+		public List<AmountDetails> amountdetails { get; set; } = new List<AmountDetails>();
 	}
 }

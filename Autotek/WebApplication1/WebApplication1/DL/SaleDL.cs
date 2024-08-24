@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Npgsql;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure.Internal;
 using NpgsqlTypes;
+using Razorpay.Api;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -710,7 +711,8 @@ namespace WebApplication1.DL
 					}
 					else
 					{
-						oGetLinkedPaymentTransactionRs.status = "No Recods Found";
+						oGetLinkedPaymentTransactionRs.status = "FAILED";
+						oGetLinkedPaymentTransactionRs.statusmessage = "No Records Found";
 					}
 				}
 			}
@@ -931,8 +933,8 @@ namespace WebApplication1.DL
 		public async Task<UpadatePaymentInOutTrnxRs> UpdatePaymentInOutTrnx(UpadatePaymentInOutTrnxRq oUpadatePaymentInOutTrnxRq)
 		{
 			UpadatePaymentInOutTrnxRs oUpadatePaymentInOutTrnxRs = new UpadatePaymentInOutTrnxRs();
-			string sqlQuery = "INSERT INTO transactions (typeofpay, customername, paymenttype, invoicedate, invoicenumber, received, total, balance, paymentstatus, registeredphonenumber)" +
-				"VALUES(@typeofpay, @customername, @paymenttype, @invoicedate, @invoicenumber, @received, @total, @balance, @paymentstatus, @registeredphonenumber)";
+			string sqlQuery = "INSERT INTO transactions (typeofpay, customername, paymenttype, invoicedate, invoicenumber, received, total, balance, paymentstatus, registeredphonenumber, amountdetails)" +
+				"VALUES(@typeofpay, @customername, @paymenttype, @invoicedate, @invoicenumber, @received, @total, @balance, @paymentstatus, @registeredphonenumber, @amountdetails)";
 			try
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
@@ -946,12 +948,13 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@registeredphonenumber", oUpadatePaymentInOutTrnxRq.registeredphonenumber);
 					cmd.Parameters.AddWithValue("@customername", oUpadatePaymentInOutTrnxRq.customername);
 					cmd.Parameters.AddWithValue("@paymenttype", oUpadatePaymentInOutTrnxRq.paymenttype);
-					cmd.Parameters.AddWithValue("@invoicedate", DateTime.UtcNow);
+					cmd.Parameters.AddWithValue("@invoicedate", oUpadatePaymentInOutTrnxRq.invoicedate);
 					cmd.Parameters.AddWithValue("@invoicenumber", oUpadatePaymentInOutTrnxRq.invoicenumber);
 					cmd.Parameters.AddWithValue("@received", oUpadatePaymentInOutTrnxRq.received);
 					cmd.Parameters.AddWithValue("@total", oUpadatePaymentInOutTrnxRq.received);
 					cmd.Parameters.AddWithValue("@balance", 0);
 					cmd.Parameters.AddWithValue("@paymentstatus", "USED");
+					cmd.Parameters.AddWithValue("@amountdetails", JsonConvert.SerializeObject(oUpadatePaymentInOutTrnxRq.amountdetails));
 					cmd.ExecuteNonQuery();
 					oUpadatePaymentInOutTrnxRs.status = "SUCCESS";
 				}
@@ -961,6 +964,92 @@ namespace WebApplication1.DL
 				Console.WriteLine(ex.Message);
 			}
 			return oUpadatePaymentInOutTrnxRs;
+		}
+
+		public async Task<GetUpdatedTrnxInOutValRs> GetUpdatedTrnxInOutVal(GetUpdatedTrnxInOutValRq oGetUpdatedTrnxInOutValRq)
+		{
+			GetUpdatedTrnxInOutValRs oGetUpdatedTrnxInOutValRs = new GetUpdatedTrnxInOutValRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT invoicenumber, typeofpay, invoicedate, customername, received, amountdetails FROM transactions where registeredphonenumber = @registeredphonenumber and invoicenumber = @invoicenumber and typeofpay = @typeofpay";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", oGetUpdatedTrnxInOutValRq.registeredphonenumber);
+					cmd.Parameters.AddWithValue("@invoicenumber", oGetUpdatedTrnxInOutValRq.invoicenumber);
+					cmd.Parameters.AddWithValue("@typeofpay", oGetUpdatedTrnxInOutValRq.typeofpay);
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+								oGetUpdatedTrnxInOutValRs.invoicenumber = reader["invoicenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["invoicenumber"]);
+								oGetUpdatedTrnxInOutValRs.received = reader["received"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["received"]);
+								oGetUpdatedTrnxInOutValRs.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
+								oGetUpdatedTrnxInOutValRs.partyname = reader["customername"] == DBNull.Value ? null : Convert.ToString(reader["customername"]);
+								oGetUpdatedTrnxInOutValRs.invoicedate = reader["invoicedate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["invoicedate"]);
+								string amountdetails = reader["amountdetails"] == DBNull.Value ? null : Convert.ToString(reader["amountdetails"]);
+								oGetUpdatedTrnxInOutValRs.amountdetails = JsonConvert.DeserializeObject<List<AmountDetails>>(amountdetails);
+							}
+							oGetUpdatedTrnxInOutValRs.status = "SUCCESS";
+						}
+						catch (Exception ex)
+						{
+							oGetUpdatedTrnxInOutValRs.status = "FAILED";
+						}
+					}
+					else
+					{
+						oGetUpdatedTrnxInOutValRs.status = "SUCCESS";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oGetUpdatedTrnxInOutValRs;
+		}
+
+		public async Task<bool> InsertPaymentInOutTrnx(List<GetLinkedPaymentTransactionList> transactions)
+		{
+			bool val = false;
+			string sqlQuery = "INSERT INTO payementinouttransactions (typeofpay, customername, invoicedate, invoicenumber, registeredphonenumber, linkedamount, paymentininvoicenumber)" +
+				"VALUES(@typeofpay, @customername, @invoicedate, @invoicenumber, @registeredphonenumber, @linkedamount, @paymentininvoicenumber)";
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = sqlQuery;
+					foreach(GetLinkedPaymentTransactionList str in transactions)
+					{
+						cmd.Parameters.AddWithValue("@typeofpay", str.typeofpay);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", str.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@customername", str.customername);
+						cmd.Parameters.AddWithValue("@invoicedate", str.invoicedate);
+						cmd.Parameters.AddWithValue("@invoicenumber", str.invoicenumber);
+						cmd.Parameters.AddWithValue("@linkedamount", str.unused);
+						cmd.Parameters.AddWithValue("@paymentininvoicenumber", str.paymentininvoicenumber);
+						cmd.ExecuteNonQuery();
+						val = true;
+						
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return val;
 		}
 		public PaymentInOutTrnxRs GetPaymentInOutTransactionDetails(GetPartyTransactionDetailsRq oGetPartyTransactionDetailsRq)
 		{
@@ -973,8 +1062,10 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT invoicenumber, typeofpay, invoicedate, linkedamount  FROM transactions where registeredphonenumber = " + oGetPartyTransactionDetailsRq.registeredphonenumber +
-						" AND paymentininvoicenumber = " + oGetPartyTransactionDetailsRq.invoicenumber + " AND linkedaccount = 'LINKED'";
+					cmd.CommandText = "SELECT invoicenumber, typeofpay, invoicedate, linkedamount  FROM payementinouttransactions where registeredphonenumber = @registeredphonenumber AND paymentininvoicenumber = @paymentininvoicenumber";
+					cmd.Parameters.AddWithValue("@typeofpay", oGetPartyTransactionDetailsRq.typeofpay);
+					cmd.Parameters.AddWithValue("@registeredphonenumber", oGetPartyTransactionDetailsRq.registeredphonenumber);
+					cmd.Parameters.AddWithValue("@paymentininvoicenumber", oGetPartyTransactionDetailsRq.invoicenumber);
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{

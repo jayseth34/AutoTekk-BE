@@ -142,6 +142,17 @@ namespace WebApplication1.Controllers
 
 		[Authorize]
 		[HttpPost]
+		[Route("GetUpdatedTrnxInOutVal")]
+		public async Task<ActionResult> GetUpdatedTrnxInOutVal(GetUpdatedTrnxInOutValRq oGetUpdatedTrnxInOutValRq)
+		{
+			GetUpdatedTrnxInOutValRs oGetUpdatedTrnxInOutValRs = new GetUpdatedTrnxInOutValRs();
+			SaleBL saleBL = new SaleBL(this.config);
+			oGetUpdatedTrnxInOutValRs = await saleBL.GetUpdatedTrnxInOutVal(oGetUpdatedTrnxInOutValRq);
+			return Ok(oGetUpdatedTrnxInOutValRs);
+		}
+
+		[Authorize]
+		[HttpPost]
 		[Route("SaveBankDetails")]
 		public async Task<ActionResult> SaveBankDetails(BankFormRq oBankFormRq)
 		{

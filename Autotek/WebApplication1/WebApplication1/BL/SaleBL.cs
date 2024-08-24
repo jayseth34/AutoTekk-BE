@@ -174,6 +174,10 @@ namespace WebApplication1.BL
 		{
 			SaleDL saledl = new SaleDL(this.config);
 			bool val = await saledl.UpdateLinkedPaymentTransaction(transactions);
+			if (val)
+			{
+				bool value = await saledl.InsertPaymentInOutTrnx(transactions);
+			}
 			return val;
 		}
 
@@ -183,6 +187,14 @@ namespace WebApplication1.BL
 			SaleDL saledl = new SaleDL(this.config);
 			oUpadatePaymentInOutTrnxRs = await saledl.UpdatePaymentInOutTrnx(oUpadatePaymentInOutTrnxRq);
 			return oUpadatePaymentInOutTrnxRs;
+		}
+
+		public async Task<GetUpdatedTrnxInOutValRs> GetUpdatedTrnxInOutVal(GetUpdatedTrnxInOutValRq oGetUpdatedTrnxInOutValRq)
+		{
+			GetUpdatedTrnxInOutValRs oGetUpdatedTrnxInOutValRs = new GetUpdatedTrnxInOutValRs();
+			SaleDL saledl = new SaleDL(this.config);
+			oGetUpdatedTrnxInOutValRs = await saledl.GetUpdatedTrnxInOutVal(oGetUpdatedTrnxInOutValRq);
+			return oGetUpdatedTrnxInOutValRs;
 		}
 
 		public async Task<BankFormRs> SaveBankDetails(BankFormRq oBankFormRq)
