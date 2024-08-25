@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using WebApplication1.DL;
 using WebApplication1.Models;
 
@@ -61,7 +62,7 @@ namespace WebApplication1.BL
 					}
 					result = saledl.FindOrInsertItem(otransactionRq);
 				}
-				amtdeatils = await saledl.UpdateBankAmount(otransactionRq.amountdetailslist, otransactionRq.registeredphonenumber);
+				amtdeatils = await saledl.UpdateBankAmount(otransactionRq.amountdetailslist, otransactionRq.registeredphonenumber, otransactionRq.typeofpay);
 			}
 			return otransactionRs;
 		}
@@ -159,12 +160,15 @@ namespace WebApplication1.BL
 			TransactionRs otransactionRs = new TransactionRs();
 			SaleDL saledl = new SaleDL(this.config);
 			string amtdeatils = string.Empty;
+			amtdeatils = await saledl.GetAmtDetails(otransactionRq);
+			List<AmountDetails> amt = new List<AmountDetails>();
+			amt = JsonConvert.DeserializeObject<List<AmountDetails>>(amtdeatils);
 			otransactionRs.status = saledl.UpdateTransactionDetails(otransactionRq);
 			if (otransactionRs.status == "SUCCESS")
 			{
 				_ = saledl.FindOrInsertItem(otransactionRq);
 				otransactionRs.status = saledl.UpdateInsertDeleteItemDetails(otransactionRq);
-				amtdeatils = await saledl.UpdateBankAmount(otransactionRq.amountdetailslist, otransactionRq.registeredphonenumber);
+				amtdeatils = await saledl.UpdateBankAmountDetails(otransactionRq.amountdetailslist, otransactionRq.registeredphonenumber, amt, otransactionRq.typeofpay);
 			}
 
 			return otransactionRs;

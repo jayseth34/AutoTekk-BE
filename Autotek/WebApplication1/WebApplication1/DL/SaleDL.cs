@@ -160,7 +160,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT tr.invoicenumber, tr.typeofpay, tr.invoicedate, tr.total, tr.balance, tr.phonenumber, tr.paymentstatus, pr.emailid, pr.billingaddress, pr.creditlimit, pr.gst, pr.creditlimit FROM transactions tr join party pr ON tr.registeredphonenumber = pr.registeredphonenumber" +
+					cmd.CommandText = "SELECT DISTINCT ON (tr.invoicenumber, tr.typeofpay)  tr.invoicenumber, tr.typeofpay, tr.invoicedate, tr.total, tr.balance, tr.phonenumber, tr.paymentstatus, pr.emailid, pr.billingaddress, pr.creditlimit, pr.gst, pr.creditlimit FROM transactions tr right join party pr ON tr.registeredphonenumber = pr.registeredphonenumber" +
 						" where tr.registeredphonenumber = " + registeredphonenumber + " AND " +
 						"tr.customername = '" + customername + "' AND tr.showtransaction = 'SHOW'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
@@ -684,7 +684,7 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT invoicenumber, typeofpay, total, linkedamount, balance, customername from transactions where balance > 0 and customername = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber +
-						" AND typeofpay in ('SALE','RECEIVABLE OPENING BALANCE');";
+						" AND typeofpay in ('SALE','RECEIVABLE OPENING BALANCE', 'PAYABLE OPENING BALANCE');";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -756,6 +756,46 @@ namespace WebApplication1.DL
 			{
 				status = ex.Message;
 			}
+			return status;
+		}
+
+		public async Task<string> GetAmtDetails(TransactionRq otransactionRq)
+		{
+			TransactionRs otransactionRs = new TransactionRs();
+			string status = string.Empty;
+			string sqlquery = "SELECT amountdetails from transactions where registeredphonenumber = @registeredphonenumber and typeofpay = @typeofpay and customername = @customername and invoicenumber = @invoicenumber";
+			using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+			{
+				conn.Open();
+				NpgsqlCommand cmd = new NpgsqlCommand();
+				cmd.Connection = conn;
+				cmd.CommandType = CommandType.Text;
+				cmd.CommandText = sqlquery;
+				cmd.Parameters.AddWithValue("@registeredphonenumber", otransactionRq.registeredphonenumber);
+				cmd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
+				cmd.Parameters.AddWithValue("@customername", otransactionRq.customername);
+				cmd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
+				NpgsqlDataReader reader = cmd.ExecuteReader();
+				if (reader.HasRows)
+				{
+					try
+					{
+						while (reader.Read())
+						{
+							status = reader["amountdetails"] == DBNull.Value ? null : Convert.ToString(reader["amountdetails"]);
+						}
+					}
+					catch (Exception ex)
+					{
+						status = "FAILED";
+					}
+				}
+				else
+				{
+					status = "FAILED";
+				}
+			}
+			
 			return status;
 		}
 
@@ -1284,12 +1324,25 @@ namespace WebApplication1.DL
 			return oGetBankDetailsRs;
 		}
 
-		public async Task<string> UpdateBankAmount(List<AmountDetails> oAmountDetails, Int64 registeredphonenumber)
+		public async Task<string> UpdateBankAmount(List<AmountDetails> oAmountDetails, Int64 registeredphonenumber, string typeofpay)
 		{
 			string result = string.Empty;
-			string sqlQuery = "UPDATE BankForm " +
+			string sqlQueryAdd = "UPDATE BankForm " +
+								"SET amount = amount + @amount " +
+								"WHERE registeredphonenumber = @registeredphonenumber and accountdisplayname = @type";
+			string sqlQuerySubtract = "UPDATE BankForm " +
 								"SET amount = amount - @amount " +
-								"WHERE registeredphonenumber = @registeredphonenumber ";
+								"WHERE registeredphonenumber = @registeredphonenumber and accountdisplayname = @type";
+			string query = string.Empty;
+			if(typeofpay == "SALE")
+			{
+				query = sqlQueryAdd;
+			}
+			else if (typeofpay == "PURCHASE")
+			{
+				query = sqlQuerySubtract;
+			}
+
 
 			try
 			{
@@ -1299,7 +1352,7 @@ namespace WebApplication1.DL
 
 					foreach (var details in oAmountDetails)
 					{
-						using (var cmd = new NpgsqlCommand(sqlQuery, conn))
+						using (var cmd = new NpgsqlCommand(query, conn))
 						{
 							cmd.CommandType = CommandType.Text;
 
@@ -1319,6 +1372,117 @@ namespace WebApplication1.DL
 			}
 			return result;
 		}
+
+		public async Task<string> UpdateBankAmountDetails(List<AmountDetails> oAmountDetails, Int64 registeredphonenumber, List<AmountDetails> amt, string typeofpay)
+		{
+			string result = string.Empty;
+			string query = string.Empty;
+
+			// SQL queries to update the amount in the BankForm table
+			string sqlQueryAdd = "UPDATE BankForm " +
+								 "SET amount = amount + @amount " +  // Add amount back
+								 "WHERE registeredphonenumber = @registeredphonenumber and accountdisplayname = @type";
+
+			string sqlQuerySubtract = "UPDATE BankForm " +
+									  "SET amount = amount - @amount " +  // Subtract amount from new account
+									  "WHERE registeredphonenumber = @registeredphonenumber and accountdisplayname = @type";
+
+			try
+			{
+				using (var conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					await conn.OpenAsync();
+
+					// Iterate through amt to handle removed items
+					foreach (var oldAmt in amt)
+					{
+						var matchingNewAmt = oAmountDetails.FirstOrDefault(a => a.type == oldAmt.type);
+						if (matchingNewAmt == null)
+						{
+							// If the type in amt is not found in oAmountDetails, revert the amount
+							if (typeofpay == "SALE")
+							{
+								query = sqlQuerySubtract;
+							}
+							else if (typeofpay == "PURCHASE")
+							{
+								query = sqlQueryAdd;
+							}
+
+							using (var cmd = new NpgsqlCommand(query, conn))
+							{
+								cmd.CommandType = CommandType.Text;
+								cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+								cmd.Parameters.AddWithValue("@amount", oldAmt.amount);
+								cmd.Parameters.AddWithValue("@type", oldAmt.type);
+								await cmd.ExecuteNonQueryAsync();
+							}
+						}
+					}
+
+					// Iterate through oAmountDetails to handle updates and additions
+					foreach (var details in oAmountDetails)
+					{
+						var matchingAmt = amt.FirstOrDefault(a => a.type == details.type);
+
+						if (matchingAmt != null)
+						{
+							// If the type is found in amt, handle based on type
+							decimal amountDifference = details.amount - matchingAmt.amount;
+
+							if (typeofpay == "SALE")
+							{
+								query = sqlQueryAdd;
+							}
+							else if (typeofpay == "PURCHASE")
+							{
+								query = sqlQuerySubtract;
+							}
+
+							using (var cmd = new NpgsqlCommand(query, conn))
+							{
+								cmd.CommandType = CommandType.Text;
+								cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+								cmd.Parameters.AddWithValue("@amount", amountDifference);
+								cmd.Parameters.AddWithValue("@type", details.type);
+								await cmd.ExecuteNonQueryAsync();
+							}
+						}
+						else
+						{
+							// If the type is not found in amt, handle as a new addition
+							if (typeofpay == "SALE")
+							{
+								query = sqlQueryAdd;
+							}
+							else if (typeofpay == "PURCHASE")
+							{
+								query = sqlQuerySubtract;
+							}
+
+							using (var cmd = new NpgsqlCommand(query, conn))
+							{
+								cmd.CommandType = CommandType.Text;
+								cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+								cmd.Parameters.AddWithValue("@amount", details.amount);
+								cmd.Parameters.AddWithValue("@type", details.type);
+								await cmd.ExecuteNonQueryAsync();
+							}
+						}
+					}
+
+					result = "SUCCESS";
+				}
+			}
+			catch (Exception ex)
+			{
+				result = "FAILED";
+				Console.WriteLine(ex.Message);
+			}
+			return result;
+		}
+
+
 
 		public async Task<GetBanksRs> GetBanks(GetBanksRq oGetBanksRq)
 		{
