@@ -415,4 +415,21 @@
 		public DateTime invoicedate { get; set;}
 		public List<AmountDetails> amountdetails { get; set; } = new List<AmountDetails>();
 	}
+
+	public class GetTransferDetailsValuesRq
+	{
+		public Int64 transactionid { get; set; }
+		public Int64 registeredphonenumber { get; set; }
+		public string typeofpay { get; set; }
+	}
+
+	public class GetTransferDetailsValuesRs
+	{
+		public string status { get; set; }
+		public string statusmessage { get; set; }
+		public string banktobank { get; set; }
+		public Decimal amount { get; set; }
+		public DateTime? adjustmentDate { get; set; }
+		public string customername {  get; set; }
+	}
 }

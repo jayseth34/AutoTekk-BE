@@ -261,6 +261,14 @@ namespace WebApplication1.BL
 			return oGetBanksDetailsValuesRs;
 		}
 
+		public async Task<GetTransferDetailsValuesRs> GetTransferDetailsValues(GetTransferDetailsValuesRq oGetTransferDetailsValuesRq)
+		{
+			GetTransferDetailsValuesRs oGetTransferDetailsValuesRs = new GetTransferDetailsValuesRs();
+			SaleDL saledl = new SaleDL(this.config);
+			oGetTransferDetailsValuesRs = await saledl.GetTransferDetailsValues(oGetTransferDetailsValuesRq);
+			return oGetTransferDetailsValuesRs;
+		}
+
 		public async Task<TransfersRs> Transfers(TransfersRq oTransfersRq)
 		{
 			TransfersRs oTransfersRs = new TransfersRs();

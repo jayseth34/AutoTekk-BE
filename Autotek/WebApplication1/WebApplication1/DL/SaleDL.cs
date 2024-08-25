@@ -1654,6 +1654,70 @@ namespace WebApplication1.DL
 			return oGetBanksDetailsValuesRs;
 		}
 
+		public async Task<GetTransferDetailsValuesRs> GetTransferDetailsValues(GetTransferDetailsValuesRq oGetTransferDetailsValuesRq)
+		{
+			GetTransferDetailsValuesRs oGetTransferDetailsValuesRs = new GetTransferDetailsValuesRs();
+			string sqlQuery = @"SELECT typeofpay, invoicedate, total, paymenttype, customername from transactions where registeredphonenumber = @registeredphonenumber and transaction_id = @transaction_id and typeofpay = @typeofpay";
+			string from = string.Empty;
+			string to = string.Empty;
+			try
+			{
+				using (var conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					await conn.OpenAsync();
+					using (var cmd = new NpgsqlCommand(sqlQuery, conn))
+					{
+						cmd.CommandType = CommandType.Text;
+
+						// Define and add parameters
+						cmd.Parameters.AddWithValue("@registeredphonenumber", oGetTransferDetailsValuesRq.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@transaction_id", oGetTransferDetailsValuesRq.transactionid);
+						cmd.Parameters.AddWithValue("@typeofpay", oGetTransferDetailsValuesRq.typeofpay);
+
+						using (var reader = await cmd.ExecuteReaderAsync())
+						{
+							if (reader.HasRows)
+							{
+								while (await reader.ReadAsync())
+								{
+									oGetTransferDetailsValuesRs.customername = reader["paymenttype"] == DBNull.Value ? null : Convert.ToString(reader["paymenttype"]);
+									oGetTransferDetailsValuesRs.banktobank = reader["customername"] == DBNull.Value ? null : Convert.ToString(reader["customername"]);
+									oGetTransferDetailsValuesRs.amount = reader["total"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["total"]);
+									oGetTransferDetailsValuesRs.adjustmentDate = reader["invoicedate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["invoicedate"]);
+									if (!string.IsNullOrEmpty(oGetTransferDetailsValuesRs.banktobank))
+									{
+										if (oGetTransferDetailsValuesRs.banktobank.Contains("FROM:"))
+										{
+											from = oGetTransferDetailsValuesRs.customername;
+										}
+										string result = oGetTransferDetailsValuesRs.banktobank.Replace("FROM:", "").Replace("TO:", "");
+										oGetTransferDetailsValuesRs.banktobank = result.Trim();
+										to = oGetTransferDetailsValuesRs.banktobank;
+										if (!string.IsNullOrEmpty(from))
+										{
+											oGetTransferDetailsValuesRs.customername = to;
+											oGetTransferDetailsValuesRs.banktobank = from;
+										}
+										
+									}
+								}
+								oGetTransferDetailsValuesRs.status = "SUCCESS";
+							}
+							else
+							{
+								oGetTransferDetailsValuesRs.status = "FAILED";
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return oGetTransferDetailsValuesRs;
+		}
+
 		public async Task<TransfersRs> Transfers(TransfersRq oTransfersRq, string sqlquery, int num)
 		{
 			TransfersRs oTransfersRs = new TransfersRs();

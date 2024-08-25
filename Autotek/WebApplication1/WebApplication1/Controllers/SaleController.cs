@@ -197,6 +197,17 @@ namespace WebApplication1.Controllers
 
 		[Authorize]
 		[HttpPost]
+		[Route("GetTransferDetailsValues")]
+		public async Task<ActionResult> GetTransferDetailsValues(GetTransferDetailsValuesRq oGetTransferDetailsValuesRq)
+		{
+			GetTransferDetailsValuesRs oGetTransferDetailsValuesRs = new GetTransferDetailsValuesRs();
+			SaleBL saleBL = new SaleBL(this.config);
+			oGetTransferDetailsValuesRs = await saleBL.GetTransferDetailsValues(oGetTransferDetailsValuesRq);
+			return Ok(oGetTransferDetailsValuesRs);
+		}
+
+		[Authorize]
+		[HttpPost]
 		[Route("transfers")]
 		public async Task<ActionResult> Transfers(TransfersRq oTransfersRq)
 		{
