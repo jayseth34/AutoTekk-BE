@@ -204,6 +204,7 @@ namespace WebApplication1.BL
 		public async Task<BankFormRs> SaveBankDetails(BankFormRq oBankFormRq)
 		{
 			BankFormRs oBankFormRs = new BankFormRs();
+			GetBankDetailsRs oGetBankDetailsRs = new GetBankDetailsRs();
 			SaleDL saledl = new SaleDL(this.config);
 			bool inserttransaction = false;
 
@@ -224,8 +225,14 @@ namespace WebApplication1.BL
 			}
 			else if (!bankExists && oBankFormRq.isbanksupdate)
 			{
+				GetBankDetailsRq oGetBankDetailsRq = new GetBankDetailsRq();
+				oGetBankDetailsRq.registeredphonenumber = oBankFormRq.registeredphonenumber;
+				oGetBankDetailsRq.accountdisplayname = oBankFormRq.oldaccountdisplayname;
 				oBankFormRs = await saledl.UpdateBankDetails(oBankFormRq);
-				inserttransaction = await saledl.UpdatetTrnx(oBankFormRq);
+				//inserttransaction = await saledl.UpdatetTrnx(oBankFormRq);
+				List<BankTrnxDetailsVal> olistamtval = await saledl.GetBankDetailsAsyncVal(oGetBankDetailsRq);
+				await saledl.UpdateCustomerNames(oGetBankDetailsRq, oBankFormRq.newaccountdisplayname);
+				var updatesinternalvalues = await saledl.UpdateInternalValuesOfpayment(olistamtval, oBankFormRq);
 
 			}
 			else if (!bankExists && !oBankFormRq.isbanksupdate)
@@ -280,7 +287,7 @@ namespace WebApplication1.BL
 			{
 				sqlquery = "UPDATE BankForm set amount = amount - @amount where accountdisplayname = @accountdisplayname and registeredphonenumber = @registeredphonenumber";
 				oTransfersRs = await saledl.Transfers(oTransfersRq,sqlquery,1);
-				sqlquery1 = "INSERT INTO transactions (typeofpay, customername, invoicedate, registeredphonenumber, showtransaction, total, paymenttype, amountdetails) " +
+				sqlquery1 = "INSERT INTO transactions (typeofpay, bankscustomername, invoicedate, registeredphonenumber, showtransaction, total, paymenttype, amountdetails) " +
 							  "VALUES ('CASH WITHDRAW', '', @invoicedate, @registeredphonenumber, 'DONT SHOW', @amount, @paymenttype, @amountdetails)";
 				AmountDetails amountDetails = new AmountDetails();
 				amountDetails.type = oTransfersRq.fromAccount;
@@ -292,7 +299,7 @@ namespace WebApplication1.BL
 			{
 				sqlquery = "UPDATE BankForm set amount = amount + @amount where accountdisplayname = @accountdisplayname and registeredphonenumber = @registeredphonenumber";
 				oTransfersRs = await saledl.Transfers(oTransfersRq, sqlquery, 1);
-				sqlquery1 = "INSERT INTO transactions (typeofpay, customername, invoicedate, registeredphonenumber, showtransaction, total, paymenttype, amountdetails) " +
+				sqlquery1 = "INSERT INTO transactions (typeofpay, bankscustomername, invoicedate, registeredphonenumber, showtransaction, total, paymenttype, amountdetails) " +
 							  "VALUES ('CASH DEPOSIT', '', @invoicedate, @registeredphonenumber, 'DONT SHOW', @amount, @paymenttype, @amountdetails)";
 				AmountDetails amountDetails = new AmountDetails();
 				amountDetails.type = oTransfersRq.toAccount;
@@ -306,7 +313,7 @@ namespace WebApplication1.BL
 				oTransfersRs = await saledl.Transfers(oTransfersRq, sqlquery, 1);
 				sqlquery = "UPDATE BankForm set amount = amount + @amount where accountdisplayname = @accountdisplayname and registeredphonenumber = @registeredphonenumber";
 				oTransfersRs = await saledl.Transfers(oTransfersRq, sqlquery, 2);
-				sqlquery1 = "INSERT INTO transactions (typeofpay, customername, invoicedate, registeredphonenumber, showtransaction, total, paymenttype, amountdetails) " +
+				sqlquery1 = "INSERT INTO transactions (typeofpay, bankscustomername, invoicedate, registeredphonenumber, showtransaction, total, paymenttype, amountdetails) " +
 							  "VALUES ('BANK TO BANK', @customername, @invoicedate, @registeredphonenumber, 'DONT SHOW', @amount, @paymenttype, @amountdetails)";
 				AmountDetails amountDetails = new AmountDetails();
 				amountDetails.type = oTransfersRq.fromAccount;
@@ -333,12 +340,12 @@ namespace WebApplication1.BL
 				oTransfersRs = await saledl.Transfers(oTransfersRq, sqlquery, 1);
 				if (oTransfersRq.adjustmentType == "decrease")
 				{
-					sqlquery1 = "INSERT INTO transactions (typeofpay, customername, invoicedate, registeredphonenumber, showtransaction, total, paymenttype, amountdetails) " +
+					sqlquery1 = "INSERT INTO transactions (typeofpay, bankscustomername, invoicedate, registeredphonenumber, showtransaction, total, paymenttype, amountdetails) " +
 							  "VALUES ('BANK ADJ DECREASE', '', @invoicedate, @registeredphonenumber, 'DONT SHOW', @amount, @paymenttype, @amountdetails)";
 				}
 				else if (oTransfersRq.adjustmentType == "increase")
 				{
-					sqlquery1 = "INSERT INTO transactions (typeofpay, customername, invoicedate, registeredphonenumber, showtransaction, total, paymenttype, amountdetails) " +
+					sqlquery1 = "INSERT INTO transactions (typeofpay, bankscustomername, invoicedate, registeredphonenumber, showtransaction, total, paymenttype, amountdetails) " +
 							  "VALUES ('BANK ADJ INCREASE', '', @invoicedate, @registeredphonenumber, 'DONT SHOW', @amount, @paymenttype, @amountdetails)";
 				}
 				AmountDetails amountDetails = new AmountDetails();

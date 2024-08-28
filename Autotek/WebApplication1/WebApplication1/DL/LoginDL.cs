@@ -559,6 +559,17 @@ namespace WebApplication1.DL
 						NpgsqlCommand cmd = new NpgsqlCommand();
 						cmd.Connection = conn;
 						cmd.CommandType = CommandType.Text;
+						cmd.CommandText = "UPDATE transactions set bankscustomername = @customername WHERE registeredphonenumber = " + opartyRq.registeredphonenumber + " AND bankscustomername = '" + opartyRq.oldpartyname + "' and isbankscustomernameupdate = false";
+						cmd.Parameters.AddWithValue("@customername", opartyRq.partyname);
+						cmd.ExecuteNonQuery();
+					}
+
+					using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+					{
+						conn.Open();
+						NpgsqlCommand cmd = new NpgsqlCommand();
+						cmd.Connection = conn;
+						cmd.CommandType = CommandType.Text;
 						cmd.CommandText = "UPDATE item_details set customername = @customername WHERE registeredphonenumber = " + opartyRq.registeredphonenumber + " AND customername = '" + opartyRq.oldpartyname + "'";
 						cmd.Parameters.AddWithValue("@customername", opartyRq.partyname);
 						cmd.ExecuteNonQuery();

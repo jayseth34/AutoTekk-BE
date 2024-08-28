@@ -341,6 +341,18 @@
 		public Decimal transactionid { get; set; }
 	}
 
+	public class BankTrnxDetailsVal
+	{
+		public string? typeofpay { get; set; }
+		public string? paymenttype { get; set; }
+		public string? customername { get; set; }
+		public DateTime? invoicedate { get; set; }
+		public Decimal amount { get; set; }
+		public Decimal transactionid { get; set; }
+		public string amtdetails {  get; set; }
+		public bool isbankscustomernameupdate {  get; set; }
+	}
+
 	public class GetBanksRq
 	{
 		public Int64 registeredphonenumber { get; set; }

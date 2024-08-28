@@ -40,8 +40,8 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "INSERT INTO transactions(typeofpay, invoicenumber, invoicedate, stateofsupply, paymenttype, total, received, balance, customername, phonenumber, registeredphonenumber, billingaddress," +
-						" shippingaddress, paymentstatus, amountdetails) VALUES(@typeofpay, @invoicenumber, @invoicedate, @stateofsupply, @paymenttype, @total, @received, @balance, @customername, @phonenumber, @registeredphonenumber, @billingaddress," +
-						" @shippingaddress, @paymentstatus, @amountdetails) RETURNING transaction_id";
+						" shippingaddress, paymentstatus, amountdetails, isbankscustomernameupdate, bankscustomername) VALUES(@typeofpay, @invoicenumber, @invoicedate, @stateofsupply, @paymenttype, @total, @received, @balance, @customername, @phonenumber, @registeredphonenumber, @billingaddress," +
+						" @shippingaddress, @paymentstatus, @amountdetails, false, @bankscustomername) RETURNING transaction_id";
 					cmd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
 					cmd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
 					cmd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
@@ -57,6 +57,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@shippingaddress", otransactionRq.shippingaddress);
 					cmd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
 					cmd.Parameters.AddWithValue("@amountdetails", JsonConvert.SerializeObject(otransactionRq.amountdetailslist));
+					cmd.Parameters.AddWithValue("@bankscustomername", otransactionRq.customername);
 					var transactionId = cmd.ExecuteScalar();
 					if (otransactionRq.itemdetailslist.Count > 0)
 					{
@@ -475,8 +476,8 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "INSERT INTO transactions(typeofpay, invoicenumber, invoicedate, stateofsupply, paymenttype, total, received, balance, customername, phonenumber, registeredphonenumber, billingaddress," +
-						" shippingaddress, paymentstatus, isconverted, amountdetails) VALUES(@typeofpay, @invoicenumber, @invoicedate, @stateofsupply, @paymenttype, @total, @received, @balance, @customername, @phonenumber, @registeredphonenumber, @billingaddress," +
-						" @shippingaddress, @paymentstatus, @isconverted, @amountdetails) RETURNING transaction_id";
+						" shippingaddress, paymentstatus, isconverted, amountdetails, isbankscustomernameupdate, bankscustomername) VALUES(@typeofpay, @invoicenumber, @invoicedate, @stateofsupply, @paymenttype, @total, @received, @balance, @customername, @phonenumber, @registeredphonenumber, @billingaddress," +
+						" @shippingaddress, @paymentstatus, @isconverted, @amountdetails, false, @bankscustomername) RETURNING transaction_id";
 					cmd.Parameters.AddWithValue("@typeofpay", typeofpay);
 					cmd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
 					cmd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
@@ -493,6 +494,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
 					cmd.Parameters.AddWithValue("@isconverted",isconverted);
 					cmd.Parameters.AddWithValue("@amountdetails", JsonConvert.SerializeObject(otransactionRq.amountdetailslist));
+					cmd.Parameters.AddWithValue("@bankscustomername", otransactionRq.customername);
 					var transactionId = cmd.ExecuteScalar();
 					if (otransactionRq.itemdetailslist.Count > 0)
 					{
@@ -973,8 +975,8 @@ namespace WebApplication1.DL
 		public async Task<UpadatePaymentInOutTrnxRs> UpdatePaymentInOutTrnx(UpadatePaymentInOutTrnxRq oUpadatePaymentInOutTrnxRq)
 		{
 			UpadatePaymentInOutTrnxRs oUpadatePaymentInOutTrnxRs = new UpadatePaymentInOutTrnxRs();
-			string sqlQuery = "INSERT INTO transactions (typeofpay, customername, paymenttype, invoicedate, invoicenumber, received, total, balance, paymentstatus, registeredphonenumber, amountdetails)" +
-				"VALUES(@typeofpay, @customername, @paymenttype, @invoicedate, @invoicenumber, @received, @total, @balance, @paymentstatus, @registeredphonenumber, @amountdetails)";
+			string sqlQuery = "INSERT INTO transactions (typeofpay, customername, paymenttype, invoicedate, invoicenumber, received, total, balance, paymentstatus, registeredphonenumber, amountdetails, bankscustomername, isbankscustomernameupdate)" +
+				"VALUES(@typeofpay, @customername, @paymenttype, @invoicedate, @invoicenumber, @received, @total, @balance, @paymentstatus, @registeredphonenumber, @amountdetails, @bankscustomername, false)";
 			try
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
@@ -995,6 +997,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@balance", 0);
 					cmd.Parameters.AddWithValue("@paymentstatus", "USED");
 					cmd.Parameters.AddWithValue("@amountdetails", JsonConvert.SerializeObject(oUpadatePaymentInOutTrnxRq.amountdetails));
+					cmd.Parameters.AddWithValue("@bankscustomername", oUpadatePaymentInOutTrnxRq.customername);
 					cmd.ExecuteNonQuery();
 					oUpadatePaymentInOutTrnxRs.status = "SUCCESS";
 				}
@@ -1256,7 +1259,7 @@ namespace WebApplication1.DL
 			List<AmountDetails> amount = new List<AmountDetails>();
 			string result = "SUCCESS";
 
-			string sqlQuery = @"SELECT typeofpay, customername, invoicedate, amountdetails, paymenttype, transaction_id
+			string sqlQuery = @"SELECT typeofpay, bankscustomername, invoicedate, amountdetails, paymenttype, transaction_id
                         FROM transactions
                         WHERE registeredphonenumber = @registeredphonenumber
                         AND (paymenttype LIKE '%' || @customername || '%' 
@@ -1285,7 +1288,7 @@ namespace WebApplication1.DL
 								while (await reader.ReadAsync())
 								{
 									BankTrnxDetails oBankTrnxDetails = new BankTrnxDetails();
-									oBankTrnxDetails.customername = reader["customername"] == DBNull.Value ? null : Convert.ToString(reader["customername"]);
+									oBankTrnxDetails.customername = reader["bankscustomername"] == DBNull.Value ? null : Convert.ToString(reader["bankscustomername"]);
 									oBankTrnxDetails.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
 									oBankTrnxDetails.invoicedate = reader["invoicedate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["invoicedate"]);
 									oBankTrnxDetails.transactionid = reader["transaction_id"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["transaction_id"]);
@@ -1323,6 +1326,183 @@ namespace WebApplication1.DL
 			}
 			return oGetBankDetailsRs;
 		}
+
+		public async Task<List<BankTrnxDetailsVal>> GetBankDetailsAsyncVal(GetBankDetailsRq oGetBankDetailsRq)
+		{
+			List<BankTrnxDetailsVal> olistamtval = new List<BankTrnxDetailsVal>();
+			string result = "SUCCESS";
+
+			string sqlQuery = @"SELECT typeofpay, bankscustomername, invoicedate, amountdetails, paymenttype, transaction_id, isbankscustomernameupdate
+                        FROM transactions
+                        WHERE registeredphonenumber = @registeredphonenumber
+                        AND (paymenttype LIKE '%' || @customername || '%' 
+                        AND (paymenttype = @customername 
+                        OR paymenttype LIKE @customername || ',%' 
+                        OR paymenttype LIKE '%,' || @customername 
+                        OR paymenttype LIKE '%,' || @customername || ',%'))";
+
+			try
+			{
+				using (var conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					await conn.OpenAsync();
+					using (var cmd = new NpgsqlCommand(sqlQuery, conn))
+					{
+						cmd.CommandType = CommandType.Text;
+
+						// Define and add parameters
+						cmd.Parameters.AddWithValue("@registeredphonenumber", oGetBankDetailsRq.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@customername", oGetBankDetailsRq.accountdisplayname);
+
+						using (var reader = await cmd.ExecuteReaderAsync())
+						{
+							if (reader.HasRows)
+							{
+								while (await reader.ReadAsync())
+								{
+									BankTrnxDetailsVal oBankTrnxDetailsVal = new BankTrnxDetailsVal();
+									oBankTrnxDetailsVal.customername = reader["bankscustomername"] == DBNull.Value ? null : Convert.ToString(reader["bankscustomername"]);
+									oBankTrnxDetailsVal.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
+									oBankTrnxDetailsVal.paymenttype = reader["paymenttype"] == DBNull.Value ? null : Convert.ToString(reader["paymenttype"]);
+									oBankTrnxDetailsVal.invoicedate = reader["invoicedate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["invoicedate"]);
+									oBankTrnxDetailsVal.transactionid = reader["transaction_id"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["transaction_id"]);
+									oBankTrnxDetailsVal.amtdetails = reader["amountdetails"] == DBNull.Value ? null : Convert.ToString(reader["amountdetails"]);
+									oBankTrnxDetailsVal.isbankscustomernameupdate = reader["isbankscustomernameupdate"] == DBNull.Value ? false : Convert.ToBoolean(reader["isbankscustomernameupdate"]);
+									olistamtval.Add(oBankTrnxDetailsVal);
+								}
+							}
+							else
+							{
+								// Log the parameters and query for debugging
+								Console.WriteLine("Query executed but no rows were returned.");
+								Console.WriteLine($"Parameters: registeredphonenumber={oGetBankDetailsRq.registeredphonenumber}, customername={oGetBankDetailsRq.accountdisplayname}");
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return olistamtval;
+		}
+
+		public async Task<List<BankTrnxDetailsVal>> GetRecordsToUpdate(GetBankDetailsRq oGetBankDetailsRq)
+		{
+			List<BankTrnxDetailsVal> records = new List<BankTrnxDetailsVal>();
+			string sqlQuery = @"
+        SELECT typeofpay, bankscustomername, invoicedate, amountdetails, paymenttype, transaction_id
+        FROM transactions
+        WHERE registeredphonenumber = @registeredphonenumber
+        AND (
+            bankscustomername LIKE '%FROM: ' || @customername || '%'
+            OR bankscustomername LIKE '%TO: ' || @customername || '%'
+        )
+    ";
+
+			try
+			{
+				using (var conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					await conn.OpenAsync();
+					using (var cmd = new NpgsqlCommand(sqlQuery, conn))
+					{
+						cmd.CommandType = CommandType.Text;
+						cmd.Parameters.AddWithValue("@registeredphonenumber", oGetBankDetailsRq.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@customername", oGetBankDetailsRq.accountdisplayname);
+
+						using (var reader = await cmd.ExecuteReaderAsync())
+						{
+							while (await reader.ReadAsync())
+							{
+								var record = new BankTrnxDetailsVal
+								{
+									typeofpay = reader.GetString(0),
+									customername = reader.GetString(1),
+									invoicedate = reader.GetDateTime(2),
+									paymenttype = reader.GetString(4),
+									transactionid = reader.GetInt64(5),
+								};
+								records.Add(record);
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				// Handle exceptions as needed
+				Console.WriteLine($"Error: {ex.Message}");
+			}
+
+			return records;
+		}
+
+		public List<BankTrnxDetailsVal> ProcessRecords(List<BankTrnxDetailsVal> records, string newCustomerName)
+		{
+			foreach (var record in records)
+			{
+				if (record.customername.Contains("FROM: "))
+				{
+					record.customername = record.customername.Replace(record.customername.Substring(record.customername.IndexOf("FROM: ") + 6), newCustomerName);
+				}
+				else if (record.customername.Contains("TO: "))
+				{
+					record.customername = record.customername.Replace(record.customername.Substring(record.customername.IndexOf("TO: ") + 4), newCustomerName);
+				}
+			}
+
+			return records;
+		}
+
+		public async Task UpdateRecords(List<BankTrnxDetailsVal> records)
+		{
+			string sqlQuery = @"
+        UPDATE transactions
+        SET bankscustomername = @customername
+        WHERE transaction_id = @transaction_id and isbankscustomernameupdate = true
+    ";
+
+			try
+			{
+				using (var conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					await conn.OpenAsync();
+					using (var transaction = conn.BeginTransaction())
+					{
+						foreach (var record in records)
+						{
+							using (var cmd = new NpgsqlCommand(sqlQuery, conn))
+							{
+								cmd.CommandType = CommandType.Text;
+								cmd.Parameters.AddWithValue("@customername", record.customername);
+								cmd.Parameters.AddWithValue("@transaction_id", record.transactionid);
+
+								await cmd.ExecuteNonQueryAsync();
+							}
+						}
+
+						transaction.Commit();
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				// Handle exceptions as needed
+				Console.WriteLine($"Error: {ex.Message}");
+			}
+		}
+
+		public async Task UpdateCustomerNames(GetBankDetailsRq oGetBankDetailsRq, string newCustomerName)
+		{
+			var records = await GetRecordsToUpdate(oGetBankDetailsRq);
+
+			var updatedRecords = ProcessRecords(records, newCustomerName);
+
+			await UpdateRecords(updatedRecords);
+		}
+
 
 		public async Task<string> UpdateBankAmount(List<AmountDetails> oAmountDetails, Int64 registeredphonenumber, string typeofpay)
 		{
@@ -1532,7 +1712,7 @@ namespace WebApplication1.DL
 		public async Task<bool> InsertTrnx(BankFormRq oBankFormRq)
 		{
 			bool val = false;
-			string sqlQuery = "INSERT INTO transactions (typeofpay, customername, invoicedate, total, balance, registeredphonenumber, showtransaction, amountdetails, paymenttype) " +
+			string sqlQuery = "INSERT INTO transactions (typeofpay, bankscustomername, invoicedate, total, balance, registeredphonenumber, showtransaction, amountdetails, paymenttype) " +
 							  "VALUES (@typeofpay, @customername, @invoicedate, @total, @balance, @registeredphonenumber, 'DONT SHOW', @amountdetails, @paymenttype)";
 
 			try
@@ -1575,8 +1755,8 @@ namespace WebApplication1.DL
 		public async Task<bool> UpdatetTrnx(BankFormRq oBankFormRq)
 		{
 			bool val = false;
-			string sqlQuery = "update transactions set typeofpay = @typeofpay, customername = @customername, invoicedate = @invoicedate, total = @total, balance = @balance" +
-							  " where registeredphonenumber = @registeredphonenumber and customername = @customername";
+			string sqlQuery = "update transactions set bankscustomername = @customername, invoicedate = @invoicedate, total = @total, balance = @balance" +
+							  " where registeredphonenumber = @registeredphonenumber and customername = @oldcustomername";
 
 			try
 			{
@@ -1594,6 +1774,7 @@ namespace WebApplication1.DL
 						cmd.Parameters.AddWithValue("@total", oBankFormRq.newopeningbalance);
 						cmd.Parameters.AddWithValue("@balance", oBankFormRq.newopeningbalance);
 						cmd.Parameters.AddWithValue("@registeredphonenumber", oBankFormRq.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@oldcustomername", oBankFormRq.oldaccountdisplayname);
 
 						cmd.ExecuteNonQuery();
 						val = true;
@@ -1606,6 +1787,87 @@ namespace WebApplication1.DL
 				Console.WriteLine("Error occurred: " + ex.Message);
 			}
 			return val;
+		}
+		
+
+		public async Task<bool> UpdateInternalValuesOfpayment(List<BankTrnxDetailsVal> olistamtval, BankFormRq oBankFormRq)
+		{
+			bool updateSuccess = true;
+			string searchString = oBankFormRq.oldaccountdisplayname;
+			string replaceString = oBankFormRq.newaccountdisplayname;
+
+			foreach (var bankDetail in olistamtval)
+			{
+				bool isUpdated = false;
+
+				if (!string.IsNullOrEmpty(bankDetail.paymenttype) && bankDetail.paymenttype.Contains(searchString))
+				{
+					bankDetail.paymenttype = bankDetail.paymenttype.Replace(searchString, replaceString);
+					isUpdated = true;
+				}
+
+				if (!string.IsNullOrEmpty(bankDetail.customername) && bankDetail.customername.Contains(searchString) && bankDetail.isbankscustomernameupdate)
+				{
+					bankDetail.customername = bankDetail.customername.Replace(searchString, replaceString);
+					isUpdated = true;
+				}
+
+				var amountDetails = JsonConvert.DeserializeObject<List<AmountDetails>>(bankDetail.amtdetails);
+
+				foreach (var detail in amountDetails)
+				{
+					if (!string.IsNullOrEmpty(detail.type) && detail.type.Contains(searchString))
+					{
+						detail.type = detail.type.Replace(searchString, replaceString);
+						isUpdated = true;
+					}
+				}
+
+				if (isUpdated)
+				{
+					bankDetail.amtdetails = JsonConvert.SerializeObject(amountDetails);
+
+					bool dbUpdateSuccess = await UpdateBankTransactionAsync(bankDetail);
+					if (!dbUpdateSuccess)
+					{
+						updateSuccess = false;
+					}
+				}
+			}
+
+			return updateSuccess;
+		}
+
+		public async Task<bool> UpdateBankTransactionAsync(BankTrnxDetailsVal bankDetail)
+		{
+			try
+			{
+				string updateQuery = @"UPDATE transactions
+                               SET paymenttype = @paymenttype, amountdetails = @amountdetails, bankscustomername = @customername
+                               WHERE transaction_id = @transaction_id";
+
+				using (var conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					await conn.OpenAsync();
+					using (var cmd = new NpgsqlCommand(updateQuery, conn))
+					{
+						cmd.CommandType = CommandType.Text;
+
+						cmd.Parameters.AddWithValue("@paymenttype", bankDetail.paymenttype ?? (object)DBNull.Value);
+						cmd.Parameters.AddWithValue("@amountdetails", bankDetail.amtdetails ?? (object)DBNull.Value);
+						cmd.Parameters.AddWithValue("@transaction_id", bankDetail.transactionid);
+						cmd.Parameters.AddWithValue("@customername", bankDetail.customername);
+
+						await cmd.ExecuteNonQueryAsync();
+					}
+				}
+				return true;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Failed to update transaction ID {bankDetail.transactionid}: {ex.Message}");
+				return false;
+			}
 		}
 
 		public async Task<GetBanksDetailsValuesRs> GetBanksDetailsValues(GetBanksDetailsValuesRq oGetBanksDetailsValuesRq)
@@ -1657,7 +1919,7 @@ namespace WebApplication1.DL
 		public async Task<GetTransferDetailsValuesRs> GetTransferDetailsValues(GetTransferDetailsValuesRq oGetTransferDetailsValuesRq)
 		{
 			GetTransferDetailsValuesRs oGetTransferDetailsValuesRs = new GetTransferDetailsValuesRs();
-			string sqlQuery = @"SELECT typeofpay, invoicedate, total, paymenttype, customername from transactions where registeredphonenumber = @registeredphonenumber and transaction_id = @transaction_id and typeofpay = @typeofpay";
+			string sqlQuery = @"SELECT typeofpay, invoicedate, total, paymenttype, bankscustomername from transactions where registeredphonenumber = @registeredphonenumber and transaction_id = @transaction_id and typeofpay = @typeofpay";
 			string from = string.Empty;
 			string to = string.Empty;
 			try
@@ -1681,7 +1943,7 @@ namespace WebApplication1.DL
 								while (await reader.ReadAsync())
 								{
 									oGetTransferDetailsValuesRs.customername = reader["paymenttype"] == DBNull.Value ? null : Convert.ToString(reader["paymenttype"]);
-									oGetTransferDetailsValuesRs.banktobank = reader["customername"] == DBNull.Value ? null : Convert.ToString(reader["customername"]);
+									oGetTransferDetailsValuesRs.banktobank = reader["bankscustomername"] == DBNull.Value ? null : Convert.ToString(reader["bankscustomername"]);
 									oGetTransferDetailsValuesRs.amount = reader["total"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["total"]);
 									oGetTransferDetailsValuesRs.adjustmentDate = reader["invoicedate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["invoicedate"]);
 									if (!string.IsNullOrEmpty(oGetTransferDetailsValuesRs.banktobank))
