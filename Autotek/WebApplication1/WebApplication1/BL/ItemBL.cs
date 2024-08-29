@@ -68,5 +68,19 @@ namespace WebApplication1.BL
 			oAddUpdateCategoryRs = itemDL.AddUpdateCategory(oAddUpdateCategoryRq);
 			return oAddUpdateCategoryRs;
 		}
+
+		public async Task<AssignCodeRs> AssignCode(AssignCodeRq oAssignCodeRq)
+		{
+			AssignCodeRs oAssignCodeRs = new AssignCodeRs();
+			ItemDL itemDL = new ItemDL(this.config);
+			oAssignCodeRs.status = "FAILED";
+			long value = await itemDL.GetNextSequenceValue();
+			if(value != 0)
+			{
+				oAssignCodeRs.status = "SUCCESS";
+				oAssignCodeRs.assignedcode = value;
+			}
+			return oAssignCodeRs;
+		}
 	}
 }

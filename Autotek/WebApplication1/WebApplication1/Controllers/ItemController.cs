@@ -112,5 +112,21 @@ namespace WebApplication1.Controllers
 
 			return BadRequest("Please Provide Valid Details");
 		}
+
+		[Authorize]
+		[HttpPost]
+		[Route("AssignCode")]
+		public async Task<IActionResult> AssignCode(AssignCodeRq AssignCodeRs)
+		{
+			AssignCodeRs oAssignCodeRs = new AssignCodeRs();
+			if (ModelState.IsValid)
+			{
+				ItemBL itemBL = new ItemBL(this.config);
+				oAssignCodeRs = await itemBL.AssignCode(AssignCodeRs);
+				return Ok(oAssignCodeRs);
+			}
+
+			return BadRequest("Please Provide Valid Details");
+		}
 	}
 }

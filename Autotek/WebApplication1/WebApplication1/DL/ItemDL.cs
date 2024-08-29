@@ -531,5 +531,30 @@ namespace WebApplication1.DL
 			}
 			return oAddUpdateCategoryRs;
 		}
+
+		public async Task<long> GetNextSequenceValue()
+		{
+			long nextValue = 0;
+
+			string sqlQuery = "SELECT nextval('assigncodeseq');";
+			try
+			{
+				using (var connection = new NpgsqlConnection(dbConn))
+				{
+					connection.Open();
+
+					using (var command = new NpgsqlCommand(sqlQuery, connection))
+					{
+						nextValue = (long)command.ExecuteScalar();
+					}
+				}
+			}
+			catch(Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+
+			return nextValue;
+		}
 	}
 }

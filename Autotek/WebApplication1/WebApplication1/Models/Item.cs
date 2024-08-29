@@ -137,4 +137,15 @@ namespace WebApplication1.Models
 		public string status { get; set; }
 		public string statusmessage { get; set; }
 	}
+
+	public class AssignCodeRq
+	{
+		public Int64 registeredphonenumber { get; set; }
+	}
+	
+	public class AssignCodeRs
+	{
+		public string status { get; set; }
+		public Int64 assignedcode { get; set; }
+	}
 }
