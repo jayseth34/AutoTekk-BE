@@ -212,6 +212,7 @@ namespace WebApplication1.DL
 		public GetPartyTransactionDetailsRs GetPartyTransactionDetails(GetPartyTransactionDetailsRq oGetPartyTransactionDetailsRq)
 		{
 			GetPartyTransactionDetailsRs oGetPartyTransactionDetailsRs = new GetPartyTransactionDetailsRs();
+			string amtdetails = string.Empty;
 			try
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
@@ -221,7 +222,7 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT tr.typeofpay, tr.invoicedate, tr.stateofsupply, tr.paymenttype, tr.total, tr.received, tr.balance, tr.customername," +
-						"tr.phonenumber, tr.billingaddress, tr.shippingaddress, ide.item, ide,qty, ide.unit, ide.priceperunit, ide.transaction_id, ide.taxrate, ide.taxrateamount, ide.discountpercent, ide.discountamount FROM transactions tr join item_details ide" +
+						"tr.phonenumber, tr.billingaddress, tr.shippingaddress, tr.amountdetails, ide.item, ide,qty, ide.unit, ide.priceperunit, ide.transaction_id, ide.taxrate, ide.taxrateamount, ide.discountpercent, ide.discountamount FROM transactions tr join item_details ide" +
 						" ON tr.transaction_id = ide.transaction_id WHERE tr.invoicenumber = " + oGetPartyTransactionDetailsRq.invoicenumber + " AND tr.registeredphonenumber = " +
 						oGetPartyTransactionDetailsRq.registeredphonenumber + " AND tr.typeofpay = '" + oGetPartyTransactionDetailsRq.typeofpay + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
@@ -245,6 +246,7 @@ namespace WebApplication1.DL
 									oGetPartyTransactionDetailsRs.phonenumber = reader["phonenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["phonenumber"]);
 									oGetPartyTransactionDetailsRs.billingaddress = reader["billingaddress"] == DBNull.Value ? null : Convert.ToString(reader["billingaddress"]);
 									oGetPartyTransactionDetailsRs.shippingaddress = reader["shippingaddress"] == DBNull.Value ? null : Convert.ToString(reader["shippingaddress"]);
+									amtdetails = reader["amountdetails"] == DBNull.Value ? null : Convert.ToString(reader["amountdetails"]);
 									recordFetched = false;
 								}
 								ItemDetailsListRs oItemDetailsListRs = new ItemDetailsListRs();
@@ -257,6 +259,7 @@ namespace WebApplication1.DL
 								oItemDetailsListRs.taxrateamount = reader["taxrateamount"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["taxrateamount"]);
 								oItemDetailsListRs.discountpercent = reader["discountpercent"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["discountpercent"]);
 								oItemDetailsListRs.discountamount = reader["discountamount"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["discountamount"]);
+								oGetPartyTransactionDetailsRs.amountdetailslist = JsonConvert.DeserializeObject<List<AmountDetails>>(amtdetails);
 								oGetPartyTransactionDetailsRs.itemdetailslist.Add(oItemDetailsListRs);
 							}
 							oGetPartyTransactionDetailsRs.status = "SUCCESS";
@@ -269,7 +272,7 @@ namespace WebApplication1.DL
 					}
 					else
 					{
-						oGetPartyTransactionDetailsRs.status = "No Recods Found";
+						oGetPartyTransactionDetailsRs.status = "No Records Found";
 					}
 				}
 			}
@@ -319,7 +322,7 @@ namespace WebApplication1.DL
 					}
 					else
 					{
-						oGetItemTransactionsRs.status = "No Recods Found";
+						oGetItemTransactionsRs.status = "No Records Found";
 					}
 				}
 			}
@@ -365,7 +368,7 @@ namespace WebApplication1.DL
 					}
 					else
 					{
-						oGetItemTransactionsRs.status = "No Recods Found";
+						oGetItemTransactionsRs.status = "No Records Found";
 					}
 				}
 			}
@@ -663,7 +666,7 @@ namespace WebApplication1.DL
 					}
 					else
 					{
-						oGetPartyTransactionDetailsRs.status = "No Recods Found";
+						oGetPartyTransactionDetailsRs.status = "No Records Found";
 					}
 				}
 			}

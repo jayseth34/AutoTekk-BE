@@ -118,8 +118,10 @@
 		public GetPartyTransactionDetailsRs()
 		{
 			itemdetailslist = new List<ItemDetailsListRs>();
+			amountdetailslist = new List<AmountDetails>();
 		}
 		public List<ItemDetailsListRs> itemdetailslist { get; set; }
+		public List<AmountDetails>? amountdetailslist { get; set; }
 	}
 
 	public class PaymentInOutTrnxRs
