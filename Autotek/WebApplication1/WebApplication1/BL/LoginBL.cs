@@ -211,5 +211,39 @@ namespace WebApplication1.BL
 			return oDashboardDetailsRs;
 		}
 
+		public async Task<DashboardSaleDetailsRs> DashboardSaleDetails(DashboardSaleDetailsRq oDashboardSaleDetailsRq)
+		{
+			DashboardSaleDetailsRs oDashboardSaleDetailsRs = new DashboardSaleDetailsRs();
+			LoginDL logindl = new LoginDL(this.config);
+			string daterange = GetDateCondition(oDashboardSaleDetailsRq.month);
+			oDashboardSaleDetailsRs = await logindl.DashboardSaleDetails(oDashboardSaleDetailsRq, daterange);
+			return oDashboardSaleDetailsRs;
+		}
+
+		private string GetDateCondition(string dateRange)
+		{
+			string dateCondition = "";
+
+			switch (dateRange)
+			{
+				case "This Month":
+					dateCondition = "AND DATE_TRUNC('month', invoicedate) = DATE_TRUNC('month', CURRENT_DATE)";
+					break;
+				case "Last Month":
+					dateCondition = "AND DATE_TRUNC('month', invoicedate) = DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')";
+					break;
+				case "This Quarter":
+					dateCondition = "AND DATE_TRUNC('quarter', invoicedate) = DATE_TRUNC('quarter', CURRENT_DATE)";
+					break;
+				case "This Year":
+					dateCondition = "AND DATE_TRUNC('year', invoicedate) = DATE_TRUNC('year', CURRENT_DATE)";
+					break;
+				default:
+					break; 
+			}
+
+			return dateCondition;
+		}
+
 	}
 }

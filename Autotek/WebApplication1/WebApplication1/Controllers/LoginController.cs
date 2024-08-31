@@ -318,5 +318,20 @@ namespace WebApplication1.Controllers
 			}
 			return BadRequest();
 		}
+
+		[Authorize]
+		[HttpPost]
+		[Route("DashboardSaleDetails")]
+		public async Task<IActionResult> DashboardSaleDetails([FromBody] DashboardSaleDetailsRq oDashboardSaleDetailsRq)
+		{
+			DashboardSaleDetailsRs oDashboardSaleDetailsRs = new DashboardSaleDetailsRs();
+			LoginBL loginBL = new LoginBL(this.config);
+			if (ModelState.IsValid)
+			{
+				oDashboardSaleDetailsRs = await loginBL.DashboardSaleDetails(oDashboardSaleDetailsRq);
+				return Ok(oDashboardSaleDetailsRs);
+			}
+			return BadRequest();
+		}
 	}
 }

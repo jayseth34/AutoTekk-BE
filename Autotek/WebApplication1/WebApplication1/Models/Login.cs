@@ -31,7 +31,7 @@ namespace WebApplication1.Models
 
 	public class RegisterRq
 	{
-		public Int64 phonenumber { get; set;}
+		public Int64 phonenumber { get; set; }
 		public string password { get; set; }
 		public string state { get; set; }
 		public string address { get; set; }
@@ -72,28 +72,28 @@ namespace WebApplication1.Models
 		public string? partyname { get; set; }
 		public string? oldpartyname { get; set; } = "";
 		public string? GST { get; set; } = "";
-		public Int64 phonenumber { get; set;}
+		public Int64 phonenumber { get; set; }
 		public string? partygroup { get; set; }
 		public string? gsttype { get; set; }
-		public string? _state { get; set;}
+		public string? _state { get; set; }
 		public string? emailid { get; set; }
 		public string? billingaddress { get; set; }
 		public string? shippingaddress { get; set; }
 		public Decimal openingbalance { get; set; }
 		public string topayorreceive { get; set; }
-		public DateTime asofdate { get; set;}
+		public DateTime asofdate { get; set; }
 		public Decimal creditlimit { get; set; }
 		public string? additionalfieldname1 { get; set; }
 		public string? additionalfieldname2 { get; set; }
-		public string? additionalfieldname3 { get; set;}
+		public string? additionalfieldname3 { get; set; }
 		public string? additionalfieldname4 { get; set; }
 		public string? additionalfieldname1value { get; set; }
 		public string? additionalfieldname2value { get; set; }
 		public string? additionalfieldname3value { get; set; }
 		public string? additionalfieldname4value { get; set; }
 		public bool ispartyupdate { get; set; }
-		public Decimal topayparty {  get; set; }
-		public Decimal toreceivefromparty {  get; set; }
+		public Decimal topayparty { get; set; }
+		public Decimal toreceivefromparty { get; set; }
 	}
 
 	public class PartyRs
@@ -111,7 +111,7 @@ namespace WebApplication1.Models
 		public List<GetAllPartyList> partyList { get; set; }
 		public string status { get; set; }
 		public string statusMessage { get; set; }
-		
+
 	}
 
 	public class GetAllPartyList
@@ -144,7 +144,7 @@ namespace WebApplication1.Models
 
 	public class GetPartyListRs
 	{
-		public string status {  get; set; }
+		public string status { get; set; }
 		public GetPartyListRs()
 		{
 			getPartyList = new List<GetPartyList>();
@@ -191,61 +191,61 @@ namespace WebApplication1.Models
 	public class AddUpdatePartyGropRq
 	{
 		public Int64 registeredphonenumber { get; set; }
-		public string newgroupname {  get; set; }
-		public string oldgroupname {  get; set; }
+		public string newgroupname { get; set; }
+		public string oldgroupname { get; set; }
 	}
 
 	public class AddUpdatePartyGropRs
 	{
-		public string status {  get; set; }
-		public string statusmessage {  get; set; }
+		public string status { get; set; }
+		public string statusmessage { get; set; }
 	}
 
-    public class GetBusinessInfoRs
-    {
-        public BusinessInfo businessInfo { get; set; }
-        public string status { get; set; }
-        public string statusmsg { get; set; }
-    }
+	public class GetBusinessInfoRs
+	{
+		public BusinessInfo businessInfo { get; set; }
+		public string status { get; set; }
+		public string statusmsg { get; set; }
+	}
 
-    public class BusinessInfo
-    {
-        public string businessName { get; set; }
-        public string gstin { get; set; }
-        public Int64 phoneNumber { get; set; }
-        public string emailId { get; set; }
-        public string businessAddress { get; set; }
-        public string businessType { get; set; }
-        public string businessCategory { get; set; }
-        public Decimal pincode { get; set; }
-        public string state { get; set; }
-        public string businessDescription { get; set; }
+	public class BusinessInfo
+	{
+		public string businessName { get; set; }
+		public string gstin { get; set; }
+		public Int64 phoneNumber { get; set; }
+		public string emailId { get; set; }
+		public string businessAddress { get; set; }
+		public string businessType { get; set; }
+		public string businessCategory { get; set; }
+		public Decimal pincode { get; set; }
+		public string state { get; set; }
+		public string businessDescription { get; set; }
 
-    }
+	}
 
-    public class AddBusinessInformationRq
-    {
-        public Int64 registeredphonenumber { get; set; }
-        public string businessName { get; set; }
-        public string gstin { get; set; }
-        public Int64 phoneNumber { get; set; }
-        public string emailId { get; set; }
-        public string businessAddress { get; set; }
-        public string businessType { get; set; }
-        public string businessCategory { get; set; }
-        public Decimal pincode { get; set; }
-        public string state { get; set; }
-        public string businessDescription { get; set; }
-    }
+	public class AddBusinessInformationRq
+	{
+		public Int64 registeredphonenumber { get; set; }
+		public string businessName { get; set; }
+		public string gstin { get; set; }
+		public Int64 phoneNumber { get; set; }
+		public string emailId { get; set; }
+		public string businessAddress { get; set; }
+		public string businessType { get; set; }
+		public string businessCategory { get; set; }
+		public Decimal pincode { get; set; }
+		public string state { get; set; }
+		public string businessDescription { get; set; }
+	}
 
 
-    public class AddBusinessInformationRs
-    {
-        public string status { get; set; }
-        public string statusmsg { get; set; }
-        public Boolean exist { get; set; }
+	public class AddBusinessInformationRs
+	{
+		public string status { get; set; }
+		public string statusmsg { get; set; }
+		public Boolean exist { get; set; }
 
-    }
+	}
 
 	public class DashboardDetailsRs
 	{
@@ -267,15 +267,15 @@ namespace WebApplication1.Models
 		public List<Youllpayreceive> youllpayreceiveparty { get; set; }
 		public List<Bankaccounts> bankaccounts { get; set; }
 		public List<PurchaseDash> purchasedash { get; set; }
-        public string status { get; set; }
-        public string statusmessage { get; set; }
+		public string status { get; set; }
+		public string statusmessage { get; set; }
 
-    }
+	}
 
-    public class Lowstocks
+	public class Lowstocks
 	{
-		public string item { get; set;}
-		public Int64 qty { get; set;}
+		public string item { get; set; }
+		public Int64 qty { get; set; }
 	}
 
 	public class Youllpayreceive
@@ -297,6 +297,29 @@ namespace WebApplication1.Models
 		public string item { get; set; }
 		public Double total { get; set; }
 
+	}
+
+	public class DashboardSaleDetailsRq
+	{
+		public Int64 registeredphonenumber { get; set; }
+		public string month { get; set; }
+	}
+
+	public class DashboardSaleDetailsRs
+	{
+		public string status { get; set; }
+		public string statusmessage { get; set; }
+		public DashboardSaleDetailsRs()
+		{
+			saledets = new List<SaleDetails>();
+		}
+		public List<SaleDetails> saledets { get; set; }
+	}
+
+	public class SaleDetails
+	{
+		public DateTime? invoicedate { get; set; }
+		public Decimal total {  get; set; }
 	}
 
 }

@@ -880,7 +880,8 @@ namespace WebApplication1.DL
                         catch (Exception ex)
                         {
                             Console.WriteLine(ex.Message);
-                        }
+							oGetBusinessInfoRs.status = "FAILED";
+						}
                     }
                 }
             }
@@ -1224,6 +1225,56 @@ namespace WebApplication1.DL
                 Console.WriteLine(ex.Message);
 			}
 			return oDashboardDetailsRs;
+		}
+
+		public async Task<DashboardSaleDetailsRs> DashboardSaleDetails(DashboardSaleDetailsRq oDashboardSaleDetailsRq, string daterange)
+		{
+			DashboardSaleDetailsRs oDashboardSaleDetailsRs = new DashboardSaleDetailsRs();
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT invoicedate, total from transactions where registeredphonenumber = @registeredphonenumber and typeofpay = 'SALE' " + daterange;
+					cmd.Parameters.AddWithValue("@registeredphonenumber", oDashboardSaleDetailsRq.registeredphonenumber);
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+								SaleDetails oSaleDetails = new SaleDetails
+								{
+									invoicedate = Convert.ToDateTime(reader["invoicedate"]),
+									total = Convert.ToDecimal(reader["total"]),
+								};
+								oDashboardSaleDetailsRs.saledets.Add(oSaleDetails);
+							}
+							oDashboardSaleDetailsRs.status = "SUCCESS";
+							oDashboardSaleDetailsRs.statusmessage = "Record fetched successfully";
+						}
+						catch (Exception ex)
+						{
+							Console.WriteLine(ex.Message);
+							oDashboardSaleDetailsRs.status = "FAILED";
+						}
+					}
+					else
+					{
+						oDashboardSaleDetailsRs.status = "SUCCESS";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+				oDashboardSaleDetailsRs.status = "FAILED";
+			}
+			return oDashboardSaleDetailsRs;
 		}
 	}
 }
