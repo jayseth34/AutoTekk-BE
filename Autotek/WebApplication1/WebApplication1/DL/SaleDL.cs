@@ -63,8 +63,6 @@ namespace WebApplication1.DL
 					{
 						foreach (var itemDetail in otransactionRq.itemdetailslist)
 						{
-							if (otransactionRq.typeofpay == "PURCHASE")
-								itemDetail.qty = itemDetail.qty * (-1);
 							using (NpgsqlConnection connn = new NpgsqlConnection(this._connectionFactory))
 							{
 								connn.Open();
@@ -89,8 +87,6 @@ namespace WebApplication1.DL
 								cmdd.Parameters.AddWithValue("@discountpercent", itemDetail.discountpercent);
 								cmdd.Parameters.AddWithValue("@discountamount", itemDetail.discountamount);
 								cmdd.ExecuteNonQuery();
-								if (otransactionRq.typeofpay == "PURCHASE" || otransactionRq.typeofpay == "PURCHASE ORDER")
-									itemDetail.qty = itemDetail.qty * (-1);
 								otransactionrs.status = "SUCCESS";
 							}
 						}
@@ -677,19 +673,28 @@ namespace WebApplication1.DL
 			return oGetPartyTransactionDetailsRs;
 		}
 
-		public GetLinkedPaymentTransactionRs GetLinkedPaymentTransaction(Int64 registeredphonenumber, string customername)
+		public GetLinkedPaymentTransactionRs GetLinkedPaymentTransaction(Int64 registeredphonenumber, string customername, string typeofpay)
 		{
 			GetLinkedPaymentTransactionRs oGetLinkedPaymentTransactionRs = new GetLinkedPaymentTransactionRs();
+			string sqlquery = string.Empty;
 			try
 			{
+				if(typeofpay == "PAYMENT IN")
+				{
+					sqlquery = "SELECT invoicenumber, typeofpay, total, linkedamount, balance, customername from transactions where balance > 0 and customername = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber +
+						" AND typeofpay in ('SALE','RECEIVABLE OPENING BALANCE', 'ADVANCE OUT')";
+				} else if(typeofpay == "PAYMENT OUT")
+				{
+					sqlquery = "SELECT invoicenumber, typeofpay, total, linkedamount, balance, customername from transactions where balance > 0 and customername = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber +
+						" AND typeofpay in ('PURCHASE', 'ADVANCE IN', 'PAYABLE OPENING BALANCE')";
+				}
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 				{
 					conn.Open();
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT invoicenumber, typeofpay, total, linkedamount, balance, customername from transactions where balance > 0 and customername = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber +
-						" AND typeofpay in ('SALE','RECEIVABLE OPENING BALANCE', 'PAYABLE OPENING BALANCE');";
+					cmd.CommandText = sqlquery;
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -1008,8 +1013,78 @@ namespace WebApplication1.DL
 			catch(Exception ex)
 			{
 				Console.WriteLine(ex.Message);
+				oUpadatePaymentInOutTrnxRs.status = "FALED";
 			}
 			return oUpadatePaymentInOutTrnxRs;
+		}
+
+		public async Task<UpadatePaymentInOutTrnxRs> InsertAdvanceTrnx(InsertAdvanceTrnxRq oInsertAdvanceTrnxRq)
+		{
+			UpadatePaymentInOutTrnxRs oUpadatePaymentInOutTrnxRs = new UpadatePaymentInOutTrnxRs();
+			string sqlQuery = "INSERT INTO transactions (typeofpay, customername, paymenttype, invoicedate, invoicenumber, received, total, balance, paymentstatus, registeredphonenumber, amountdetails, bankscustomername, isbankscustomernameupdate)" +
+				"VALUES(@typeofpay, @customername, @paymenttype, @invoicedate, @invoicenumber, @received, @total, @balance, @paymentstatus, @registeredphonenumber, @amountdetails, @bankscustomername, false)";
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = sqlQuery;
+					cmd.Parameters.AddWithValue("@typeofpay", oInsertAdvanceTrnxRq.typeofpay);
+					cmd.Parameters.AddWithValue("@registeredphonenumber", oInsertAdvanceTrnxRq.registeredphonenumber);
+					cmd.Parameters.AddWithValue("@customername", oInsertAdvanceTrnxRq.customername);
+					cmd.Parameters.AddWithValue("@paymenttype", oInsertAdvanceTrnxRq.paymenttype);
+					cmd.Parameters.AddWithValue("@invoicedate", oInsertAdvanceTrnxRq.invoicedate);
+					cmd.Parameters.AddWithValue("@invoicenumber", oInsertAdvanceTrnxRq.invoicenumber);
+					cmd.Parameters.AddWithValue("@received", 0);
+					cmd.Parameters.AddWithValue("@total", oInsertAdvanceTrnxRq.received);
+					cmd.Parameters.AddWithValue("@balance", oInsertAdvanceTrnxRq.received);
+					cmd.Parameters.AddWithValue("@paymentstatus", "UNPAID");
+					cmd.Parameters.AddWithValue("@amountdetails", JsonConvert.SerializeObject(oInsertAdvanceTrnxRq.amountdetails));
+					cmd.Parameters.AddWithValue("@bankscustomername", oInsertAdvanceTrnxRq.customername);
+					cmd.ExecuteNonQuery();
+					oUpadatePaymentInOutTrnxRs.status = "SUCCESS";
+				}
+				return oUpadatePaymentInOutTrnxRs;
+
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+				oUpadatePaymentInOutTrnxRs.status = "FAILED";
+			}
+			return oUpadatePaymentInOutTrnxRs;
+		}
+
+		public async Task<bool> UpdatePartyToPayReceive(InsertAdvanceTrnxRq oInsertAdvanceTrnxRq)
+		{
+			string sqlQuery = "update party set topayparty = @topayparty, toreceivefromparty = @toreceivefromparty where registeredphonenumber = @registeredphonenumber and partyname = @customername";
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = sqlQuery;
+					cmd.Parameters.AddWithValue("@registeredphonenumber", oInsertAdvanceTrnxRq.registeredphonenumber);
+					cmd.Parameters.AddWithValue("@customername", oInsertAdvanceTrnxRq.customername);
+					cmd.Parameters.AddWithValue("@topayparty", oInsertAdvanceTrnxRq.topayparty);
+					cmd.Parameters.AddWithValue("@toreceivefromparty", oInsertAdvanceTrnxRq.toreceivefromparty);
+					cmd.ExecuteNonQuery();
+				}
+				return true;
+
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+				return false;
+			}
+			return true;
 		}
 
 		public async Task<GetUpdatedTrnxInOutValRs> GetUpdatedTrnxInOutVal(GetUpdatedTrnxInOutValRq oGetUpdatedTrnxInOutValRq)

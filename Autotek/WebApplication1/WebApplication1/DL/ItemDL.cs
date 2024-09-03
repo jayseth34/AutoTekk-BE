@@ -461,7 +461,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT itemname, remainingquantity from item where registeredphonenumber = " + registeredphonenumber + " AND category = '" + category + "'";
+					cmd.CommandText = "SELECT itemname, remainingquantity, purchaseprice from item where registeredphonenumber = " + registeredphonenumber + " AND category = '" + category + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -472,6 +472,7 @@ namespace WebApplication1.DL
 								GetItemList oGetItemList = new GetItemList();
 								oGetItemList.itemname = reader["itemname"] == DBNull.Value ? null : Convert.ToString(reader["itemname"]);
 								oGetItemList.remainingquantity = reader["remainingquantity"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["remainingquantity"]);
+								oGetItemList.purchaseprice = reader["purchaseprice"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["purchaseprice"]);
 								oGetItemByCategoryRs.getItemList.Add(oGetItemList);
 							}
 							oGetItemByCategoryRs.status = "SUCCESS";

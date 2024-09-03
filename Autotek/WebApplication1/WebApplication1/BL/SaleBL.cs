@@ -119,11 +119,11 @@ namespace WebApplication1.BL
 			oGetItemTransactionsRs = saledl.GetItemHeaderDetails(registeredphonenumber,itemname, oGetItemTransactionsRs.itemTransactionsList);
 			return oGetItemTransactionsRs;
 		}
-		public async Task<GetLinkedPaymentTransactionRs> GetLinkedPaymentTransaction([FromQuery] Int64 registeredphonenumber, [FromQuery] string customername)
+		public async Task<GetLinkedPaymentTransactionRs> GetLinkedPaymentTransaction(Int64 registeredphonenumber, string customername, string typeofpay)
 		{
 			GetLinkedPaymentTransactionRs oGetLinkedPaymentTransactionRs = new GetLinkedPaymentTransactionRs();
 			SaleDL saledl = new SaleDL(this.config);
-			oGetLinkedPaymentTransactionRs = saledl.GetLinkedPaymentTransaction(registeredphonenumber, customername);
+			oGetLinkedPaymentTransactionRs = saledl.GetLinkedPaymentTransaction(registeredphonenumber, customername, typeofpay);
 			return oGetLinkedPaymentTransactionRs;
 		}
 
@@ -132,8 +132,8 @@ namespace WebApplication1.BL
 			GetTypeOfPayTransactionsRs oGetTypeOfPayTransactionsRs = new GetTypeOfPayTransactionsRs();
 			SaleDL saledl = new SaleDL(this.config);
 			oGetTypeOfPayTransactionsRs = saledl.GetTypeOfPayTransactions(registeredphonenumber, typeofpay);
-			if (typeofpay == "SALE" || typeofpay == "ESTIMATE QUOTATION" || typeofpay == "PAYMENT IN" ||
-				typeofpay == "SALE ORDER" || typeofpay == "DELIVERY CHALLAN" || typeofpay == "SALE RETURN" || typeofpay == "PURCHASE ORDER" || typeofpay == "PURCHASE")
+			if (typeofpay == "SALE" || typeofpay == "ESTIMATE QUOTATION" || typeofpay == "PAYMENT IN" || typeofpay == "PAYMENT OUT" || 
+				typeofpay == "SALE ORDER" || typeofpay == "DELIVERY CHALLAN" || typeofpay == "SALE RETURN" || typeofpay == "PURCHASE ORDER" || typeofpay == "PURCHASE" || typeofpay == "ADVANCE IN" || typeofpay == "ADVANCE OUT")
 			{
 				oGetTypeOfPayTransactionsRs.invoicenumbercount = saledl.GetInvoiceNumberCount(registeredphonenumber, typeofpay);
 			}
@@ -190,6 +190,18 @@ namespace WebApplication1.BL
 			UpadatePaymentInOutTrnxRs oUpadatePaymentInOutTrnxRs = new UpadatePaymentInOutTrnxRs();
 			SaleDL saledl = new SaleDL(this.config);
 			oUpadatePaymentInOutTrnxRs = await saledl.UpdatePaymentInOutTrnx(oUpadatePaymentInOutTrnxRq);
+			return oUpadatePaymentInOutTrnxRs;
+		}
+
+		public async Task<UpadatePaymentInOutTrnxRs> InsertAdvanceTrnx(InsertAdvanceTrnxRq oInsertAdvanceTrnxRq)
+		{
+			UpadatePaymentInOutTrnxRs oUpadatePaymentInOutTrnxRs = new UpadatePaymentInOutTrnxRs();
+			SaleDL saledl = new SaleDL(this.config);
+			oUpadatePaymentInOutTrnxRs = await saledl.InsertAdvanceTrnx(oInsertAdvanceTrnxRq);
+			if(oUpadatePaymentInOutTrnxRs.status == "SUCCESS")
+			{
+				bool updateparty = await saledl.UpdatePartyToPayReceive(oInsertAdvanceTrnxRq);
+			}
 			return oUpadatePaymentInOutTrnxRs;
 		}
 

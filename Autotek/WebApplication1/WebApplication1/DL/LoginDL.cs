@@ -42,11 +42,15 @@ namespace WebApplication1.DL
 						ologinrs.statusMessage = reader["status"].ToString();
 						ologinrs.expiryDate = Convert.ToDateTime(reader["expirydate"]);
 						ologinrs.plantype =  reader["plantype"] == DBNull.Value ? null : Convert.ToString(reader["plantype"]);
+						return ologinrs;
 					}
+					ologinrs.status = "FAILED";
+					ologinrs.statusMessage = "Record Not Found";
 				}
 			}
 			catch(Exception ex)
 			{
+				ologinrs.status = "SUCCESS";
 				ologinrs.statusMessage = "Record Not Found";
 			}
 			return ologinrs;
@@ -784,18 +788,26 @@ namespace WebApplication1.DL
 								oGetPartyList.topayparty = Convert.ToInt64(reader["topayparty"]);
 								oGetPartyList.toreceivefromparty = Convert.ToInt64(reader["toreceivefromparty"]);
 								oGetPartyByGroupRs.getPartyList.Add(oGetPartyList);
+								oGetPartyByGroupRs.status = "SUCCESS";
 							}
 						}
 						catch (Exception ex)
 						{
 							Console.WriteLine(ex.Message);
+							oGetPartyByGroupRs.status = "FAILED";
 						}
+					}
+					else
+					{
+						oGetPartyByGroupRs.status = "FAILED";
+						oGetPartyByGroupRs.statusmessage = "No Records Found";
 					}
 				}
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex.Message);
+				oGetPartyByGroupRs.status = "FAILED";
 			}
 			return oGetPartyByGroupRs;
 		}

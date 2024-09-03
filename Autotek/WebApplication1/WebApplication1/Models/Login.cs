@@ -181,6 +181,8 @@ namespace WebApplication1.Models
 
 	public class GetPartyByGroupRs
 	{
+		public string status { get; set; }
+		public string statusmessage { get; set; }
 		public GetPartyByGroupRs()
 		{
 			getPartyList = new List<GetPartyList>();

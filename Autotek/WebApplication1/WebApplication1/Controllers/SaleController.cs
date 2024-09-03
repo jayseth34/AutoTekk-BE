@@ -102,13 +102,13 @@ namespace WebApplication1.Controllers
 		}
 
 		[Authorize]
-		[HttpGet]
+		[HttpPost]
 		[Route("GetLinkedPaymentTransaction")]
-		public async Task<ActionResult> GetLinkedPaymentTransaction([FromQuery] Int64 registeredphonenumber, [FromQuery] string customername)
+		public async Task<ActionResult> GetLinkedPaymentTransaction([FromBody] getlinkedtrncRq ogetlinkedtrncRq)
 		{
 			GetLinkedPaymentTransactionRs oGetLinkedPaymentTransactionRs = new GetLinkedPaymentTransactionRs();
 			SaleBL saleBl = new SaleBL(this.config);
-			oGetLinkedPaymentTransactionRs = await saleBl.GetLinkedPaymentTransaction(registeredphonenumber, customername);
+			oGetLinkedPaymentTransactionRs = await saleBl.GetLinkedPaymentTransaction(ogetlinkedtrncRq.registeredphonenumber, ogetlinkedtrncRq.customername, ogetlinkedtrncRq.typeofpay);
 			return Ok(oGetLinkedPaymentTransactionRs);
 		}
 
@@ -137,6 +137,17 @@ namespace WebApplication1.Controllers
 			UpadatePaymentInOutTrnxRs oUpadatePaymentInOutTrnxRs = new UpadatePaymentInOutTrnxRs();
 			SaleBL saleBL = new SaleBL(this.config);
 			oUpadatePaymentInOutTrnxRs = await saleBL.UpdatePaymentInOutTrnx(oUpadatePaymentInOutTrnxRq);
+			return Ok(oUpadatePaymentInOutTrnxRs);
+		}
+
+		[Authorize]
+		[HttpPost]
+		[Route("InsertAdvanceTrnx")]
+		public async Task<ActionResult> InsertAdvanceTrnx(InsertAdvanceTrnxRq oInsertAdvanceTrnxRq)
+		{
+			UpadatePaymentInOutTrnxRs oUpadatePaymentInOutTrnxRs = new UpadatePaymentInOutTrnxRs();
+			SaleBL saleBL = new SaleBL(this.config);
+			oUpadatePaymentInOutTrnxRs = await saleBL.InsertAdvanceTrnx(oInsertAdvanceTrnxRq);
 			return Ok(oUpadatePaymentInOutTrnxRs);
 		}
 

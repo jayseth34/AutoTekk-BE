@@ -232,6 +232,13 @@
 		public Int64 paymentininvoicenumber {  get; set; }
 	}
 
+	public class getlinkedtrncRq
+	{
+		public Int64 registeredphonenumber { get; set; }
+		public string customername { get; set; }
+		public string typeofpay { get; set; }
+	}
+
 	public class GetTypeOfPayTransactionsList
 	{
 		public Int64 invoicenumber { get; set; }
@@ -260,6 +267,21 @@
 	public class UpadatePaymentInOutTrnxRs
 	{
 		public string status { get; set; }
+		public string statusmessage { get; set; }
+	}
+
+	public class InsertAdvanceTrnxRq
+	{
+		public Int64 invoicenumber { get; set; }
+		public DateTime invoicedate { get; set; }
+		public Decimal received { get; set; }
+		public Int64 registeredphonenumber { get; set; }
+		public string paymenttype { get; set; }
+		public string customername { get; set; }
+		public string typeofpay { get; set; }
+		public List<AmountDetails> amountdetails { get; set; }
+		public Decimal topayparty { get; set; }
+		public Decimal toreceivefromparty { get; set; }
 	}
 
 	public class ConvertToSaleSaleOrderRq
