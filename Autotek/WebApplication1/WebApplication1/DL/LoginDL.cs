@@ -50,7 +50,7 @@ namespace WebApplication1.DL
 			}
 			catch(Exception ex)
 			{
-				ologinrs.status = "SUCCESS";
+				ologinrs.status = "FAILED";
 				ologinrs.statusMessage = "Record Not Found";
 			}
 			return ologinrs;

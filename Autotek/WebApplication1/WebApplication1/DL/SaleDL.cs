@@ -1774,7 +1774,7 @@ namespace WebApplication1.DL
 							}
 							else
 							{
-								oGetBanksRs.status = "FAILED";
+								oGetBanksRs.status = "SUCCESS";
 							}
 						}
 					}
