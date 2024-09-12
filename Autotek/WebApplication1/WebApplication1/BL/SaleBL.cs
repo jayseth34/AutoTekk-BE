@@ -201,6 +201,7 @@ namespace WebApplication1.BL
 			if(oUpadatePaymentInOutTrnxRs.status == "SUCCESS")
 			{
 				bool updateparty = await saledl.UpdatePartyToPayReceive(oInsertAdvanceTrnxRq);
+				bool val = await saledl.InsertAdvanceInOutTrnx(oInsertAdvanceTrnxRq);
 			}
 			return oUpadatePaymentInOutTrnxRs;
 		}

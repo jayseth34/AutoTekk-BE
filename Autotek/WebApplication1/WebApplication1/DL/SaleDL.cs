@@ -1038,7 +1038,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@paymenttype", oInsertAdvanceTrnxRq.paymenttype);
 					cmd.Parameters.AddWithValue("@invoicedate", oInsertAdvanceTrnxRq.invoicedate);
 					cmd.Parameters.AddWithValue("@invoicenumber", oInsertAdvanceTrnxRq.invoicenumber);
-					cmd.Parameters.AddWithValue("@received", 0);
+					cmd.Parameters.AddWithValue("@received", oInsertAdvanceTrnxRq.received);
 					cmd.Parameters.AddWithValue("@total", oInsertAdvanceTrnxRq.received);
 					cmd.Parameters.AddWithValue("@balance", oInsertAdvanceTrnxRq.received);
 					cmd.Parameters.AddWithValue("@paymentstatus", "UNPAID");
@@ -1172,6 +1172,38 @@ namespace WebApplication1.DL
 			}
 			return val;
 		}
+
+		public async Task<bool> InsertAdvanceInOutTrnx(InsertAdvanceTrnxRq oInsertAdvanceTrnxRq)
+		{
+			bool val = false;
+			string sqlQuery = "INSERT INTO payementinouttransactions (typeofpay, customername, invoicedate, invoicenumber, registeredphonenumber, linkedamount, paymentininvoicenumber)" +
+				"VALUES(@typeofpay, @customername, @invoicedate, @invoicenumber, @registeredphonenumber, @linkedamount, @paymentininvoicenumber)";
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = sqlQuery;
+					cmd.Parameters.AddWithValue("@typeofpay", oInsertAdvanceTrnxRq.typeofpay);
+					cmd.Parameters.AddWithValue("@registeredphonenumber", oInsertAdvanceTrnxRq.registeredphonenumber);
+					cmd.Parameters.AddWithValue("@customername", oInsertAdvanceTrnxRq.customername);
+					cmd.Parameters.AddWithValue("@invoicedate", oInsertAdvanceTrnxRq.invoicedate);
+					cmd.Parameters.AddWithValue("@invoicenumber", oInsertAdvanceTrnxRq.invoicenumber);
+					cmd.Parameters.AddWithValue("@linkedamount", oInsertAdvanceTrnxRq.received);
+					cmd.Parameters.AddWithValue("@paymentininvoicenumber", oInsertAdvanceTrnxRq.invoicenumber);
+					cmd.ExecuteNonQuery();
+					val = true;
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			return val;
+		}
 		public PaymentInOutTrnxRs GetPaymentInOutTransactionDetails(GetPartyTransactionDetailsRq oGetPartyTransactionDetailsRq)
 		{
 			PaymentInOutTrnxRs oPaymentInOutTrnxRs = new PaymentInOutTrnxRs();
@@ -1194,7 +1226,6 @@ namespace WebApplication1.DL
 						{
 							while (reader.Read())
 							{
-
 								ListPaymentInOutTrnxRs oListPaymentInOutTrnxRs = new ListPaymentInOutTrnxRs();
 								oListPaymentInOutTrnxRs.invoicenumber = reader["invoicenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["invoicenumber"]);
 								oListPaymentInOutTrnxRs.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);

@@ -31,6 +31,7 @@ namespace WebApplication1.Models
 		public Decimal minimumstocktomaintain { get; set; }
 		public string _location { get; set; }
 		public bool isitemupdate { get; set; }
+		public Decimal? mrp { get; set; } = 0;
 	}
 
 	public class ItemRs
@@ -59,7 +60,9 @@ namespace WebApplication1.Models
 		public Decimal wholesaleprice { get; set; }
 		public Decimal minimumwholesalequantity { get; set; }
 		public Decimal discountonsaleprice { get; set; }
+		public Decimal mrp { get; set; }
 		public string percentageoramounttype { get; set; }
+		public string itemcode { get; set; }
 	}
 
 	public class GetItemRs

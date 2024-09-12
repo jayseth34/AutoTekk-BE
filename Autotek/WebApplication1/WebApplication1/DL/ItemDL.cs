@@ -48,9 +48,9 @@ namespace WebApplication1.DL
 							cmd.Connection = conn;
 							cmd.CommandType = CommandType.Text;
 							cmd.CommandText = "INSERT INTO item (typeofpay, registeredphonenumber, itemname, itemhsn, baseunit, secondaryunit, conversionrates, category, itemcode, saleprice, salewithorwithouttax, discountonsaleprice," +
-								"wholesaleprice, wholesalewithorwithouttax, minimumwholesalequantity, purchaseprice, purchasewithorwithouttax, taxrate, openingquantity, remainingquantity, atprice, asofdate, minimumstocktomaintain, _location, percentageoramounttype) " +
+								"wholesaleprice, wholesalewithorwithouttax, minimumwholesalequantity, purchaseprice, purchasewithorwithouttax, taxrate, openingquantity, remainingquantity, atprice, asofdate, minimumstocktomaintain, _location, percentageoramounttype, mrp) " +
 								"VALUES (@typeofpay, @registeredphonenumber, @itemname, @itemhsn, @baseunit, @secondaryunit, @conversionrates, @category, @itemcode, @saleprice, @salewithorwithouttax, @discountonsaleprice," +
-								" @wholesaleprice, @wholesalewithorwithouttax, @minimumwholesalequantity, @purchaseprice, @purchasewithorwithouttax, @taxrate, @openingquantity, @remainingquantity, @atprice, @asofdate, @minimumstocktomaintain, @_location, @percentageoramounttype)";
+								" @wholesaleprice, @wholesalewithorwithouttax, @minimumwholesalequantity, @purchaseprice, @purchasewithorwithouttax, @taxrate, @openingquantity, @remainingquantity, @atprice, @asofdate, @minimumstocktomaintain, @_location, @percentageoramounttype, @mrp)";
 							cmd.Parameters.AddWithValue("@typeofpay", oitemRq.typeofpay);
 							cmd.Parameters.AddWithValue("@registeredphonenumber", oitemRq.registeredphonenumber);
 							cmd.Parameters.AddWithValue("@itemname", oitemRq.itemname);
@@ -76,6 +76,7 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@minimumstocktomaintain", oitemRq.minimumstocktomaintain);
 							cmd.Parameters.AddWithValue("@_location", oitemRq._location);
 							cmd.Parameters.AddWithValue("@percentageoramounttype", oitemRq.percentageoramounttype);
+							cmd.Parameters.AddWithValue("@mrp", oitemRq.mrp);
 							cmd.ExecuteNonQuery();
 							oitemRs.statusmessage = "Inserted Successfully";
 							oitemRs.status = "Success";
@@ -191,7 +192,7 @@ namespace WebApplication1.DL
 							cmd.CommandText = "Update item SET typeofpay = @typeofpay, itemname = @itemname, itemhsn = @itemhsn, baseunit = @baseunit, secondaryunit = @secondaryunit, conversionrates = @conversionrates, category = @category," +
 								"itemcode = @itemcode, saleprice = @saleprice, salewithorwithouttax = @salewithorwithouttax, discountonsaleprice = @discountonsaleprice," +
 								"wholesaleprice = @wholesaleprice, wholesalewithorwithouttax = @wholesalewithorwithouttax, minimumwholesalequantity = @minimumwholesalequantity, purchaseprice = @purchaseprice, purchasewithorwithouttax = @purchasewithorwithouttax," +
-								"taxrate = @taxrate, openingquantity = @openingquantity, remainingquantity = @remainingquantity, atprice = @atprice, asofdate = @asofdate, minimumstocktomaintain = @minimumstocktomaintain, _location = @_location, percentageoramounttype = @percentageoramounttype WHERE " +
+								"taxrate = @taxrate, openingquantity = @openingquantity, remainingquantity = @remainingquantity, atprice = @atprice, asofdate = @asofdate, minimumstocktomaintain = @minimumstocktomaintain, _location = @_location, percentageoramounttype = @percentageoramounttype, mrp = @mrp WHERE " +
 								"registeredphonenumber = " + oitemRq.registeredphonenumber + " AND itemname = '" + oitemRq.itemname + "'";
 							cmd.Parameters.AddWithValue("@typeofpay", oitemRq.typeofpay);
 							cmd.Parameters.AddWithValue("@itemname", oitemRq.itemname);
@@ -217,6 +218,7 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@minimumstocktomaintain", oitemRq.minimumstocktomaintain);
 							cmd.Parameters.AddWithValue("@_location", oitemRq._location);
 							cmd.Parameters.AddWithValue("@percentageoramounttype", oitemRq.percentageoramounttype);
+							cmd.Parameters.AddWithValue("@mrp", oitemRq.mrp);
 							cmd.ExecuteNonQuery();
 							oitemRs.statusmessage = "Item Updated Successfully";
 							oitemRs.status = "Success";
@@ -305,7 +307,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT itemname, remainingquantity, saleprice, purchaseprice, baseunit, wholesaleprice, minimumwholesalequantity, percentageoramounttype, discountonsaleprice from item where registeredphonenumber = " + registeredphonenumber;
+					cmd.CommandText = "SELECT itemname, remainingquantity, saleprice, purchaseprice, baseunit, wholesaleprice, minimumwholesalequantity, percentageoramounttype, discountonsaleprice, mrp, itemcode from item where registeredphonenumber = " + registeredphonenumber;
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -321,8 +323,10 @@ namespace WebApplication1.DL
 								oGetItemList.wholesaleprice = reader["wholesaleprice"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["wholesaleprice"]);
 								oGetItemList.minimumwholesalequantity = reader["minimumwholesalequantity"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["minimumwholesalequantity"]);
 								oGetItemList.discountonsaleprice = reader["discountonsaleprice"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["discountonsaleprice"]);
+								oGetItemList.mrp = reader["mrp"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["mrp"]);
 								oGetItemList.percentageoramounttype = reader["percentageoramounttype"] == DBNull.Value ? null : Convert.ToString(reader["percentageoramounttype"]);
 								oGetItemList.baseunit = reader["baseunit"] == DBNull.Value ? null : Convert.ToString(reader["baseunit"]);
+								oGetItemList.itemcode = reader["itemcode"] == DBNull.Value ? null : Convert.ToString(reader["itemcode"]);
 
 								oGetItemListRs.getItemList.Add(oGetItemList);
 							}
