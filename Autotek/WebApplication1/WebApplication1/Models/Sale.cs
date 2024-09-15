@@ -54,6 +54,8 @@
 		public Int64 transactionid { get; set; }
 		public Decimal discountpercent { get; set; }
 		public Decimal discountamount { get; set; }
+		public Decimal mrp { get; set; }
+		public string itemcode { get; set; }
 	}
 
 	public class TransactionRs
@@ -154,6 +156,8 @@
 		public Decimal taxrateamount { get; set; }
 		public Decimal discountpercent { get; set; }
 		public Decimal discountamount { get; set; }
+		public Decimal mrp { get; set; }
+		public string itemcode { get; set; }
 	}
 
 	public class GetItemTransactionsRq

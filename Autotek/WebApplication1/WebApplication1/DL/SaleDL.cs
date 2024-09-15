@@ -69,8 +69,8 @@ namespace WebApplication1.DL
 								NpgsqlCommand cmdd = new NpgsqlCommand();
 								cmdd.Connection = connn;
 								cmdd.CommandType = CommandType.Text;
-								cmdd.CommandText = "INSERT INTO item_details (transaction_id, item, qty, unit, priceperunit, registeredphonenumber, invoicenumber, customername, invoicedate, typeofpay, paymentstatus, taxrate, taxrateamount, discountpercent, discountamount) " +
-									"VALUES (@transaction_id, @item, @qty, @unit, @priceperunit, @registeredphonenumber, @invoicenumber, @customername, @invoicedate, @typeofpay, @paymentstatus, @taxrate, @taxrateamount, @discountpercent, @discountamount)";
+								cmdd.CommandText = "INSERT INTO item_details (transaction_id, item, qty, unit, priceperunit, registeredphonenumber, invoicenumber, customername, invoicedate, typeofpay, paymentstatus, taxrate, taxrateamount, discountpercent, discountamount, itemcode, mrp) " +
+									"VALUES (@transaction_id, @item, @qty, @unit, @priceperunit, @registeredphonenumber, @invoicenumber, @customername, @invoicedate, @typeofpay, @paymentstatus, @taxrate, @taxrateamount, @discountpercent, @discountamount, @itemcode, @mrp)";
 								cmdd.Parameters.AddWithValue("@transaction_id", transactionId);
 								cmdd.Parameters.AddWithValue("@item", itemDetail.item);
 								cmdd.Parameters.AddWithValue("@qty", itemDetail.qty);
@@ -86,6 +86,8 @@ namespace WebApplication1.DL
 								cmdd.Parameters.AddWithValue("@taxrateamount", itemDetail.taxrateamount);
 								cmdd.Parameters.AddWithValue("@discountpercent", itemDetail.discountpercent);
 								cmdd.Parameters.AddWithValue("@discountamount", itemDetail.discountamount);
+								cmdd.Parameters.AddWithValue("@itemcode", itemDetail.itemcode);
+								cmdd.Parameters.AddWithValue("@mrp", itemDetail.mrp);
 								cmdd.ExecuteNonQuery();
 								otransactionrs.status = "SUCCESS";
 							}
@@ -218,7 +220,7 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT tr.typeofpay, tr.invoicedate, tr.stateofsupply, tr.paymenttype, tr.total, tr.received, tr.balance, tr.customername," +
-						"tr.phonenumber, tr.billingaddress, tr.shippingaddress, tr.amountdetails, ide.item, ide,qty, ide.unit, ide.priceperunit, ide.transaction_id, ide.taxrate, ide.taxrateamount, ide.discountpercent, ide.discountamount FROM transactions tr join item_details ide" +
+						"tr.phonenumber, tr.billingaddress, tr.shippingaddress, tr.amountdetails, ide.item, ide,qty, ide.unit, ide.priceperunit, ide.transaction_id, ide.taxrate, ide.taxrateamount, ide.discountpercent, ide.discountamount, ide.itemcode, ide.mrp FROM transactions tr join item_details ide" +
 						" ON tr.transaction_id = ide.transaction_id WHERE tr.invoicenumber = " + oGetPartyTransactionDetailsRq.invoicenumber + " AND tr.registeredphonenumber = " +
 						oGetPartyTransactionDetailsRq.registeredphonenumber + " AND tr.typeofpay = '" + oGetPartyTransactionDetailsRq.typeofpay + "'";
 					NpgsqlDataReader reader = cmd.ExecuteReader();
@@ -255,6 +257,8 @@ namespace WebApplication1.DL
 								oItemDetailsListRs.taxrateamount = reader["taxrateamount"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["taxrateamount"]);
 								oItemDetailsListRs.discountpercent = reader["discountpercent"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["discountpercent"]);
 								oItemDetailsListRs.discountamount = reader["discountamount"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["discountamount"]);
+								oItemDetailsListRs.mrp = reader["mrp"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["mrp"]);
+								oItemDetailsListRs.itemcode = reader["itemcode"] == DBNull.Value ? null : Convert.ToString(reader["itemcode"]);
 								oGetPartyTransactionDetailsRs.amountdetailslist = JsonConvert.DeserializeObject<List<AmountDetails>>(amtdetails);
 								oGetPartyTransactionDetailsRs.itemdetailslist.Add(oItemDetailsListRs);
 							}
@@ -505,8 +509,8 @@ namespace WebApplication1.DL
 								NpgsqlCommand cmdd = new NpgsqlCommand();
 								cmdd.Connection = connn;
 								cmdd.CommandType = CommandType.Text;
-								cmdd.CommandText = "INSERT INTO item_details (transaction_id, item, qty, unit, priceperunit, registeredphonenumber, invoicenumber, customername, invoicedate, typeofpay, paymentstatus, taxrate, taxrateamount, discountpercent, discountamount) " +
-									"VALUES (@transaction_id, @item, @qty, @unit, @priceperunit, @registeredphonenumber, @invoicenumber, @customername, @invoicedate, @typeofpay, @paymentstatus, @taxrate, @taxrateamount, @discountpercent, @discountamount)";
+								cmdd.CommandText = "INSERT INTO item_details (transaction_id, item, qty, unit, priceperunit, registeredphonenumber, invoicenumber, customername, invoicedate, typeofpay, paymentstatus, taxrate, taxrateamount, discountpercent, discountamount, itemcode, mrp) " +
+									"VALUES (@transaction_id, @item, @qty, @unit, @priceperunit, @registeredphonenumber, @invoicenumber, @customername, @invoicedate, @typeofpay, @paymentstatus, @taxrate, @taxrateamount, @discountpercent, @discountamount, @itemcode, @mrp)";
 								cmdd.Parameters.AddWithValue("@transaction_id", transactionId);
 								cmdd.Parameters.AddWithValue("@item", itemDetail.item);
 								cmdd.Parameters.AddWithValue("@qty", itemDetail.qty);
@@ -522,6 +526,8 @@ namespace WebApplication1.DL
 								cmdd.Parameters.AddWithValue("@taxrateamount", itemDetail.taxrateamount);
 								cmdd.Parameters.AddWithValue("@discountpercent", itemDetail.discountpercent);
 								cmdd.Parameters.AddWithValue("@discountamount", itemDetail.discountamount);
+								cmdd.Parameters.AddWithValue("@mrp", itemDetail.mrp);
+								cmdd.Parameters.AddWithValue("@itemcode", itemDetail.itemcode);
 								cmdd.ExecuteNonQuery();
 								otransactionrs.status = "SUCCESS";
 							}
@@ -819,13 +825,13 @@ namespace WebApplication1.DL
 					string query = string.Empty;
 					if (itemDetail.queryoperationtype == "INSERT")
 					{
-						query = "INSERT INTO item_details (transaction_id, item, qty, unit, priceperunit, registeredphonenumber, invoicenumber, customername, invoicedate, typeofpay, paymentstatus, taxrate, taxrateamount, discountpercent, discountamount) " +
-							"VALUES (@transaction_id, @item, @qty, @unit, @priceperunit, @registeredphonenumber, @invoicenumber, @customername, @invoicedate, @typeofpay, @paymentstatus, @taxrate, @taxrateamount, @discountpercent, @discountamount)";
+						query = "INSERT INTO item_details (transaction_id, item, qty, unit, priceperunit, registeredphonenumber, invoicenumber, customername, invoicedate, typeofpay, paymentstatus, taxrate, taxrateamount, discountpercent, discountamount, itemcode, mrp) " +
+							"VALUES (@transaction_id, @item, @qty, @unit, @priceperunit, @registeredphonenumber, @invoicenumber, @customername, @invoicedate, @typeofpay, @paymentstatus, @taxrate, @taxrateamount, @discountpercent, @discountamount, @itemcode, @mrp)";
 					}
 					else if (itemDetail.queryoperationtype == "UPDATE")
 					{
 						query = "UPDATE item_details SET item = @item, qty = @qty, unit = @unit, priceperunit = @priceperunit, invoicedate = @invoicedate, typeofpay = @typeofpay, paymentstatus = @paymentstatus," +
-							"taxrate = @taxrate, taxrateamount = @taxrateamount, discountpercent = @discountpercent, discountamount = @discountamount WHERE registeredphonenumber = " + otransactionRq.registeredphonenumber + " AND transaction_id = " + itemDetail.transactionid + " " +
+							"taxrate = @taxrate, taxrateamount = @taxrateamount, discountpercent = @discountpercent, discountamount = @discountamount, itemcode = @itemcoe, mrp = @mrp WHERE registeredphonenumber = " + otransactionRq.registeredphonenumber + " AND transaction_id = " + itemDetail.transactionid + " " +
 							"AND item = '" + itemDetail.item + "' AND invoicenumber = " + otransactionRq.invoicenumber;
 					}
 					else if (itemDetail.queryoperationtype == "DELETE")
@@ -859,6 +865,8 @@ namespace WebApplication1.DL
 							cmdd.Parameters.AddWithValue("@taxrateamount", itemDetail.taxrateamount);
 							cmdd.Parameters.AddWithValue("@discountpercent", itemDetail.discountpercent);
 							cmdd.Parameters.AddWithValue("@discountamount", itemDetail.discountamount);
+							cmdd.Parameters.AddWithValue("@itemcode", itemDetail.itemcode);
+							cmdd.Parameters.AddWithValue("@mrp", itemDetail.mrp);
 							cmdd.ExecuteNonQuery();
 						}
 					}
