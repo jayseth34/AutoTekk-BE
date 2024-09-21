@@ -233,32 +233,32 @@ namespace WebApplication1.DL
 							{
 								if (recordFetched)
 								{
-									oGetPartyTransactionDetailsRs.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
+									oGetPartyTransactionDetailsRs.typeofpay = reader["typeofpay"] == DBNull.Value ? "" : Convert.ToString(reader["typeofpay"]);
 									oGetPartyTransactionDetailsRs.invoicedate = reader["invoicedate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["invoicedate"]);
-									oGetPartyTransactionDetailsRs.stateofsupply = reader["stateofsupply"] == DBNull.Value ? null : Convert.ToString(reader["stateofsupply"]);
-									oGetPartyTransactionDetailsRs.paymenttype = reader["paymenttype"] == DBNull.Value ? null : Convert.ToString(reader["paymenttype"]);
+									oGetPartyTransactionDetailsRs.stateofsupply = reader["stateofsupply"] == DBNull.Value ? "" : Convert.ToString(reader["stateofsupply"]);
+									oGetPartyTransactionDetailsRs.paymenttype = reader["paymenttype"] == DBNull.Value ? "" : Convert.ToString(reader["paymenttype"]);
 									oGetPartyTransactionDetailsRs.total = reader["total"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["total"]);
 									oGetPartyTransactionDetailsRs.received = reader["received"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["received"]);
 									oGetPartyTransactionDetailsRs.balance = reader["balance"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["balance"]);
-									oGetPartyTransactionDetailsRs.customername = reader["customername"] == DBNull.Value ? null : Convert.ToString(reader["customername"]);
+									oGetPartyTransactionDetailsRs.customername = reader["customername"] == DBNull.Value ? "" : Convert.ToString(reader["customername"]);
 									oGetPartyTransactionDetailsRs.phonenumber = reader["phonenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["phonenumber"]);
-									oGetPartyTransactionDetailsRs.billingaddress = reader["billingaddress"] == DBNull.Value ? null : Convert.ToString(reader["billingaddress"]);
-									oGetPartyTransactionDetailsRs.shippingaddress = reader["shippingaddress"] == DBNull.Value ? null : Convert.ToString(reader["shippingaddress"]);
-									amtdetails = reader["amountdetails"] == DBNull.Value ? null : Convert.ToString(reader["amountdetails"]);
+									oGetPartyTransactionDetailsRs.billingaddress = reader["billingaddress"] == DBNull.Value ? "" : Convert.ToString(reader["billingaddress"]);
+									oGetPartyTransactionDetailsRs.shippingaddress = reader["shippingaddress"] == DBNull.Value ? "" : Convert.ToString(reader["shippingaddress"]);
+									amtdetails = reader["amountdetails"] == DBNull.Value ? "" : Convert.ToString(reader["amountdetails"]);
 									recordFetched = false;
 								}
 								ItemDetailsListRs oItemDetailsListRs = new ItemDetailsListRs();
-								oItemDetailsListRs.item = reader["item"] == DBNull.Value ? null : Convert.ToString(reader["item"]);
+								oItemDetailsListRs.item = reader["item"] == DBNull.Value ? "" : Convert.ToString(reader["item"]);
 								oItemDetailsListRs.qty = reader["qty"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["qty"]);
-								oItemDetailsListRs.unit = reader["unit"] == DBNull.Value ? null : Convert.ToString(reader["unit"]);
+								oItemDetailsListRs.unit = reader["unit"] == DBNull.Value ? "" : Convert.ToString(reader["unit"]);
 								oItemDetailsListRs.priceperunit = reader["priceperunit"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["priceperunit"]);
 								oItemDetailsListRs.transactionid = reader["transaction_id"] == DBNull.Value ? 0 : Convert.ToInt64(reader["transaction_id"]);
-								oItemDetailsListRs.taxrate = reader["taxrate"] == DBNull.Value ? null : Convert.ToString(reader["taxrate"]);
+								oItemDetailsListRs.taxrate = reader["taxrate"] == DBNull.Value ? "" : Convert.ToString(reader["taxrate"]);
 								oItemDetailsListRs.taxrateamount = reader["taxrateamount"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["taxrateamount"]);
 								oItemDetailsListRs.discountpercent = reader["discountpercent"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["discountpercent"]);
 								oItemDetailsListRs.discountamount = reader["discountamount"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["discountamount"]);
 								oItemDetailsListRs.mrp = reader["mrp"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["mrp"]);
-								oItemDetailsListRs.itemcode = reader["itemcode"] == DBNull.Value ? null : Convert.ToString(reader["itemcode"]);
+								oItemDetailsListRs.itemcode = reader["itemcode"] == DBNull.Value ? "" : Convert.ToString(reader["itemcode"]);
 								oGetPartyTransactionDetailsRs.amountdetailslist = JsonConvert.DeserializeObject<List<AmountDetails>>(amtdetails);
 								oGetPartyTransactionDetailsRs.itemdetailslist.Add(oItemDetailsListRs);
 							}
@@ -305,12 +305,12 @@ namespace WebApplication1.DL
 							{
 								GetAllItemTransactionsList oGetAllItemTransactionsList = new GetAllItemTransactionsList();
 								oGetAllItemTransactionsList.invoicenumber = reader["invoicenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["invoicenumber"]);
-								oGetAllItemTransactionsList.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
-								oGetAllItemTransactionsList.partyname = reader["customername"] == DBNull.Value ? null : Convert.ToString(reader["customername"]);
+								oGetAllItemTransactionsList.typeofpay = reader["typeofpay"] == DBNull.Value ? "" : Convert.ToString(reader["typeofpay"]);
+								oGetAllItemTransactionsList.partyname = reader["customername"] == DBNull.Value ? "" : Convert.ToString(reader["customername"]);
 								oGetAllItemTransactionsList.invoicedate = reader["invoicedate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["invoicedate"]);
 								oGetAllItemTransactionsList.qty = reader["qty"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["qty"]);
 								oGetAllItemTransactionsList.priceperunit = reader["priceperunit"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["priceperunit"]);
-								oGetAllItemTransactionsList.paymentstatus = reader["paymentstatus"] == DBNull.Value ? null : Convert.ToString(reader["paymentstatus"]);
+								oGetAllItemTransactionsList.paymentstatus = reader["paymentstatus"] == DBNull.Value ? "" : Convert.ToString(reader["paymentstatus"]);
 								oGetItemTransactionsRs.itemTransactionsList.Add(oGetAllItemTransactionsList);
 							}
 							oGetItemTransactionsRs.status = "SUCCESS";
@@ -402,11 +402,11 @@ namespace WebApplication1.DL
 
 								GetTypeOfPayTransactionsList oGetTypeOfPayTransactionsList = new GetTypeOfPayTransactionsList();
 								oGetTypeOfPayTransactionsList.invoicenumber = reader["invoicenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["invoicenumber"]);
-								oGetTypeOfPayTransactionsList.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
-								oGetTypeOfPayTransactionsList.customername = reader["customername"] == DBNull.Value ? null : Convert.ToString(reader["customername"]);
+								oGetTypeOfPayTransactionsList.typeofpay = reader["typeofpay"] == DBNull.Value ? "" : Convert.ToString(reader["typeofpay"]);
+								oGetTypeOfPayTransactionsList.customername = reader["customername"] == DBNull.Value ? "" : Convert.ToString(reader["customername"]);
 								oGetTypeOfPayTransactionsList.invoicedate = reader["invoicedate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["invoicedate"]);
-								oGetTypeOfPayTransactionsList.paymentstatus = reader["paymentstatus"] == DBNull.Value ? null : Convert.ToString(reader["paymentstatus"]);
-								oGetTypeOfPayTransactionsList.paymenttype = reader["paymenttype"] == DBNull.Value ? null : Convert.ToString(reader["paymenttype"]);
+								oGetTypeOfPayTransactionsList.paymentstatus = reader["paymentstatus"] == DBNull.Value ? "" : Convert.ToString(reader["paymentstatus"]);
+								oGetTypeOfPayTransactionsList.paymenttype = reader["paymenttype"] == DBNull.Value ? "" : Convert.ToString(reader["paymenttype"]);
 								oGetTypeOfPayTransactionsList.total = reader["total"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["total"]);
 								oGetTypeOfPayTransactionsList.balance = reader["balance"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["balance"]);
 								oGetTypeOfPayTransactionsList.isconverted = reader["isconverted"] == DBNull.Value ? false : Convert.ToBoolean(reader["isconverted"]);
@@ -638,23 +638,23 @@ namespace WebApplication1.DL
 							{
 								if (recordFetched)
 								{
-									oGetPartyTransactionDetailsRs.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
+									oGetPartyTransactionDetailsRs.typeofpay = reader["typeofpay"] == DBNull.Value ? "" : Convert.ToString(reader["typeofpay"]);
 									oGetPartyTransactionDetailsRs.invoicedate = reader["invoicedate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["invoicedate"]);
-									oGetPartyTransactionDetailsRs.stateofsupply = reader["stateofsupply"] == DBNull.Value ? null : Convert.ToString(reader["stateofsupply"]);
-									oGetPartyTransactionDetailsRs.paymenttype = reader["paymenttype"] == DBNull.Value ? null : Convert.ToString(reader["paymenttype"]);
+									oGetPartyTransactionDetailsRs.stateofsupply = reader["stateofsupply"] == DBNull.Value ? "" : Convert.ToString(reader["stateofsupply"]);
+									oGetPartyTransactionDetailsRs.paymenttype = reader["paymenttype"] == DBNull.Value ? "" : Convert.ToString(reader["paymenttype"]);
 									oGetPartyTransactionDetailsRs.total = reader["total"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["total"]);
 									oGetPartyTransactionDetailsRs.received = reader["received"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["received"]);
 									oGetPartyTransactionDetailsRs.balance = reader["balance"] == DBNull.Value ? 0 : Convert.ToInt64(reader["balance"]);
-									oGetPartyTransactionDetailsRs.customername = reader["customername"] == DBNull.Value ? null : Convert.ToString(reader["customername"]);
+									oGetPartyTransactionDetailsRs.customername = reader["customername"] == DBNull.Value ? "" : Convert.ToString(reader["customername"]);
 									oGetPartyTransactionDetailsRs.phonenumber = reader["phonenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["phonenumber"]);
-									oGetPartyTransactionDetailsRs.billingaddress = reader["billingaddress"] == DBNull.Value ? null : Convert.ToString(reader["billingaddress"]);
-									oGetPartyTransactionDetailsRs.shippingaddress = reader["shippingaddress"] == DBNull.Value ? null : Convert.ToString(reader["shippingaddress"]);
+									oGetPartyTransactionDetailsRs.billingaddress = reader["billingaddress"] == DBNull.Value ? "" : Convert.ToString(reader["billingaddress"]);
+									oGetPartyTransactionDetailsRs.shippingaddress = reader["shippingaddress"] == DBNull.Value ? "" : Convert.ToString(reader["shippingaddress"]);
 									recordFetched = false;
 								}
 								ItemDetailsListRs oItemDetailsListRs = new ItemDetailsListRs();
-								oItemDetailsListRs.item = reader["item"] == DBNull.Value ? null : Convert.ToString(reader["item"]);
+								oItemDetailsListRs.item = reader["item"] == DBNull.Value ? "" : Convert.ToString(reader["item"]);
 								oItemDetailsListRs.qty = reader["qty"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["qty"]);
-								oItemDetailsListRs.unit = reader["unit"] == DBNull.Value ? null : Convert.ToString(reader["unit"]);
+								oItemDetailsListRs.unit = reader["unit"] == DBNull.Value ? "" : Convert.ToString(reader["unit"]);
 								oItemDetailsListRs.priceperunit = reader["priceperunit"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["priceperunit"]);
 								oGetPartyTransactionDetailsRs.itemdetailslist.Add(oItemDetailsListRs);
 							}
@@ -710,8 +710,8 @@ namespace WebApplication1.DL
 							{
 								GetLinkedPaymentTransactionList oGetLinkedPaymentTransactionList = new GetLinkedPaymentTransactionList();
 								oGetLinkedPaymentTransactionList.invoicenumber = reader["invoicenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["invoicenumber"]);
-								oGetLinkedPaymentTransactionList.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
-								oGetLinkedPaymentTransactionList.customername = reader["customername"] == DBNull.Value ? null : Convert.ToString(reader["customername"]);
+								oGetLinkedPaymentTransactionList.typeofpay = reader["typeofpay"] == DBNull.Value ? "" : Convert.ToString(reader["typeofpay"]);
+								oGetLinkedPaymentTransactionList.customername = reader["customername"] == DBNull.Value ? "" : Convert.ToString(reader["customername"]);
 								oGetLinkedPaymentTransactionList.invoicedate = DateTime.Today; ;
 								oGetLinkedPaymentTransactionList.total = reader["total"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["total"]);
 								oGetLinkedPaymentTransactionList.linkedamount = reader["linkedamount"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["linkedamount"]);
@@ -798,7 +798,7 @@ namespace WebApplication1.DL
 					{
 						while (reader.Read())
 						{
-							status = reader["amountdetails"] == DBNull.Value ? null : Convert.ToString(reader["amountdetails"]);
+							status = reader["amountdetails"] == DBNull.Value ? "" : Convert.ToString(reader["amountdetails"]);
 						}
 					}
 					catch (Exception ex)
@@ -1119,10 +1119,10 @@ namespace WebApplication1.DL
 							{
 								oGetUpdatedTrnxInOutValRs.invoicenumber = reader["invoicenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["invoicenumber"]);
 								oGetUpdatedTrnxInOutValRs.received = reader["received"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["received"]);
-								oGetUpdatedTrnxInOutValRs.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
-								oGetUpdatedTrnxInOutValRs.partyname = reader["customername"] == DBNull.Value ? null : Convert.ToString(reader["customername"]);
+								oGetUpdatedTrnxInOutValRs.typeofpay = reader["typeofpay"] == DBNull.Value ? "" : Convert.ToString(reader["typeofpay"]);
+								oGetUpdatedTrnxInOutValRs.partyname = reader["customername"] == DBNull.Value ? "" : Convert.ToString(reader["customername"]);
 								oGetUpdatedTrnxInOutValRs.invoicedate = reader["invoicedate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["invoicedate"]);
-								string amountdetails = reader["amountdetails"] == DBNull.Value ? null : Convert.ToString(reader["amountdetails"]);
+								string amountdetails = reader["amountdetails"] == DBNull.Value ? "" : Convert.ToString(reader["amountdetails"]);
 								oGetUpdatedTrnxInOutValRs.amountdetails = JsonConvert.DeserializeObject<List<AmountDetails>>(amountdetails);
 							}
 							oGetUpdatedTrnxInOutValRs.status = "SUCCESS";
@@ -1236,7 +1236,7 @@ namespace WebApplication1.DL
 							{
 								ListPaymentInOutTrnxRs oListPaymentInOutTrnxRs = new ListPaymentInOutTrnxRs();
 								oListPaymentInOutTrnxRs.invoicenumber = reader["invoicenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["invoicenumber"]);
-								oListPaymentInOutTrnxRs.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
+								oListPaymentInOutTrnxRs.typeofpay = reader["typeofpay"] == DBNull.Value ? "" : Convert.ToString(reader["typeofpay"]);
 								oListPaymentInOutTrnxRs.invoicedate = reader["invoicedate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["invoicedate"]);
 								oListPaymentInOutTrnxRs.linkedamount = reader["linkedamount"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["linkedamount"]);
 								oPaymentInOutTrnxRs.inouttrnxlist.Add(oListPaymentInOutTrnxRs);
@@ -1405,8 +1405,8 @@ namespace WebApplication1.DL
 								while (await reader.ReadAsync())
 								{
 									BankTrnxDetails oBankTrnxDetails = new BankTrnxDetails();
-									oBankTrnxDetails.customername = reader["bankscustomername"] == DBNull.Value ? null : Convert.ToString(reader["bankscustomername"]);
-									oBankTrnxDetails.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
+									oBankTrnxDetails.customername = reader["bankscustomername"] == DBNull.Value ? "" : Convert.ToString(reader["bankscustomername"]);
+									oBankTrnxDetails.typeofpay = reader["typeofpay"] == DBNull.Value ? "" : Convert.ToString(reader["typeofpay"]);
 									oBankTrnxDetails.invoicedate = reader["invoicedate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["invoicedate"]);
 									oBankTrnxDetails.transactionid = reader["transaction_id"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["transaction_id"]);
 									amount = reader["amountdetails"] == DBNull.Value ? null : JsonConvert.DeserializeObject<List<AmountDetails>>(Convert.ToString(reader["amountdetails"]));
@@ -1478,9 +1478,9 @@ namespace WebApplication1.DL
 								while (await reader.ReadAsync())
 								{
 									BankTrnxDetailsVal oBankTrnxDetailsVal = new BankTrnxDetailsVal();
-									oBankTrnxDetailsVal.customername = reader["bankscustomername"] == DBNull.Value ? null : Convert.ToString(reader["bankscustomername"]);
-									oBankTrnxDetailsVal.typeofpay = reader["typeofpay"] == DBNull.Value ? null : Convert.ToString(reader["typeofpay"]);
-									oBankTrnxDetailsVal.paymenttype = reader["paymenttype"] == DBNull.Value ? null : Convert.ToString(reader["paymenttype"]);
+									oBankTrnxDetailsVal.customername = reader["bankscustomername"] == DBNull.Value ? "" : Convert.ToString(reader["bankscustomername"]);
+									oBankTrnxDetailsVal.typeofpay = reader["typeofpay"] == DBNull.Value ? "" : Convert.ToString(reader["typeofpay"]);
+									oBankTrnxDetailsVal.paymenttype = reader["paymenttype"] == DBNull.Value ? "" : Convert.ToString(reader["paymenttype"]);
 									oBankTrnxDetailsVal.invoicedate = reader["invoicedate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["invoicedate"]);
 									oBankTrnxDetailsVal.transactionid = reader["transaction_id"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["transaction_id"]);
 									oBankTrnxDetailsVal.amtdetails = reader["amountdetails"] == DBNull.Value ? null : Convert.ToString(reader["amountdetails"]);
@@ -1805,7 +1805,7 @@ namespace WebApplication1.DL
 								while (await reader.ReadAsync())
 								{
 									BanksList oBanksList = new BanksList();
-									oBanksList.accountdisplayname = reader["accountdisplayname"] == DBNull.Value ? null : Convert.ToString(reader["accountdisplayname"]);
+									oBanksList.accountdisplayname = reader["accountdisplayname"] == DBNull.Value ? "" : Convert.ToString(reader["accountdisplayname"]);
 									oBanksList.amount = reader["amount"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["amount"]);
 									oGetBanksRs.bankslist.Add(oBanksList);
 								}
@@ -2011,7 +2011,7 @@ namespace WebApplication1.DL
 							{
 								while (await reader.ReadAsync())
 								{
-									oGetBanksDetailsValuesRs.newaccountdisplayname = reader["accountdisplayname"] == DBNull.Value ? null : Convert.ToString(reader["accountdisplayname"]);
+									oGetBanksDetailsValuesRs.newaccountdisplayname = reader["accountdisplayname"] == DBNull.Value ? "" : Convert.ToString(reader["accountdisplayname"]);
 									oGetBanksDetailsValuesRs.newopeningbalance = reader["openingbalance"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["openingbalance"]);
 									oGetBanksDetailsValuesRs.amount = reader["amount"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["amount"]);
 									oGetBanksDetailsValuesRs.asofDate = reader["asofdate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["asofdate"]);
@@ -2059,8 +2059,8 @@ namespace WebApplication1.DL
 							{
 								while (await reader.ReadAsync())
 								{
-									oGetTransferDetailsValuesRs.customername = reader["paymenttype"] == DBNull.Value ? null : Convert.ToString(reader["paymenttype"]);
-									oGetTransferDetailsValuesRs.banktobank = reader["bankscustomername"] == DBNull.Value ? null : Convert.ToString(reader["bankscustomername"]);
+									oGetTransferDetailsValuesRs.customername = reader["paymenttype"] == DBNull.Value ? "" : Convert.ToString(reader["paymenttype"]);
+									oGetTransferDetailsValuesRs.banktobank = reader["bankscustomername"] == DBNull.Value ? "" : Convert.ToString(reader["bankscustomername"]);
 									oGetTransferDetailsValuesRs.amount = reader["total"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["total"]);
 									oGetTransferDetailsValuesRs.adjustmentDate = reader["invoicedate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["invoicedate"]);
 									if (!string.IsNullOrEmpty(oGetTransferDetailsValuesRs.banktobank))

@@ -41,7 +41,7 @@ namespace WebApplication1.DL
 						ologinrs.status = "SUCCESS";
 						ologinrs.statusMessage = reader["status"].ToString();
 						ologinrs.expiryDate = Convert.ToDateTime(reader["expirydate"]);
-						ologinrs.plantype =  reader["plantype"] == DBNull.Value ? null : Convert.ToString(reader["plantype"]);
+						ologinrs.plantype =  reader["plantype"] == DBNull.Value ? "" : Convert.ToString(reader["plantype"]);
 						return ologinrs;
 					}
 					ologinrs.status = "FAILED";
@@ -99,7 +99,7 @@ namespace WebApplication1.DL
 						otpRs.status = "SUCCESS";
 						otpRs.statusmessage = reader["status"].ToString();
 						otpRs.expiryDate = Convert.ToDateTime(reader["expirydate"]);
-						otpRs.plantype = reader["plantype"] == DBNull.Value ? null : Convert.ToString(reader["plantype"]);
+						otpRs.plantype = reader["plantype"] == DBNull.Value ? "" : Convert.ToString(reader["plantype"]);
 					}
 				}
 			}
@@ -691,12 +691,12 @@ namespace WebApplication1.DL
 							while (reader.Read())
 							{
 								GetPartyList oGetPartyList = new GetPartyList();
-								oGetPartyList.partyname = reader["partyname"] == DBNull.Value ? null : Convert.ToString(reader["partyname"]);
+								oGetPartyList.partyname = reader["partyname"] == DBNull.Value ? "" : Convert.ToString(reader["partyname"]);
 								oGetPartyList.topayparty = reader["topayparty"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["topayparty"]);
 								oGetPartyList.toreceivefromparty = reader["toreceivefromparty"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["toreceivefromparty"]);
 								oGetPartyList.creditlimit = reader["creditlimit"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["creditlimit"]);
-								oGetPartyList.shippingaddress = reader["shippingaddress"] == DBNull.Value ? null : Convert.ToString(reader["shippingaddress"]);
-								oGetPartyList.billingaddress = reader["billingaddress"] == DBNull.Value ? null : Convert.ToString(reader["billingaddress"]);
+								oGetPartyList.shippingaddress = reader["shippingaddress"] == DBNull.Value ? "" : Convert.ToString(reader["shippingaddress"]);
+								oGetPartyList.billingaddress = reader["billingaddress"] == DBNull.Value ? "" : Convert.ToString(reader["billingaddress"]);
 								oGetPartyList.phonenumber = reader["phonenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["phonenumber"]);
 								oGetPartyListRs.getPartyList.Add(oGetPartyList);
 
