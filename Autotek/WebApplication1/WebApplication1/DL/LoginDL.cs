@@ -799,7 +799,7 @@ namespace WebApplication1.DL
 					}
 					else
 					{
-						oGetPartyByGroupRs.status = "FAILED";
+						oGetPartyByGroupRs.status = "SUCCESS";
 						oGetPartyByGroupRs.statusmessage = "No Records Found";
 					}
 				}
