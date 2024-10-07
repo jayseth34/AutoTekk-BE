@@ -831,7 +831,7 @@ namespace WebApplication1.DL
 					else if (itemDetail.queryoperationtype == "UPDATE")
 					{
 						query = "UPDATE item_details SET item = @item, qty = @qty, unit = @unit, priceperunit = @priceperunit, invoicedate = @invoicedate, typeofpay = @typeofpay, paymentstatus = @paymentstatus," +
-							"taxrate = @taxrate, taxrateamount = @taxrateamount, discountpercent = @discountpercent, discountamount = @discountamount, itemcode = @itemcoe, mrp = @mrp WHERE registeredphonenumber = " + otransactionRq.registeredphonenumber + " AND transaction_id = " + itemDetail.transactionid + " " +
+							"taxrate = @taxrate, taxrateamount = @taxrateamount, discountpercent = @discountpercent, discountamount = @discountamount, itemcode = @itemcode, mrp = @mrp WHERE registeredphonenumber = " + otransactionRq.registeredphonenumber + " AND transaction_id = " + itemDetail.transactionid + " " +
 							"AND item = '" + itemDetail.item + "' AND invoicenumber = " + otransactionRq.invoicenumber;
 					}
 					else if (itemDetail.queryoperationtype == "DELETE")
@@ -1376,7 +1376,7 @@ namespace WebApplication1.DL
 			List<AmountDetails> amount = new List<AmountDetails>();
 			string result = "SUCCESS";
 
-			string sqlQuery = @"SELECT typeofpay, bankscustomername, invoicedate, amountdetails, paymenttype, transaction_id
+			string sqlQuery = @"SELECT typeofpay, bankscustomername, invoicedate, amountdetails, paymenttype, transaction_id, invoicenumber
                         FROM transactions
                         WHERE registeredphonenumber = @registeredphonenumber
                         AND (paymenttype LIKE '%' || @customername || '%' 
@@ -1409,6 +1409,7 @@ namespace WebApplication1.DL
 									oBankTrnxDetails.typeofpay = reader["typeofpay"] == DBNull.Value ? "" : Convert.ToString(reader["typeofpay"]);
 									oBankTrnxDetails.invoicedate = reader["invoicedate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["invoicedate"]);
 									oBankTrnxDetails.transactionid = reader["transaction_id"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["transaction_id"]);
+									oBankTrnxDetails.invoicenumber = reader["invoicenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["invoicenumber"]);
 									amount = reader["amountdetails"] == DBNull.Value ? null : JsonConvert.DeserializeObject<List<AmountDetails>>(Convert.ToString(reader["amountdetails"]));
 									if (amount != null)
 									{

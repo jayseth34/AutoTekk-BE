@@ -367,6 +367,7 @@
 		public DateTime? invoicedate { get; set; }
 		public Decimal amount { get; set; }
 		public Decimal transactionid { get; set; }
+		public Int64 invoicenumber { get; set; }
 	}
 
 	public class BankTrnxDetailsVal
