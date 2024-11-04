@@ -1082,7 +1082,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "select itemname, remainingquantity from item where minimumstocktomaintain < remainingquantity and registeredphonenumber = @registeredphonenumber";
+					cmd.CommandText = "select itemname, remainingquantity from item where minimumstocktomaintain > remainingquantity and registeredphonenumber = @registeredphonenumber";
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)

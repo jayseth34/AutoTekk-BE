@@ -190,7 +190,42 @@ namespace WebApplication1.DL
 						{
 							oGetPartyTransactionsRs.status = "FAILED";
 						}
+					}
+					else
+					{
+						oGetPartyTransactionsRs.status = "SUCCESS";
+						oGetPartyTransactionsRs.statusmessage = "No records found";
 
+					}
+				}
+
+
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = "SELECT gst, emailid, billingaddress, phonenumber, creditlimit from party where partyname = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber;
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows)
+					{
+						try
+						{
+							while (reader.Read())
+							{
+								oGetPartyTransactionsRs.gst = reader["gst"] == DBNull.Value ? "" : Convert.ToString(reader["gst"]);
+								oGetPartyTransactionsRs.emailid = reader["emailid"] == DBNull.Value ? "" : Convert.ToString(reader["emailid"]);
+								oGetPartyTransactionsRs.billingaddress = reader["billingaddress"] == DBNull.Value ? "" : Convert.ToString(reader["billingaddress"]);
+								oGetPartyTransactionsRs.phonenumber = reader["phonenumber"] == DBNull.Value ? 0 : Convert.ToInt64(reader["phonenumber"]);
+								oGetPartyTransactionsRs.creditlimit = reader["creditlimit"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["creditlimit"]);
+							}
+							oGetPartyTransactionsRs.status = "SUCCESS";
+						}
+						catch (Exception ex)
+						{
+							oGetPartyTransactionsRs.status = "FAILED";
+						}
 					}
 					else
 					{
