@@ -432,29 +432,31 @@ namespace WebApplication1.DL
 									NpgsqlCommand cmd = new NpgsqlCommand();
 									cmd.Connection = conn;
 									cmd.CommandType = CommandType.Text;
-
-									cmd.CommandText = "UPDATE transactions SET typeofpay = @typeofpay, invoicedate = @invoicedate, total = @total, balance = @balance, customername = @customername, phonenumber = @phonenumber, invoicenumber = 1" +
-													  " WHERE registeredphonenumber = @registeredphonenumber AND customername = @oldpartyname and typeofpay = @typeofpay";
-									cmd.Parameters.AddWithValue("@typeofpay", opartyRq.typeofpay);
-									cmd.Parameters.AddWithValue("@invoicedate", DateTime.UtcNow);
-									cmd.Parameters.AddWithValue("@total", opartyRq.openingbalance);
-									cmd.Parameters.AddWithValue("@balance", opartyRq.openingbalance);
-									cmd.Parameters.AddWithValue("@customername", opartyRq.partyname);
-									cmd.Parameters.AddWithValue("@phonenumber", opartyRq.phonenumber);
-									cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
-									cmd.Parameters.AddWithValue("@oldpartyname", opartyRq.oldpartyname);
-									cmd.Parameters.AddWithValue("@paymentstatus", "UNPAID");
-
-									int affectedRows = cmd.ExecuteNonQuery();
-
+									int affectedRows = 0;
 									if (affectedRows == 0)
 									{
 										// No rows updated, perform insert
 										cmd.CommandText = "INSERT INTO transactions (typeofpay, invoicedate, total, balance, customername, phonenumber, registeredphonenumber, paymentstatus, invoicenumber)" +
 														  " VALUES (@typeofpay, @invoicedate, @total, @balance, @customername, @phonenumber, @registeredphonenumber, @paymentstatus, 1)";
+										cmd.Parameters.AddWithValue("@typeofpay", opartyRq.typeofpay);
+										cmd.Parameters.AddWithValue("@invoicedate", DateTime.UtcNow);
+										cmd.Parameters.AddWithValue("@total", opartyRq.openingbalance);
+										cmd.Parameters.AddWithValue("@balance", opartyRq.openingbalance);
+										cmd.Parameters.AddWithValue("@customername", opartyRq.partyname);
+										cmd.Parameters.AddWithValue("@phonenumber", opartyRq.phonenumber);
+										cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
+										cmd.Parameters.AddWithValue("@oldpartyname", opartyRq.oldpartyname);
+										cmd.Parameters.AddWithValue("@paymentstatus", "UNPAID");
 										cmd.ExecuteNonQuery();
 										opartyRs.status = "Success";
 										opartyRs.statusmessage = "Party Updated Successfully";
+										string val = string.Empty;
+										if (opartyRq.typeofpay == "PAYABLE OPENING BALANCE")
+											val = "RECEIVABLE OPENING BALANCE";
+										else if (opartyRq.typeofpay == "RECEIVABLE OPENING BALANCE")
+											val = "PAYABLE OPENING BALANCE";
+										cmd.CommandText = "DELETE FROM transactions where registeredphonenumber = @registeredphonenumber AND customername = @oldpartyname AND typeofpay = '" + val + "'";
+										cmd.ExecuteNonQuery();
 									}
 
 									transaction.Commit();
