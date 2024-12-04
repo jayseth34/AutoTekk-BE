@@ -13,7 +13,7 @@ namespace WebApplication1.Controllers
 	{
 		private readonly IConfiguration config;
 		private readonly string dbConn;
-		private readonly string _apiKey = "7fccc705-21c6-11ef-8b60-0200cd936042";
+		private readonly string _apiKey = "3cb8a053-8404-11ec-b9b5-0200cd936042";
 
 		public LoginController(IConfiguration _config)
 		{
@@ -44,6 +44,7 @@ namespace WebApplication1.Controllers
 		{
 			OtpRs otpRs = new OtpRs();
 			LoginBL loginBL = new LoginBL(this.config);
+
 			bool exist = await loginBL.ValidateOtpUser(phoneNumber);
 			if (!exist)
 			{
@@ -51,19 +52,13 @@ namespace WebApplication1.Controllers
 				otpRs.statusmessage = "Kindly Register before Login";
 				return Ok(otpRs);
 			}
-			var client = new RestClient();
-			var url = $"https://2factor.in/API/V1/{_apiKey}/SMS/{phoneNumber}/AUTOGEN";
-			var restRequest = new RestRequest(url, Method.Get);
 
-			var response = await client.ExecuteAsync(restRequest);
-
-			if (response.IsSuccessful)
-			{
-				return Ok(response.Content);
-			}
-			otpRs.status = "FAILED";
-			otpRs.statusmessage = "Failed to send otp";
-			return Ok(otpRs);
+			string apiKey = "3cb8a053-8404-11ec-b9b5-0200cd936042";
+			var client = new HttpClient();
+			var request = new HttpRequestMessage(HttpMethod.Get, $"https://2factor.in/API/V1/{apiKey}/SMS/+91{phoneNumber}/AUTOGEN/OTP FOR LOGIN VERIFICATION");
+			var response = await client.SendAsync(request);
+			response.EnsureSuccessStatusCode();
+			return Ok(response.Content.ReadAsStringAsync());
 		}
 
 		[HttpPost("verify-otp")]
