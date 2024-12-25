@@ -4,32 +4,32 @@ namespace WebApplication1.Models
 {
 	public class ItemRq
 	{
-		public string typeofpay { get; set; }
+		public string typeofpay { get; set; } = "";
 		public Int64 registeredphonenumber {  get; set; }
-		public string itemname { get; set; }
-		public string olditemname { get; set; }
-		public string itemhsn { get; set; }
-		public string baseunit { get; set; }
-		public string secondaryunit { get; set; }
+		public string itemname { get; set; } = "";
+		public string olditemname { get; set; } = "";
+		public string itemhsn { get; set; } = "";
+		public string baseunit { get; set; } = "";
+		public string secondaryunit { get; set; } = "";
 		public Decimal conversionrates { get; set; }
-		public string category { get; set; }
-		public string itemcode { get; set; }
-		public Decimal saleprice { get; set; }
-		public string salewithorwithouttax { get; set; }
-		public Decimal discountonsaleprice { get; set; }
-		public string percentageoramounttype { get; set; }
-		public Decimal wholesaleprice { get; set; }
-		public string wholesalewithorwithouttax { get; set; }
+		public string category { get; set; } = "GENERAL";
+		public string itemcode { get; set; } = "";
+		public Decimal saleprice { get; set; } = 0;
+		public string salewithorwithouttax { get; set; } = "Without Tax";
+		public Decimal discountonsaleprice { get; set; } = 0;
+		public string percentageoramounttype { get; set; } = "Percentage";
+		public Decimal wholesaleprice { get; set; } = 0;
+		public string wholesalewithorwithouttax { get; set; } = "Without Tax";
 		public Decimal minimumwholesalequantity { get; set; }
-		public Decimal purchaseprice { get; set; }
-		public string purchasewithorwithouttax { get; set; }
-		public string taxrate { get; set; }
-		public Decimal openingquantity { get; set; }
-		public Decimal remainingquantity { get; set; }
-		public Decimal atprice { get; set; }
+		public Decimal purchaseprice { get; set; } = 0;
+		public string purchasewithorwithouttax { get; set; } = "Without Tax";
+		public string taxrate { get; set; } = "";
+		public Decimal openingquantity { get; set; } = 0;
+		public Decimal remainingquantity { get; set; } = 0;
+		public Decimal atprice { get; set; } = 0;
 		public DateTime asofdate { get; set; }
-		public Decimal minimumstocktomaintain { get; set; }
-		public string _location { get; set; }
+		public Decimal minimumstocktomaintain { get; set; } = 0;
+		public string _location { get; set; } = "";
 		public bool isitemupdate { get; set; }
 		public Decimal? mrp { get; set; } = 0;
 	}

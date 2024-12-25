@@ -128,5 +128,23 @@ namespace WebApplication1.Controllers
 
 			return BadRequest("Please Provide Valid Details");
 		}
+
+		[HttpPost("upload")]
+		public async Task<IActionResult> UploadItems([FromForm] IFormFile file, [FromForm] Int64 registeredphonenumber)
+		{
+			if (file == null || file.Length == 0)
+			{
+				return BadRequest("No file uploaded.");
+			}
+
+			// Read and map Excel data
+			ItemBL itemBL = new ItemBL(this.config);
+			var items = await itemBL.ReadAndMapExcelAsync(file, registeredphonenumber);
+
+			// Pass data to Business Layer
+			var result = await itemBL.ProcessItemsAsync(items);
+
+			return Ok(result);
+		}
 	}
 }
