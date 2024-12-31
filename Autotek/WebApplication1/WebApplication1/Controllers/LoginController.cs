@@ -169,7 +169,7 @@ namespace WebApplication1.Controllers
 			{
 				statusm = "FAILED";
 			}
-			return Ok( new { status = statusm });
+			return Ok( new { status = statusm, expiryDate = date });
 		}
 
 		[HttpPost]

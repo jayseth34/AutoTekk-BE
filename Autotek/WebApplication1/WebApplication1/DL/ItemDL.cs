@@ -28,7 +28,9 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT itemname FROM item WHERE registeredphonenumber = " + oitemRq.registeredphonenumber + " AND itemname = '" + oitemRq.itemname + "'";
+					cmd.CommandText = "SELECT itemname FROM item WHERE registeredphonenumber = @registeredphonenumber AND itemname = @itemname";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", oitemRq.registeredphonenumber);
+					cmd.Parameters.AddWithValue("@itemname", oitemRq.itemname);
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					while (reader.Read())
 					{
@@ -101,7 +103,9 @@ namespace WebApplication1.DL
 								NpgsqlCommand cmd = new NpgsqlCommand();
 								cmd.Connection = conn;
 								cmd.CommandType = CommandType.Text;
-								cmd.CommandText = "SELECT category FROM category WHERE registeredphonenumber = " + oitemRq.registeredphonenumber + " AND category = '" + oitemRq.category + "'";
+								cmd.CommandText = "SELECT category FROM category WHERE registeredphonenumber = @registeredphonenumber AND category = @category";
+								cmd.Parameters.AddWithValue("@registeredphonenumber", oitemRq.registeredphonenumber);
+								cmd.Parameters.AddWithValue("@category", oitemRq.category);
 								NpgsqlDataReader reader = cmd.ExecuteReader();
 								while (reader.Read())
 								{
@@ -169,7 +173,9 @@ namespace WebApplication1.DL
 						NpgsqlCommand cmd = new NpgsqlCommand();
 						cmd.Connection = conn;
 						cmd.CommandType = CommandType.Text;
-						cmd.CommandText = "SELECT itemname FROM item WHERE registeredphonenumber = " + oitemRq.registeredphonenumber + " AND itemname = '" + oitemRq.itemname + "'";
+						cmd.CommandText = "SELECT itemname FROM item WHERE registeredphonenumber = @registeredphonenumber AND itemname = @itemname";
+						cmd.Parameters.AddWithValue("@registeredphonenumber", oitemRq.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@itemname", oitemRq.itemname);
 						NpgsqlDataReader reader = cmd.ExecuteReader();
 						while (reader.Read())
 						{
@@ -189,11 +195,11 @@ namespace WebApplication1.DL
 							NpgsqlCommand cmd = new NpgsqlCommand();
 							cmd.Connection = conn;
 							cmd.CommandType = CommandType.Text;
-							cmd.CommandText = "Update item SET typeofpay = @typeofpay, itemname = @itemname, itemhsn = @itemhsn, baseunit = @baseunit, secondaryunit = @secondaryunit, conversionrates = @conversionrates, category = @category," +
-								"itemcode = @itemcode, saleprice = @saleprice, salewithorwithouttax = @salewithorwithouttax, discountonsaleprice = @discountonsaleprice," +
-								"wholesaleprice = @wholesaleprice, wholesalewithorwithouttax = @wholesalewithorwithouttax, minimumwholesalequantity = @minimumwholesalequantity, purchaseprice = @purchaseprice, purchasewithorwithouttax = @purchasewithorwithouttax," +
-								"taxrate = @taxrate, openingquantity = @openingquantity, remainingquantity = @remainingquantity, atprice = @atprice, asofdate = @asofdate, minimumstocktomaintain = @minimumstocktomaintain, _location = @_location, percentageoramounttype = @percentageoramounttype, mrp = @mrp WHERE " +
-								"registeredphonenumber = " + oitemRq.registeredphonenumber + " AND itemname = '" + oitemRq.itemname + "'";
+							cmd.CommandText = @"UPDATE item SET typeofpay = @typeofpay, itemname = @itemname, itemhsn = @itemhsn, baseunit = @baseunit, secondaryunit = @secondaryunit, conversionrates = @conversionrates, category = @category,
+                    itemcode = @itemcode, saleprice = @saleprice, salewithorwithouttax = @salewithorwithouttax, discountonsaleprice = @discountonsaleprice,
+                    wholesaleprice = @wholesaleprice, wholesalewithorwithouttax = @wholesalewithorwithouttax, minimumwholesalequantity = @minimumwholesalequantity, purchaseprice = @purchaseprice, purchasewithorwithouttax = @purchasewithorwithouttax,
+                    taxrate = @taxrate, openingquantity = @openingquantity, remainingquantity = @remainingquantity, atprice = @atprice, asofdate = @asofdate, minimumstocktomaintain = @minimumstocktomaintain, _location = @_location, percentageoramounttype = @percentageoramounttype, mrp = @mrp
+                    WHERE registeredphonenumber = @where_registeredphonenumber AND itemname = @where_itemname"; // Parameterized WHERE clause
 							cmd.Parameters.AddWithValue("@typeofpay", oitemRq.typeofpay);
 							cmd.Parameters.AddWithValue("@itemname", oitemRq.itemname);
 							cmd.Parameters.AddWithValue("@itemhsn", oitemRq.itemhsn);
@@ -219,6 +225,8 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@_location", oitemRq._location);
 							cmd.Parameters.AddWithValue("@percentageoramounttype", oitemRq.percentageoramounttype);
 							cmd.Parameters.AddWithValue("@mrp", oitemRq.mrp);
+							cmd.Parameters.AddWithValue("@where_registeredphonenumber", oitemRq.registeredphonenumber);
+							cmd.Parameters.AddWithValue("@where_itemname", oitemRq.itemname);
 							cmd.ExecuteNonQuery();
 							oitemRs.statusmessage = "Item Updated Successfully";
 							oitemRs.status = "Success";
@@ -243,7 +251,9 @@ namespace WebApplication1.DL
 								NpgsqlCommand cmd = new NpgsqlCommand();
 								cmd.Connection = conn;
 								cmd.CommandType = CommandType.Text;
-								cmd.CommandText = "SELECT category FROM category WHERE registeredphonenumber = " + oitemRq.registeredphonenumber + " AND category = '" + oitemRq.category + "'";
+								cmd.CommandText = "SELECT category FROM category WHERE registeredphonenumber = @registeredphonenumber AND category = @category";
+								cmd.Parameters.AddWithValue("@registeredphonenumber", oitemRq.registeredphonenumber);
+								cmd.Parameters.AddWithValue("@category", oitemRq.category);
 								NpgsqlDataReader reader = cmd.ExecuteReader();
 								while (reader.Read())
 								{
@@ -307,7 +317,8 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT itemname, remainingquantity, saleprice, purchaseprice, baseunit, wholesaleprice, minimumwholesalequantity, percentageoramounttype, discountonsaleprice, mrp, itemcode from item where registeredphonenumber = " + registeredphonenumber;
+					cmd.CommandText = "SELECT itemname, remainingquantity, saleprice, purchaseprice, baseunit, wholesaleprice, minimumwholesalequantity, percentageoramounttype, discountonsaleprice, mrp, itemcode FROM item WHERE registeredphonenumber = @registeredphonenumber";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -357,9 +368,12 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT typeofpay, itemhsn, baseunit, secondaryunit, conversionrates, category, itemcode, saleprice, salewithorwithouttax, discountonsaleprice, wholesaleprice, wholesalewithorwithouttax," +
-						"minimumwholesalequantity, purchaseprice, purchasewithorwithouttax, taxrate, openingquantity, remainingquantity, atprice, asofdate, minimumstocktomaintain, _location, percentageoramounttype FROM item WHERE registeredphonenumber = " + registeredphonenumber + " AND itemname = '" +
-						itemname + "'";
+					cmd.CommandText = @"SELECT typeofpay, itemhsn, baseunit, secondaryunit, conversionrates, category, itemcode, saleprice, salewithorwithouttax, discountonsaleprice, wholesaleprice, wholesalewithorwithouttax,
+                    minimumwholesalequantity, purchaseprice, purchasewithorwithouttax, taxrate, openingquantity, remainingquantity, atprice, asofdate, minimumstocktomaintain, _location, percentageoramounttype 
+                FROM item 
+                WHERE registeredphonenumber = @registeredphonenumber AND itemname = @itemname";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+					cmd.Parameters.AddWithValue("@itemname", itemname);
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -425,7 +439,13 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT cat.category, COUNT(it.category) AS categorycount FROM category AS cat LEFT JOIN item AS it ON cat.category = it.category AND it.registeredphonenumber = " + registeredphonenumber + " WHERE cat.registeredphonenumber = " + registeredphonenumber + " GROUP BY cat.category";
+					cmd.CommandText = @"SELECT cat.category, COUNT(it.category) AS categorycount 
+                FROM category AS cat 
+                LEFT JOIN item AS it ON cat.category = it.category AND it.registeredphonenumber = @registeredphonenumber_join
+                WHERE cat.registeredphonenumber = @registeredphonenumber_where
+                GROUP BY cat.category";
+					cmd.Parameters.AddWithValue("@registeredphonenumber_where", registeredphonenumber);
+					cmd.Parameters.AddWithValue("@registeredphonenumber_join", registeredphonenumber);
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -465,7 +485,9 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT itemname, remainingquantity, purchaseprice from item where registeredphonenumber = " + registeredphonenumber + " AND category = '" + category + "'";
+					cmd.CommandText = "SELECT itemname, remainingquantity, purchaseprice FROM item WHERE registeredphonenumber = @registeredphonenumber AND category = @category";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+					cmd.Parameters.AddWithValue("@category", category);
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{

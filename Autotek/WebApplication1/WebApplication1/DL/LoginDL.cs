@@ -34,7 +34,12 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT status, expirydate, plantype FROM registeragent WHERE phonenumber = " + ologinRq.phonenumber + " AND _password = '" + ologinRq.password + "'";
+					cmd.CommandText = @"SELECT status, expirydate, plantype
+                FROM registeragent
+                WHERE phonenumber = @phonenumber
+                  AND _password = @password";
+					cmd.Parameters.AddWithValue("@phonenumber", ologinRq.phonenumber);
+					cmd.Parameters.AddWithValue("@password", ologinRq.password);
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					while (reader.Read())
 					{
@@ -66,7 +71,8 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT status, expirydate FROM registeragent WHERE phonenumber = " + Convert.ToInt64(phonenumber);
+					cmd.CommandText = "SELECT status, expirydate FROM registeragent WHERE phonenumber = @phonenumber";
+					cmd.Parameters.AddWithValue("@phonenumber", Convert.ToInt64(phonenumber));
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					while (reader.Read())
 					{
@@ -92,7 +98,8 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT status, expirydate, plantype FROM registeragent WHERE phonenumber = " + Convert.ToInt64(request.registeredphonenumber);
+					cmd.CommandText = "SELECT status, expirydate, plantype FROM registeragent WHERE phonenumber = @phonenumber";
+					cmd.Parameters.AddWithValue("@phonenumber", Convert.ToInt64(request.registeredphonenumber));
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					while (reader.Read())
 					{
@@ -122,7 +129,8 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT phonenumber FROM registeragent WHERE phonenumber = " + oregisterRq.phonenumber ;
+					cmd.CommandText = "SELECT phonenumber FROM registeragent WHERE phonenumber = @phonenumber";
+					cmd.Parameters.AddWithValue("@phonenumber", oregisterRq.phonenumber);
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					while (reader.Read())
 					{
@@ -181,7 +189,9 @@ namespace WebApplication1.DL
 						NpgsqlCommand cmd = new NpgsqlCommand();
 						cmd.Connection = conn;
 						cmd.CommandType = CommandType.Text;
-						cmd.CommandText = "SELECT partyname FROM party WHERE registeredphonenumber = " + opartyRq.registeredphonenumber + " AND partyname = '" + opartyRq.partyname + "'";
+						cmd.CommandText = "SELECT partyname FROM party WHERE registeredphonenumber = @registeredphonenumber AND partyname = @partyname";
+						cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@partyname", opartyRq.partyname);
 						NpgsqlDataReader reader = cmd.ExecuteReader();
 						while (reader.Read())
 						{
@@ -288,7 +298,9 @@ namespace WebApplication1.DL
 								NpgsqlCommand cmd = new NpgsqlCommand();
 								cmd.Connection = conn;
 								cmd.CommandType = CommandType.Text;
-								cmd.CommandText = "SELECT partygroup FROM partygroup WHERE registeredphonenumber = " + opartyRq.registeredphonenumber + " AND partygroup = '" + opartyRq.partygroup + "'";
+								cmd.CommandText = "SELECT partygroup FROM partygroup WHERE registeredphonenumber = @registeredphonenumber AND partygroup = @partygroup";
+								cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
+								cmd.Parameters.AddWithValue("@partygroup", opartyRq.partygroup);
 								NpgsqlDataReader reader = cmd.ExecuteReader();
 								while (reader.Read())
 								{
@@ -353,7 +365,9 @@ namespace WebApplication1.DL
 							NpgsqlCommand cmd = new NpgsqlCommand();
 							cmd.Connection = conn;
 							cmd.CommandType = CommandType.Text;
-							cmd.CommandText = "SELECT partyname FROM party WHERE registeredphonenumber = " + opartyRq.registeredphonenumber + " AND partyname = '" + opartyRq.partyname + "'";
+							cmd.CommandText = "SELECT partyname FROM party WHERE registeredphonenumber = @registeredphonenumber AND partyname = @partyname";
+							cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
+							cmd.Parameters.AddWithValue("@partyname", opartyRq.partyname);
 							NpgsqlDataReader reader = cmd.ExecuteReader();
 							while (reader.Read())
 							{
@@ -484,8 +498,12 @@ namespace WebApplication1.DL
 							NpgsqlCommand cmd = new NpgsqlCommand();
 							cmd.Connection = conn;
 							cmd.CommandType = CommandType.Text;
-							cmd.CommandText = "DELETE FROM transactions WHERE registeredphonenumber = " + opartyRq.registeredphonenumber + " AND customername = '" + opartyRq.oldpartyname + "'" +
-								"AND (typeofpay = 'RECEIVABLE OPENING BALANCE' OR typeofpay = 'PAYABLE OPENING BALANCE')";
+							cmd.CommandText = @"DELETE FROM transactions
+                WHERE registeredphonenumber = @registeredphonenumber
+                  AND customername = @oldpartyname
+                  AND (typeofpay = 'RECEIVABLE OPENING BALANCE' OR typeofpay = 'PAYABLE OPENING BALANCE')";
+							cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
+							cmd.Parameters.AddWithValue("@oldpartyname", opartyRq.oldpartyname);
 							cmd.ExecuteNonQuery();
 						}
 					}
@@ -507,7 +525,9 @@ namespace WebApplication1.DL
 								NpgsqlCommand cmd = new NpgsqlCommand();
 								cmd.Connection = conn;
 								cmd.CommandType = CommandType.Text;
-								cmd.CommandText = "SELECT partygroup FROM partygroup WHERE registeredphonenumber = " + opartyRq.registeredphonenumber + " AND partygroup = '" + opartyRq.partygroup + "'";
+								cmd.CommandText = "SELECT partygroup FROM partygroup WHERE registeredphonenumber = @registeredphonenumber AND partygroup = @partygroup";
+								cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
+								cmd.Parameters.AddWithValue("@partygroup", opartyRq.partygroup);
 								NpgsqlDataReader reader = cmd.ExecuteReader();
 								while (reader.Read())
 								{
@@ -554,7 +574,12 @@ namespace WebApplication1.DL
 						NpgsqlCommand cmd = new NpgsqlCommand();
 						cmd.Connection = conn;
 						cmd.CommandType = CommandType.Text;
-						cmd.CommandText = "UPDATE transactions set customername = @customername WHERE registeredphonenumber = " + opartyRq.registeredphonenumber + " AND customername = '" + opartyRq.oldpartyname + "'";
+						cmd.CommandText = @"UPDATE transactions
+                SET customername = @customername
+                WHERE registeredphonenumber = @registeredphonenumber
+                  AND customername = @oldpartyname";
+						cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@oldpartyname", opartyRq.oldpartyname);
 						cmd.Parameters.AddWithValue("@customername", opartyRq.partyname);
 						cmd.ExecuteNonQuery();
 					}
@@ -565,8 +590,14 @@ namespace WebApplication1.DL
 						NpgsqlCommand cmd = new NpgsqlCommand();
 						cmd.Connection = conn;
 						cmd.CommandType = CommandType.Text;
-						cmd.CommandText = "UPDATE transactions set bankscustomername = @customername WHERE registeredphonenumber = " + opartyRq.registeredphonenumber + " AND bankscustomername = '" + opartyRq.oldpartyname + "' and isbankscustomernameupdate = false";
+						cmd.CommandText = @"UPDATE transactions
+                SET bankscustomername = @customername
+                WHERE registeredphonenumber = @registeredphonenumber
+                  AND bankscustomername = @oldpartyname
+                  AND isbankscustomernameupdate = false";
 						cmd.Parameters.AddWithValue("@customername", opartyRq.partyname);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@oldpartyname", opartyRq.oldpartyname);
 						cmd.ExecuteNonQuery();
 					}
 
@@ -576,8 +607,13 @@ namespace WebApplication1.DL
 						NpgsqlCommand cmd = new NpgsqlCommand();
 						cmd.Connection = conn;
 						cmd.CommandType = CommandType.Text;
-						cmd.CommandText = "UPDATE item_details set customername = @customername WHERE registeredphonenumber = " + opartyRq.registeredphonenumber + " AND customername = '" + opartyRq.oldpartyname + "'";
+						cmd.CommandText = @"UPDATE item_details
+                SET customername = @customername
+                WHERE registeredphonenumber = @registeredphonenumber
+                  AND customername = @oldpartyname";
 						cmd.Parameters.AddWithValue("@customername", opartyRq.partyname);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@oldpartyname", opartyRq.oldpartyname);
 						cmd.ExecuteNonQuery();
 					}
 				}
@@ -684,7 +720,10 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT partyname, topayparty, toreceivefromparty, shippingaddress, billingaddress, phonenumber, creditlimit from party where registeredphonenumber = " + registeredphonenumber ;
+					cmd.CommandText = @"SELECT partyname, topayparty, toreceivefromparty, shippingaddress, billingaddress, phonenumber, creditlimit
+                FROM party
+                WHERE registeredphonenumber = @registeredphonenumber";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -732,7 +771,13 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT pg.partygroup, COUNT(par.partygroup) AS partygroup_count FROM partygroup AS pg LEFT JOIN party AS par ON pg.partygroup = par.partygroup AND par.registeredphonenumber = " + registeredphonenumber + " WHERE pg.registeredphonenumber = " + registeredphonenumber + " GROUP BY pg.partygroup";
+					cmd.CommandText = @"SELECT pg.partygroup, COUNT(par.partygroup) AS partygroup_count
+                FROM partygroup AS pg
+                LEFT JOIN party AS par ON pg.partygroup = par.partygroup AND par.registeredphonenumber = @registeredphonenumber
+                WHERE pg.registeredphonenumber = @registeredphonenumber
+                GROUP BY pg.partygroup";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -777,7 +822,12 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT partyname, topayparty, toreceivefromparty from party where registeredphonenumber = " + registeredphonenumber + " AND partygroup = '" + groupname + "'";
+					cmd.CommandText = @"SELECT partyname, topayparty, toreceivefromparty
+                FROM party
+                WHERE registeredphonenumber = @registeredphonenumber
+                  AND partygroup = @groupname";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+					cmd.Parameters.AddWithValue("@groupname", groupname);
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -864,8 +914,9 @@ namespace WebApplication1.DL
                     NpgsqlCommand cmd = new NpgsqlCommand();
                     cmd.Connection = conn;
                     cmd.CommandType = CommandType.Text;
-                    cmd.CommandText = "SELECT * from AddBusinessInformation where registeredphonenumber = " + registeredphonenumber ;
-                    NpgsqlDataReader reader = cmd.ExecuteReader();
+                    cmd.CommandText = "SELECT * FROM AddBusinessInformation WHERE registeredphonenumber = @registeredphonenumber";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+					NpgsqlDataReader reader = cmd.ExecuteReader();
                     if (reader.HasRows)
                     {
                         try
@@ -917,8 +968,9 @@ namespace WebApplication1.DL
                     NpgsqlCommand cmd = new NpgsqlCommand();
                     cmd.Connection = conn;
                     cmd.CommandType = CommandType.Text;
-                    cmd.CommandText = "SELECT registeredphonenumber FROM AddBusinessInformation WHERE registeredphonenumber = " + OAddBusinessInformationRq.registeredphonenumber;
-                    NpgsqlDataReader reader = cmd.ExecuteReader();
+                    cmd.CommandText = "SELECT registeredphonenumber FROM AddBusinessInformation WHERE registeredphonenumber = @registeredphonenumber";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", OAddBusinessInformationRq.registeredphonenumber);
+					NpgsqlDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
                         OAddBusinessInformationRs.statusmsg = "Phone Number already registered.";
@@ -1017,9 +1069,11 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "UPDATE registeragent set expirydate = @expirydate, plantype = @plantype WHERE phonenumber = " + registeredphonenumber ;
+					cmd.CommandText = "UPDATE registeragent SET expirydate = @expirydate, plantype = @plantype WHERE phonenumber = @phonenumber";
 					cmd.Parameters.AddWithValue("@expirydate", date);
 					cmd.Parameters.AddWithValue("@plantype", planType);
+					cmd.Parameters.AddWithValue("@phonenumber", registeredphonenumber);
+
 					cmd.ExecuteNonQuery();
 				}
 			}

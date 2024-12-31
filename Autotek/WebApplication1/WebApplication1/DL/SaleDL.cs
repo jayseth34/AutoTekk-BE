@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using DocumentFormat.OpenXml.Office.Word;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -156,12 +157,32 @@ namespace WebApplication1.DL
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 				{
 					conn.Open();
-					NpgsqlCommand cmd = new NpgsqlCommand();
-					cmd.Connection = conn;
-					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT DISTINCT ON (tr.invoicenumber, tr.typeofpay)  tr.invoicenumber, tr.typeofpay, tr.invoicedate, tr.total, tr.balance, tr.phonenumber, tr.paymentstatus, pr.emailid, pr.billingaddress, pr.creditlimit, pr.gst, pr.creditlimit FROM transactions tr right join party pr ON tr.registeredphonenumber = pr.registeredphonenumber" +
-						" where tr.registeredphonenumber = " + registeredphonenumber + " AND " +
-						"tr.customername = '" + customername + "' AND tr.showtransaction = 'SHOW'";
+
+					// Prepare parameterized query for better security and readability
+					string query = @"SELECT DISTINCT ON (tr.invoicenumber, tr.typeofpay)
+                                    tr.invoicenumber, 
+                                    tr.typeofpay, 
+                                    tr.invoicedate, 
+                                    tr.total, 
+                                    tr.balance, 
+                                    tr.phonenumber, 
+                                    tr.paymentstatus, 
+                                    pr.emailid, 
+                                    pr.billingaddress, 
+                                    pr.creditlimit, 
+                                    pr.gst
+                            FROM transactions tr
+                            RIGHT JOIN party pr ON tr.registeredphonenumber = pr.registeredphonenumber
+                            WHERE tr.registeredphonenumber = @registeredphonenumber
+                            AND tr.customername = @customername
+                            AND tr.showtransaction = 'SHOW'";
+
+					NpgsqlCommand cmd = new NpgsqlCommand(query, conn);
+
+					// Add parameters for the query
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+					cmd.Parameters.AddWithValue("@customername", customername);
+
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -206,7 +227,10 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT gst, emailid, billingaddress, phonenumber, creditlimit from party where partyname = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber;
+					cmd.CommandText = "SELECT gst, emailid, billingaddress, phonenumber, creditlimit FROM party WHERE partyname = @customername AND registeredphonenumber = @registeredphonenumber";
+					cmd.Parameters.AddWithValue("@customername", customername);
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -250,14 +274,43 @@ namespace WebApplication1.DL
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 				{
+					string query1 = @"SELECT tr.typeofpay, 
+                   tr.invoicedate, 
+                   tr.stateofsupply, 
+                   tr.paymenttype, 
+                   tr.total, 
+                   tr.received, 
+                   tr.balance, 
+                   tr.customername,
+                   tr.phonenumber, 
+                   tr.billingaddress, 
+                   tr.shippingaddress, 
+                   tr.amountdetails, 
+                   ide.item, 
+                   ide.qty, 
+                   ide.unit, 
+                   ide.priceperunit, 
+                   ide.transaction_id, 
+                   ide.taxrate, 
+                   ide.taxrateamount, 
+                   ide.discountpercent, 
+                   ide.discountamount, 
+                   ide.itemcode, 
+                   ide.mrp
+            FROM transactions tr
+            JOIN item_details ide ON tr.transaction_id = ide.transaction_id
+            WHERE tr.invoicenumber = @invoicenumber
+              AND tr.registeredphonenumber = @registeredphonenumber
+              AND tr.typeofpay = @typeofpay;";
 					conn.Open();
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT tr.typeofpay, tr.invoicedate, tr.stateofsupply, tr.paymenttype, tr.total, tr.received, tr.balance, tr.customername," +
-						"tr.phonenumber, tr.billingaddress, tr.shippingaddress, tr.amountdetails, ide.item, ide,qty, ide.unit, ide.priceperunit, ide.transaction_id, ide.taxrate, ide.taxrateamount, ide.discountpercent, ide.discountamount, ide.itemcode, ide.mrp FROM transactions tr join item_details ide" +
-						" ON tr.transaction_id = ide.transaction_id WHERE tr.invoicenumber = " + oGetPartyTransactionDetailsRq.invoicenumber + " AND tr.registeredphonenumber = " +
-						oGetPartyTransactionDetailsRq.registeredphonenumber + " AND tr.typeofpay = '" + oGetPartyTransactionDetailsRq.typeofpay + "'";
+					cmd.CommandText = query1;
+					cmd.Parameters.AddWithValue("@invoicenumber", oGetPartyTransactionDetailsRq.invoicenumber);
+					cmd.Parameters.AddWithValue("@registeredphonenumber", oGetPartyTransactionDetailsRq.registeredphonenumber);
+					cmd.Parameters.AddWithValue("@typeofpay", oGetPartyTransactionDetailsRq.typeofpay);
+
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -325,12 +378,19 @@ namespace WebApplication1.DL
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 				{
+					string query2 = @"SELECT invoicenumber, typeofpay, customername, invoicedate, qty, priceperunit, paymentstatus
+                FROM item_details
+                WHERE registeredphonenumber = @registeredphonenumber
+                  AND item = @itemname
+                  AND showtransaction = @showtransaction";
 					conn.Open();
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT invoicenumber, typeofpay, customername, invoicedate, qty, priceperunit, paymentstatus " +
-						"FROM item_details WHERE registeredphonenumber = " + registeredphonenumber + " and item = '" + itemname + "' AND showtransaction = 'SHOW'";
+					cmd.CommandText = query2;
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+					cmd.Parameters.AddWithValue("@itemname", itemname);
+					cmd.Parameters.AddWithValue("@showtransaction", "SHOW");
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -375,11 +435,17 @@ namespace WebApplication1.DL
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 				{
+					string query3 = @"SELECT saleprice, wholesaleprice, purchaseprice, remainingquantity
+                FROM item
+                WHERE registeredphonenumber = @registeredphonenumber
+                  AND itemname = @itemname";
 					conn.Open();
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT saleprice, wholesaleprice, purchaseprice, remainingquantity from item WHERE registeredphonenumber = " + registeredphonenumber + " and itemname = '" + itemname + "'";
+					cmd.CommandText = query3;
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+					cmd.Parameters.AddWithValue("@itemname", itemname);
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -421,12 +487,17 @@ namespace WebApplication1.DL
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 				{
+					string query4 = @"SELECT invoicenumber, typeofpay, customername, invoicedate, paymentstatus, paymenttype, total, balance, isconverted
+                FROM transactions
+                WHERE registeredphonenumber = @registeredphonenumber
+                  AND typeofpay = @typeofpay";
 					conn.Open();
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT invoicenumber, typeofpay, customername, invoicedate, paymentstatus, paymenttype, total, balance, isconverted FROM transactions where registeredphonenumber = " + registeredphonenumber +
-						" AND typeofpay = '" + typeofpay + "'";
+					cmd.CommandText = query4;
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+					cmd.Parameters.AddWithValue("@typeofpay", typeofpay);
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -585,11 +656,14 @@ namespace WebApplication1.DL
 				
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 				{
+					string query5 = "SELECT MAX(invoicenumber) FROM transactions WHERE typeofpay = @typeofpay AND registeredphonenumber = @registeredphonenumber";
 					conn.Open();
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT MAX(invoicenumber) FROM transactions WHERE typeofpay = '" + typeofpay + "' AND registeredphonenumber = " + registeredphonenumber + "";
+					cmd.CommandText = query5;
+					cmd.Parameters.AddWithValue("@typeofpay", typeofpay);
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 					object result = cmd.ExecuteScalar();
 					if (result != DBNull.Value)
 					{
@@ -612,11 +686,20 @@ namespace WebApplication1.DL
 				{
 					using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 					{
+						string query6 = @"UPDATE transactions
+                SET showtransaction = @showtransaction
+                WHERE invoicenumber = @invoicenumber
+                  AND registeredphonenumber = @registeredphonenumber
+                  AND typeofpay = @typeofpay";
 						conn.Open();
 						NpgsqlCommand cmd = new NpgsqlCommand();
 						cmd.Connection = conn;
 						cmd.CommandType = CommandType.Text;
-						cmd.CommandText = "UPDATE transactions SET showtransaction = 'DONT SHOW' WHERE invoicenumber = '" + invoicenumber + "' AND registeredphonenumber = " + registeredphonenumber + " AND typeofpay = '" + typeofpay + "'";
+						cmd.CommandText = query6;
+						cmd.Parameters.AddWithValue("@showtransaction", "DONT SHOW"); // Or make this a parameter if needed
+						cmd.Parameters.AddWithValue("@invoicenumber", invoicenumber);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+						cmd.Parameters.AddWithValue("@typeofpay", typeofpay);
 						cmd.ExecuteNonQuery();
 					}
 				}
@@ -629,11 +712,20 @@ namespace WebApplication1.DL
 				{
 					using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 					{
+						string query7 = @"UPDATE item_details
+                SET showtransaction = @showtransaction
+                WHERE invoicenumber = @invoicenumber
+                  AND registeredphonenumber = @registeredphonenumber
+                  AND typeofpay = @typeofpay";
 						conn.Open();
 						NpgsqlCommand cmd = new NpgsqlCommand();
 						cmd.Connection = conn;
 						cmd.CommandType = CommandType.Text;
-						cmd.CommandText = "UPDATE item_details SET showtransaction = 'DONT SHOW' WHERE invoicenumber = '" + invoicenumber + "' AND registeredphonenumber = " + registeredphonenumber + " AND typeofpay = '" + typeofpay + "'";
+						cmd.CommandText = query7;
+						cmd.Parameters.AddWithValue("@showtransaction", "DONT SHOW"); // Or pass this as a parameter
+						cmd.Parameters.AddWithValue("@invoicenumber", invoicenumber);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+						cmd.Parameters.AddWithValue("@typeofpay", typeofpay);
 						cmd.ExecuteNonQuery();
 					}
 				}
@@ -655,14 +747,36 @@ namespace WebApplication1.DL
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 				{
+					string query8 = @"SELECT tr.typeofpay, 
+                   tr.invoicedate, 
+                   tr.stateofsupply, 
+                   tr.paymenttype, 
+                   tr.total, 
+                   tr.received, 
+                   tr.balance, 
+                   tr.customername,
+                   tr.phonenumber, 
+                   tr.billingaddress, 
+                   tr.shippingaddress, 
+                   ide.item, 
+                   ide.qty, 
+                   ide.unit, 
+                   ide.priceperunit
+            FROM transactions tr
+            JOIN item_details ide ON tr.transaction_id = ide.transaction_id
+            WHERE tr.invoicenumber = @invoicenumber
+              AND tr.registeredphonenumber = @registeredphonenumber
+              AND tr.typeofpay = @typeofpay
+              AND tr.customername = @customername;";
 					conn.Open();
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT tr.typeofpay, tr.invoicedate, tr.stateofsupply, tr.paymenttype, tr.total, tr.received, tr.balance, tr.customername," +
-						"tr.phonenumber, tr.billingaddress, tr.shippingaddress, ide.item, ide,qty, ide.unit, ide.priceperunit FROM transactions tr join item_details ide" +
-						" ON tr.transaction_id = ide.transaction_id WHERE tr.invoicenumber = " + oConvertToSaleSaleOrderRq.invoicenumber + " AND tr.registeredphonenumber = " +
-						oConvertToSaleSaleOrderRq.registeredphonenumber + " AND tr.typeofpay = '" + oConvertToSaleSaleOrderRq.typeofpay + "' AND tr.customername = '" + oConvertToSaleSaleOrderRq.customername + "'";
+					cmd.CommandText = query8;
+					cmd.Parameters.AddWithValue("@invoicenumber", oConvertToSaleSaleOrderRq.invoicenumber);
+					cmd.Parameters.AddWithValue("@registeredphonenumber", oConvertToSaleSaleOrderRq.registeredphonenumber);
+					cmd.Parameters.AddWithValue("@typeofpay", oConvertToSaleSaleOrderRq.typeofpay);
+					cmd.Parameters.AddWithValue("@customername", oConvertToSaleSaleOrderRq.customername);
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -722,12 +836,20 @@ namespace WebApplication1.DL
 			{
 				if(typeofpay == "PAYMENT IN")
 				{
-					sqlquery = "SELECT invoicenumber, typeofpay, total, linkedamount, balance, customername from transactions where balance > 0 and customername = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber +
-						" AND typeofpay in ('SALE','RECEIVABLE OPENING BALANCE', 'ADVANCE OUT')";
+					sqlquery = @"SELECT invoicenumber, typeofpay, total, linkedamount, balance, customername
+                FROM transactions
+                WHERE balance > 0
+                  AND customername = @customername
+                  AND registeredphonenumber = @registeredphonenumber
+                  AND typeofpay IN ('SALE', 'RECEIVABLE OPENING BALANCE', 'ADVANCE OUT')";
 				} else if(typeofpay == "PAYMENT OUT")
 				{
-					sqlquery = "SELECT invoicenumber, typeofpay, total, linkedamount, balance, customername from transactions where balance > 0 and customername = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber +
-						" AND typeofpay in ('PURCHASE', 'ADVANCE IN', 'PAYABLE OPENING BALANCE')";
+					sqlquery = @"SELECT invoicenumber, typeofpay, total, linkedamount, balance, customername
+                FROM transactions
+                WHERE balance > 0
+                  AND customername = @customername
+                  AND registeredphonenumber = @registeredphonenumber
+                  AND typeofpay IN ('PURCHASE', 'ADVANCE IN', 'PAYABLE OPENING BALANCE')";
 				}
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 				{
@@ -736,6 +858,8 @@ namespace WebApplication1.DL
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = sqlquery;
+					cmd.Parameters.AddWithValue("@customername", customername);
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -780,13 +904,28 @@ namespace WebApplication1.DL
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 				{
+					string query9 = @"UPDATE transactions
+                SET phonenumber = @phonenumber,
+                    billingaddress = @billingaddress,
+                    shippingaddress = @shippingaddress,
+                    invoicedate = @invoicedate,
+                    stateofsupply = @stateofsupply,
+                    total = @total,
+                    received = @received,
+                    balance = @balance,
+                    paymenttype = @paymenttype,
+                    paymentstatus = @paymentstatus,
+                    amountdetails = @amountdetails
+                WHERE registeredphonenumber = @registeredphonenumber
+                  AND invoicenumber = @invoicenumber
+                  AND customername = @customername
+                  AND typeofpay = @typeofpay";
 					conn.Open();
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "UPDATE transactions SET phonenumber = @phonenumber, billingaddress = @billingaddress, shippingaddress = @shippingaddress, invoicedate = @invoicedate, stateofsupply = @stateofsupply," +
-						" total = @total, received = @received, balance = @balance, paymenttype = @paymenttype, paymentstatus = @paymentstatus, amountdetails = @amountdetails where registeredphonenumber = " + otransactionRq.registeredphonenumber + " AND invoicenumber = " + otransactionRq.invoicenumber + " AND " +
-						" customername = '" + otransactionRq.customername + "' AND typeofpay = '" + otransactionRq.typeofpay + "'";
+					cmd.CommandText = query9;
+
 					cmd.Parameters.AddWithValue("@phonenumber", otransactionRq.phonenumber);
 					cmd.Parameters.AddWithValue("@billingaddress", otransactionRq.billingaddress);
 					cmd.Parameters.AddWithValue("@shippingaddress", otransactionRq.shippingaddress);
@@ -799,6 +938,10 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@paymentstatus", otransactionRq.paymentstatus);
 					cmd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
 					cmd.Parameters.AddWithValue("@amountdetails", JsonConvert.SerializeObject(otransactionRq.amountdetailslist));
+					cmd.Parameters.AddWithValue("@registeredphonenumber", otransactionRq.registeredphonenumber);
+					cmd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
+					cmd.Parameters.AddWithValue("@customername", otransactionRq.customername);
+					cmd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
 					cmd.ExecuteNonQuery();
 					status = "SUCCESS";
 				}
@@ -969,10 +1112,15 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmdd = new NpgsqlCommand();
 					cmdd.Connection = connn;
 					cmdd.CommandType = CommandType.Text;
-					cmdd.CommandText = "UPDATE party SET topayparty = @topayparty, toreceivefromparty = @toreceivefromparty WHERE partyname = @partyname and registeredphonenumber = " + registeredphonenumber;
+					cmdd.CommandText = @"UPDATE party
+                SET topayparty = @topayparty,
+                    toreceivefromparty = @toreceivefromparty
+                WHERE partyname = @partyname
+                  AND registeredphonenumber = @registeredphonenumber";
 					cmdd.Parameters.AddWithValue("@topayparty", topayparty);
 					cmdd.Parameters.AddWithValue("@toreceivefromparty", toreceivefromparty);
 					cmdd.Parameters.AddWithValue("@partyname", partyname);
+					cmdd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 					await cmdd.ExecuteNonQueryAsync();
 				}
 
@@ -996,8 +1144,12 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT topayparty, toreceivefromparty from party where partyname = '" + customername + "' AND registeredphonenumber = " + registeredphonenumber;
-						
+					cmd.CommandText = @"SELECT topayparty, toreceivefromparty
+                FROM party
+                WHERE partyname = @partyname
+                  AND registeredphonenumber = @registeredphonenumber";
+					cmd.Parameters.AddWithValue("@partyname", customername);
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 					NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
@@ -1183,8 +1335,8 @@ namespace WebApplication1.DL
 		public async Task<bool> InsertPaymentInOutTrnx(List<GetLinkedPaymentTransactionList> transactions)
 		{
 			bool val = false;
-			string sqlQuery = "INSERT INTO payementinouttransactions (typeofpay, customername, invoicedate, invoicenumber, registeredphonenumber, linkedamount, paymentininvoicenumber)" +
-				"VALUES(@typeofpay, @customername, @invoicedate, @invoicenumber, @registeredphonenumber, @linkedamount, @paymentininvoicenumber)";
+			string sqlQuery = "INSERT INTO payementinouttransactions (typeofpay, customername, invoicedate, invoicenumber, registeredphonenumber, linkedamount, paymentininvoicenumber, showtype)" +
+				"VALUES(@typeofpay, @customername, @invoicedate, @invoicenumber, @registeredphonenumber, @linkedamount, @paymentininvoicenumber, 0)";
 			try
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
@@ -1219,8 +1371,8 @@ namespace WebApplication1.DL
 		public async Task<bool> InsertAdvanceInOutTrnx(InsertAdvanceTrnxRq oInsertAdvanceTrnxRq)
 		{
 			bool val = false;
-			string sqlQuery = "INSERT INTO payementinouttransactions (typeofpay, customername, invoicedate, invoicenumber, registeredphonenumber, linkedamount, paymentininvoicenumber)" +
-				"VALUES(@typeofpay, @customername, @invoicedate, @invoicenumber, @registeredphonenumber, @linkedamount, @paymentininvoicenumber)";
+			string sqlQuery = "INSERT INTO payementinouttransactions (typeofpay, customername, invoicedate, invoicenumber, registeredphonenumber, linkedamount, paymentininvoicenumber, showtype)" +
+				"VALUES(@typeofpay, @customername, @invoicedate, @invoicenumber, @registeredphonenumber, @linkedamount, @paymentininvoicenumber, 1)";
 			try
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
@@ -1258,7 +1410,7 @@ namespace WebApplication1.DL
 					NpgsqlCommand cmd = new NpgsqlCommand();
 					cmd.Connection = conn;
 					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT invoicenumber, typeofpay, invoicedate, linkedamount  FROM payementinouttransactions where registeredphonenumber = @registeredphonenumber AND paymentininvoicenumber = @paymentininvoicenumber";
+					cmd.CommandText = "SELECT invoicenumber, typeofpay, invoicedate, linkedamount  FROM payementinouttransactions where registeredphonenumber = @registeredphonenumber AND paymentininvoicenumber = @paymentininvoicenumber and showtype = 0";
 					cmd.Parameters.AddWithValue("@typeofpay", oGetPartyTransactionDetailsRq.typeofpay);
 					cmd.Parameters.AddWithValue("@registeredphonenumber", oGetPartyTransactionDetailsRq.registeredphonenumber);
 					cmd.Parameters.AddWithValue("@paymentininvoicenumber", oGetPartyTransactionDetailsRq.invoicenumber);

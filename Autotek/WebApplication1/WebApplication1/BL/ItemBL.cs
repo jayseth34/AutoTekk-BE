@@ -194,7 +194,6 @@ namespace WebApplication1.BL
 				ItemDL itemDL = new ItemDL(this.config);
 				oitemRs = itemDL.AddItem(item);
 			}
-
 			return oitemRs;
 		}
 	}
