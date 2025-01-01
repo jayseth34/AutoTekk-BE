@@ -1002,7 +1002,7 @@ namespace WebApplication1.DL
                             cmd.Parameters.AddWithValue("@state", OAddBusinessInformationRq.state);
                             cmd.Parameters.AddWithValue("@businessDescription", OAddBusinessInformationRq.businessDescription);
                             cmd.ExecuteNonQuery();
-                            OAddBusinessInformationRs.statusmsg = "Phone number registered Successfully";
+                            OAddBusinessInformationRs.statusmsg = "Business Details registered Successfully";
                             OAddBusinessInformationRs.status = "Success";
                             OAddBusinessInformationRs.exist = false;
                         }
@@ -1038,7 +1038,7 @@ namespace WebApplication1.DL
                             cmd.Parameters.AddWithValue("@state", OAddBusinessInformationRq.state);
                             cmd.Parameters.AddWithValue("@businessDescription", OAddBusinessInformationRq.businessDescription);
                             cmd.ExecuteNonQuery();
-                            OAddBusinessInformationRs.statusmsg = "Data Updated Successfully";
+                            OAddBusinessInformationRs.statusmsg = "Business Details Updated Successfully";
                             OAddBusinessInformationRs.status = "Success";
                             OAddBusinessInformationRs.exist = true;
                         }

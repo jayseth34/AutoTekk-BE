@@ -111,7 +111,7 @@ namespace WebApplication1.DL
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(dbConn))
 				{
-					conn.Open(); // Open the connection outside the loop
+					conn.Open();
 
 					foreach (var itemDetails in otransactionRq.itemdetailslist)
 					{
