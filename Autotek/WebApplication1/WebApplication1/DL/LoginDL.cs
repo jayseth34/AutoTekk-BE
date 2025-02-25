@@ -14,7 +14,7 @@ namespace WebApplication1.DL
 {
 	public class LoginDL
 	{
-		private readonly string _connectionFactory;
+		private readonly string _connectionFactory; 
 		private static IConfigurationRoot root = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 		private static readonly string dbConn = root.GetValue<string>("ConnectionStrings");
 
