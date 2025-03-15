@@ -125,7 +125,7 @@ namespace WebApplication1.Controllers
 				{
 					return Ok("Something went wrong");
 				}
-				return Ok(new { status = "SUCCESS", message = "Free trial activated" });
+				return Ok(new { status = "SUCCESS", message = "Free trial activated", expiryDate = DateTime.UtcNow.AddDays(7) });
 			}
 
 			int validatedAmount = loginBL.ValidatePlanAmount(request.PlanType);
