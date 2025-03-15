@@ -116,13 +116,12 @@ namespace WebApplication1.BL
 							try
 							{
 								// Debugging: Log row data
-								Console.WriteLine($"Processing row {row.RowNumber()}: {string.Join(", ", row.Cells().Select(c => c.GetString()))}");
+								// Console.WriteLine($"Processing row {row.RowNumber()}: {string.Join(", ", row.Cells().Select(c => c.GetString()))}");
 
 								var itemName = row.Cell("A").GetString();
 								if (string.IsNullOrEmpty(itemName))
 								{
-									Console.WriteLine($"Item name is empty in row {row.RowNumber()}");
-									continue; // Skip empty rows
+									continue;
 								}
 
 								var item = new ItemRq
