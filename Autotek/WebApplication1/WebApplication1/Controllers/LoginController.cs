@@ -328,5 +328,14 @@ namespace WebApplication1.Controllers
 			}
 			return BadRequest();
 		}
+
+		[AllowAnonymous]
+		[HttpGet]
+		[Route("Healthcheck")]
+		public async Task<ActionResult> Healthcheck()
+		{
+			return BadRequest("It is working");
+			
+		}
 	}
 }
