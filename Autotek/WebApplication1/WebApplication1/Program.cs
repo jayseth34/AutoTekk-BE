@@ -9,11 +9,11 @@ builder.WebHost.UseUrls("http://0.0.0.0:5000", "https://0.0.0.0:443");
 // Add services to the container.
 builder.Services.AddCors(options =>
 {
-	options.AddDefaultPolicy(policy =>
+	options.AddPolicy("AllowAll", policy =>
 	{
-		policy.AllowAnyOrigin();
-		policy.AllowAnyMethod();
-		policy.AllowAnyHeader();
+		policy.AllowAnyOrigin()
+			  .AllowAnyMethod()
+			  .AllowAnyHeader();
 	});
 });
 
@@ -83,7 +83,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-app.UseCors();
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 
