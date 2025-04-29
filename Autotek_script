@@ -1,0 +1,704 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 16.2
+-- Dumped by pg_dump version 16.2
+
+-- Started on 2025-04-29 18:22:27
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 240 (class 1255 OID 24693)
+-- Name: sp_addupdatecategory(character varying, character varying, numeric); Type: PROCEDURE; Schema: public; Owner: postgres
+--
+
+CREATE PROCEDURE public.sp_addupdatecategory(IN v_oldcategory character varying, IN v_newcategory character varying, IN v_registeredphonenumber numeric, OUT output_result character varying)
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    COUNTROW INTEGER;
+	COUNTNUM INTEGER;
+	INSERTVAL character varying;
+BEGIN
+    SELECT COUNT(*) INTO COUNTROW FROM category WHERE category = v_newcategory AND registeredphonenumber = v_registeredphonenumber;
+	SELECT COUNT(*) INTO COUNTNUM FROM category WHERE category = v_oldcategory AND registeredphonenumber = v_registeredphonenumber;
+
+	IF COUNTNUM != 0 THEN
+		IF COUNTROW != 0 THEN
+			output_result := 'Record exists';
+		ELSE
+			UPDATE category SET category = v_newcategory WHERE category = v_oldcategory AND registeredphonenumber = v_registeredphonenumber;
+			UPDATE item SET category = v_newcategory WHERE category = v_oldcategory AND registeredphonenumber = v_registeredphonenumber;
+			output_result := 'Record updated Successfully';
+			INSERTVAL := 'NO';
+		END IF;
+	ELSIF COUNTROW = 0 THEN
+		INSERTVAL := 'YES';
+	ELSE 
+		output_result := 'Record exists';
+    END IF;
+	
+    IF COUNTROW = 0 AND INSERTVAL = 'YES' THEN
+        INSERT INTO category(category, registeredphonenumber)
+        VALUES (v_newcategory, v_registeredphonenumber);
+		output_result := 'Record added Successfully';
+	END IF;
+		
+END;
+$$;
+
+
+ALTER PROCEDURE public.sp_addupdatecategory(IN v_oldcategory character varying, IN v_newcategory character varying, IN v_registeredphonenumber numeric, OUT output_result character varying) OWNER TO postgres;
+
+--
+-- TOC entry 241 (class 1255 OID 24692)
+-- Name: sp_addupdatepartygroup(character varying, character varying, numeric); Type: PROCEDURE; Schema: public; Owner: postgres
+--
+
+CREATE PROCEDURE public.sp_addupdatepartygroup(IN v_oldgroupname character varying, IN v_newgroupname character varying, IN v_registeredphonenumber numeric, OUT output_result character varying)
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    COUNTROW INTEGER;
+	COUNTNUM INTEGER;
+	INSERTVAL character varying;
+BEGIN
+    SELECT COUNT(*) INTO COUNTROW FROM partygroup WHERE partygroup = v_newgroupname AND registeredphonenumber = v_registeredphonenumber;
+	SELECT COUNT(*) INTO COUNTNUM FROM partygroup WHERE partygroup = v_oldgroupname AND registeredphonenumber = v_registeredphonenumber;
+    
+	IF COUNTNUM != 0 THEN
+		IF COUNTROW != 0 THEN
+			output_result := 'Record exists';
+		ELSE
+			UPDATE partygroup SET partygroup = v_newgroupname WHERE partygroup = v_oldgroupname AND registeredphonenumber = v_registeredphonenumber;
+			UPDATE party SET partygroup = v_newgroupname WHERE partygroup = v_oldgroupname AND registeredphonenumber = v_registeredphonenumber;
+			output_result := 'Record updated Successfully';
+			INSERTVAL := 'NO';
+		END IF;
+	ELSIF COUNTROW = 0 THEN
+		INSERTVAL := 'YES';
+	ELSE 
+		output_result := 'Record exists';
+    END IF;
+	
+    IF COUNTROW = 0 AND INSERTVAL = 'YES' THEN
+        INSERT INTO partygroup(partygroup, registeredphonenumber)
+        VALUES (v_newgroupname, v_registeredphonenumber);
+		output_result := 'Record added Successfully';
+	END IF;
+    
+END;
+$$;
+
+
+ALTER PROCEDURE public.sp_addupdatepartygroup(IN v_oldgroupname character varying, IN v_newgroupname character varying, IN v_registeredphonenumber numeric, OUT output_result character varying) OWNER TO postgres;
+
+--
+-- TOC entry 242 (class 1255 OID 24748)
+-- Name: sp_findorinsertitems(character varying, numeric, numeric, character varying, character varying, numeric, numeric, character varying, numeric, numeric, character varying, numeric, boolean); Type: PROCEDURE; Schema: public; Owner: postgres
+--
+
+CREATE PROCEDURE public.sp_findorinsertitems(IN v_customername character varying, IN v_phonenumber numeric, IN v_registeredphonenumber numeric, IN v_billingaddress character varying, IN v_shippingaddress character varying, IN v_topayparty numeric, IN v_toreceivefromparty numeric, IN v_item character varying, IN v_qty numeric, IN v_remainingquantity numeric, IN v_typeofpay character varying, IN v_invoicenumber numeric, IN v_isupdate boolean, OUT output_result character varying)
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    countRow INTEGER;
+    countNum INTEGER;
+    countQty NUMERIC;
+BEGIN
+    -- Start transaction
+    BEGIN
+        -- Check if the party exists and insert if not
+        SELECT COUNT(*) INTO countRow 
+        FROM party 
+        WHERE partyname = v_customername AND registeredphonenumber = v_registeredphonenumber;
+        
+        IF countRow = 0 THEN
+            INSERT INTO party(partyname, phonenumber, registeredphonenumber, billingaddress, shippingaddress, partygroup)
+            VALUES (v_customername, v_phonenumber, v_registeredphonenumber, v_billingaddress, v_shippingaddress, 'GENERAL');
+        END IF;
+      
+        -- Check if the item exists and insert if not
+        SELECT COUNT(*) INTO countNum 
+        FROM item 
+        WHERE itemname = v_item AND registeredphonenumber = v_registeredphonenumber;
+        
+        -- Check the quantity in item_details for the given customer and item
+        SELECT qty INTO countQty 
+        FROM item_details 
+        WHERE customername = v_customername 
+          AND typeofpay = v_typeofpay 
+          AND item = v_item 
+          AND invoicenumber = v_invoicenumber;
+
+        -- Adjust quantity only if update is requested
+        IF v_isupdate THEN
+            IF countQty = v_qty THEN
+                v_qty := 0;
+            ELSE
+                v_qty := v_qty - countQty;
+            END IF;
+        END IF;
+        
+        -- Insert or update item
+        IF countNum = 0 THEN
+            INSERT INTO item(itemname, remainingquantity, registeredphonenumber, typeofpay, category)
+            VALUES (v_item, v_remainingquantity - v_qty, v_registeredphonenumber, v_typeofpay, 'GENERAL');
+        ELSE
+            IF v_typeofpay = 'SALE RETURN' OR v_typeofpay = 'PURCHASE' THEN
+                UPDATE item 
+                SET remainingquantity = remainingquantity + v_qty 
+                WHERE itemname = v_item AND registeredphonenumber = v_registeredphonenumber;
+            ELSE
+                UPDATE item 
+                SET remainingquantity = remainingquantity - v_qty 
+                WHERE itemname = v_item AND registeredphonenumber = v_registeredphonenumber;
+            END IF;
+        END IF;
+
+        -- Update party's payment details
+        UPDATE party 
+        SET topayparty = v_topayparty, toreceivefromparty = v_toreceivefromparty 
+        WHERE partyname = v_customername AND registeredphonenumber = v_registeredphonenumber;
+
+        -- Set the output result
+        output_result := 'Record added or updated successfully';
+    EXCEPTION
+        WHEN OTHERS THEN
+            output_result := 'An error occurred: ' || SQLERRM;
+    END;
+END;
+$$;
+
+
+ALTER PROCEDURE public.sp_findorinsertitems(IN v_customername character varying, IN v_phonenumber numeric, IN v_registeredphonenumber numeric, IN v_billingaddress character varying, IN v_shippingaddress character varying, IN v_topayparty numeric, IN v_toreceivefromparty numeric, IN v_item character varying, IN v_qty numeric, IN v_remainingquantity numeric, IN v_typeofpay character varying, IN v_invoicenumber numeric, IN v_isupdate boolean, OUT output_result character varying) OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 225 (class 1259 OID 24736)
+-- Name: addbusinessinformation; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.addbusinessinformation (
+    registeredphonenumber numeric NOT NULL,
+    businessname character varying(50),
+    gstin character varying(50),
+    phonenumber numeric,
+    emailid character varying(255),
+    businessaddress character varying(300),
+    businesstype character varying(100),
+    businesscategory character varying(100),
+    pincode numeric,
+    state character varying(100),
+    businessdescription character varying(300)
+);
+
+
+ALTER TABLE public.addbusinessinformation OWNER TO postgres;
+
+--
+-- TOC entry 228 (class 1259 OID 24768)
+-- Name: assigncodeseq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.assigncodeseq
+    START WITH 2000000
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.assigncodeseq OWNER TO postgres;
+
+--
+-- TOC entry 226 (class 1259 OID 24755)
+-- Name: bankform; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.bankform (
+    accountdisplayname character varying(60) NOT NULL,
+    openingbalance numeric,
+    asofdate date NOT NULL,
+    transfertype character varying(50),
+    fromaccount character varying(60),
+    toaccount character varying(60),
+    amount numeric,
+    adjustmentdate date,
+    accountname character varying(60),
+    adjustmenttype character varying(50),
+    description text,
+    typeofpay character varying(20),
+    registeredphonenumber numeric,
+    transaction_id numeric
+);
+
+
+ALTER TABLE public.bankform OWNER TO postgres;
+
+--
+-- TOC entry 224 (class 1259 OID 24687)
+-- Name: category; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.category (
+    category character varying(100),
+    registeredphonenumber numeric
+);
+
+
+ALTER TABLE public.category OWNER TO postgres;
+
+--
+-- TOC entry 222 (class 1259 OID 16537)
+-- Name: countrow; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.countrow (
+    count bigint
+);
+
+
+ALTER TABLE public.countrow OWNER TO postgres;
+
+--
+-- TOC entry 217 (class 1259 OID 16496)
+-- Name: item; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.item (
+    typeofpay character varying(255),
+    registeredphonenumber numeric,
+    itemname character varying(255),
+    itemhsn character varying(255),
+    baseunit character varying(255),
+    secondaryunit character varying(255),
+    category character varying(255),
+    itemcode character varying(255),
+    saleprice numeric,
+    salewithorwithouttax character varying(50),
+    discountonsaleprice numeric,
+    percentageoramount numeric,
+    wholesaleprice numeric,
+    wholesalewithorwithouttax character varying(50),
+    minimumwholesalequantity numeric,
+    purchaseprice numeric DEFAULT 0,
+    purchasewithorwithouttax character varying(50),
+    taxrate character varying(50),
+    openingquantity numeric,
+    atprice numeric,
+    asofdate date,
+    minimumstocktomaintain numeric,
+    _location character varying(255),
+    conversionrates numeric,
+    remainingquantity numeric,
+    percentageoramounttype character varying(255),
+    mrp numeric DEFAULT 0
+);
+
+
+ALTER TABLE public.item OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 16520)
+-- Name: item_details; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.item_details (
+    detail_id integer NOT NULL,
+    transaction_id numeric,
+    item character varying(255),
+    qty numeric,
+    unit character varying(50),
+    priceperunit numeric,
+    registeredphonenumber numeric,
+    invoicenumber numeric,
+    customername character varying,
+    invoicedate date,
+    typeofpay character varying,
+    paymentstatus character varying,
+    showtransaction character varying(100) DEFAULT 'SHOW'::character varying,
+    taxrate character varying(255) DEFAULT ''::character varying,
+    taxrateamount numeric DEFAULT 0,
+    discountpercent numeric DEFAULT 0,
+    discountamount numeric DEFAULT 0,
+    mrp numeric DEFAULT 0,
+    itemcode character varying(20) DEFAULT ''::character varying
+);
+
+
+ALTER TABLE public.item_details OWNER TO postgres;
+
+--
+-- TOC entry 220 (class 1259 OID 16519)
+-- Name: item_details_detail_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.item_details_detail_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.item_details_detail_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 4928 (class 0 OID 0)
+-- Dependencies: 220
+-- Name: item_details_detail_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.item_details_detail_id_seq OWNED BY public.item_details.detail_id;
+
+
+--
+-- TOC entry 216 (class 1259 OID 16485)
+-- Name: party; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.party (
+    partyname character varying(255),
+    gst character varying(255) DEFAULT ''::character varying,
+    phonenumber numeric,
+    partygroup character varying(255),
+    gsttype character varying(255),
+    _state character varying(255),
+    emailid character varying(255),
+    billingaddress character varying(255),
+    shippingaddress character varying(255),
+    openingbalance numeric DEFAULT 0,
+    asofdate date,
+    creditlimit numeric DEFAULT 0,
+    additionalfieldname1 character varying(255),
+    additionalfieldname2 character varying(255),
+    additionalfieldname3 character varying(255),
+    additionalfieldname4 character varying(255),
+    registeredphonenumber numeric,
+    topayorreceive character varying,
+    typeofpay character varying,
+    partybalance numeric DEFAULT 0,
+    additionalfieldname1value character varying(255),
+    additionalfieldname2value character varying(255),
+    additionalfieldname3value character varying(255),
+    topayparty numeric DEFAULT 0,
+    toreceivefromparty numeric DEFAULT 0,
+    additionalfieldname4value character varying(20) DEFAULT ''::character varying
+);
+
+
+ALTER TABLE public.party OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 24682)
+-- Name: partygroup; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.partygroup (
+    partygroup character varying(255),
+    registeredphonenumber numeric
+);
+
+
+ALTER TABLE public.partygroup OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 24761)
+-- Name: payementinouttransactions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.payementinouttransactions (
+    invoicedate date,
+    invoicenumber numeric,
+    typeofpay character varying(50),
+    linkedamount numeric,
+    customername character varying(50),
+    registeredphonenumber numeric,
+    paymentininvoicenumber numeric,
+    showtype integer DEFAULT 0
+);
+
+
+ALTER TABLE public.payementinouttransactions OWNER TO postgres;
+
+--
+-- TOC entry 215 (class 1259 OID 16432)
+-- Name: registeragent; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.registeragent (
+    phonenumber numeric,
+    _password character varying(255) NOT NULL,
+    _state character varying(255) NOT NULL,
+    address character varying(255) NOT NULL,
+    status character varying(255) DEFAULT 'PARTIAL'::character varying,
+    expirydate date DEFAULT (CURRENT_DATE + 1),
+    plantype character varying(10)
+);
+
+
+ALTER TABLE public.registeragent OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 16511)
+-- Name: transactions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.transactions (
+    transaction_id numeric NOT NULL,
+    typeofpay character varying(255),
+    invoicenumber numeric,
+    invoicedate date,
+    stateofsupply character varying(255),
+    paymenttype character varying(255),
+    total numeric,
+    received numeric,
+    balance numeric,
+    customername character varying(255),
+    phonenumber numeric,
+    registeredphonenumber numeric,
+    billingaddress character varying(255),
+    shippingaddress character varying(255),
+    paymentstatus character varying,
+    showtransaction character varying(100) DEFAULT 'SHOW'::character varying,
+    linkedaccount character varying(255) DEFAULT 'NOT LINKED'::character varying,
+    linkedamount numeric DEFAULT 0,
+    paymentinoutinvoicedate date,
+    isconverted boolean DEFAULT false,
+    paymentininvoicenumber numeric,
+    amountdetails character varying(255) DEFAULT ''::character varying,
+    bankscustomername character varying(50) DEFAULT ''::character varying,
+    isbankscustomernameupdate boolean DEFAULT true
+);
+
+
+ALTER TABLE public.transactions OWNER TO postgres;
+
+--
+-- TOC entry 218 (class 1259 OID 16510)
+-- Name: transactions_transaction_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.transactions_transaction_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.transactions_transaction_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 4929 (class 0 OID 0)
+-- Dependencies: 218
+-- Name: transactions_transaction_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.transactions_transaction_id_seq OWNED BY public.transactions.transaction_id;
+
+
+--
+-- TOC entry 4752 (class 2604 OID 24732)
+-- Name: item_details detail_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.item_details ALTER COLUMN detail_id SET DEFAULT nextval('public.item_details_detail_id_seq'::regclass);
+
+
+--
+-- TOC entry 4744 (class 2604 OID 24733)
+-- Name: transactions transaction_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.transactions ALTER COLUMN transaction_id SET DEFAULT nextval('public.transactions_transaction_id_seq'::regclass);
+
+
+--
+-- TOC entry 4919 (class 0 OID 24736)
+-- Dependencies: 225
+-- Data for Name: addbusinessinformation; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.addbusinessinformation (registeredphonenumber, businessname, gstin, phonenumber, emailid, businessaddress, businesstype, businesscategory, pincode, state, businessdescription) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4920 (class 0 OID 24755)
+-- Dependencies: 226
+-- Data for Name: bankform; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.bankform (accountdisplayname, openingbalance, asofdate, transfertype, fromaccount, toaccount, amount, adjustmentdate, accountname, adjustmenttype, description, typeofpay, registeredphonenumber, transaction_id) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4918 (class 0 OID 24687)
+-- Dependencies: 224
+-- Data for Name: category; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.category (category, registeredphonenumber) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4916 (class 0 OID 16537)
+-- Dependencies: 222
+-- Data for Name: countrow; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.countrow (count) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4911 (class 0 OID 16496)
+-- Dependencies: 217
+-- Data for Name: item; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.item (typeofpay, registeredphonenumber, itemname, itemhsn, baseunit, secondaryunit, category, itemcode, saleprice, salewithorwithouttax, discountonsaleprice, percentageoramount, wholesaleprice, wholesalewithorwithouttax, minimumwholesalequantity, purchaseprice, purchasewithorwithouttax, taxrate, openingquantity, atprice, asofdate, minimumstocktomaintain, _location, conversionrates, remainingquantity, percentageoramounttype, mrp) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4915 (class 0 OID 16520)
+-- Dependencies: 221
+-- Data for Name: item_details; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.item_details (detail_id, transaction_id, item, qty, unit, priceperunit, registeredphonenumber, invoicenumber, customername, invoicedate, typeofpay, paymentstatus, showtransaction, taxrate, taxrateamount, discountpercent, discountamount, mrp, itemcode) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4910 (class 0 OID 16485)
+-- Dependencies: 216
+-- Data for Name: party; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.party (partyname, gst, phonenumber, partygroup, gsttype, _state, emailid, billingaddress, shippingaddress, openingbalance, asofdate, creditlimit, additionalfieldname1, additionalfieldname2, additionalfieldname3, additionalfieldname4, registeredphonenumber, topayorreceive, typeofpay, partybalance, additionalfieldname1value, additionalfieldname2value, additionalfieldname3value, topayparty, toreceivefromparty, additionalfieldname4value) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4917 (class 0 OID 24682)
+-- Dependencies: 223
+-- Data for Name: partygroup; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.partygroup (partygroup, registeredphonenumber) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4921 (class 0 OID 24761)
+-- Dependencies: 227
+-- Data for Name: payementinouttransactions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.payementinouttransactions (invoicedate, invoicenumber, typeofpay, linkedamount, customername, registeredphonenumber, paymentininvoicenumber, showtype) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4909 (class 0 OID 16432)
+-- Dependencies: 215
+-- Data for Name: registeragent; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.registeragent (phonenumber, _password, _state, address, status, expirydate, plantype) FROM stdin;
+9920279905	qwertyasdf	Maharashtra	F07, Siddesh Jyoti building	PARTIAL	2025-03-22	free
+\.
+
+
+--
+-- TOC entry 4913 (class 0 OID 16511)
+-- Dependencies: 219
+-- Data for Name: transactions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.transactions (transaction_id, typeofpay, invoicenumber, invoicedate, stateofsupply, paymenttype, total, received, balance, customername, phonenumber, registeredphonenumber, billingaddress, shippingaddress, paymentstatus, showtransaction, linkedaccount, linkedamount, paymentinoutinvoicedate, isconverted, paymentininvoicenumber, amountdetails, bankscustomername, isbankscustomernameupdate) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4930 (class 0 OID 0)
+-- Dependencies: 228
+-- Name: assigncodeseq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.assigncodeseq', 2000007, true);
+
+
+--
+-- TOC entry 4931 (class 0 OID 0)
+-- Dependencies: 220
+-- Name: item_details_detail_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.item_details_detail_id_seq', 314, true);
+
+
+--
+-- TOC entry 4932 (class 0 OID 0)
+-- Dependencies: 218
+-- Name: transactions_transaction_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.transactions_transaction_id_seq', 572, true);
+
+
+--
+-- TOC entry 4764 (class 2606 OID 16527)
+-- Name: item_details item_details_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.item_details
+    ADD CONSTRAINT item_details_pkey PRIMARY KEY (detail_id);
+
+
+--
+-- TOC entry 4762 (class 2606 OID 24706)
+-- Name: transactions transactions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.transactions
+    ADD CONSTRAINT transactions_pkey PRIMARY KEY (transaction_id);
+
+
+--
+-- TOC entry 4765 (class 2606 OID 24718)
+-- Name: item_details item_details_transaction_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.item_details
+    ADD CONSTRAINT item_details_transaction_id_fkey FOREIGN KEY (transaction_id) REFERENCES public.transactions(transaction_id);
+
+
+-- Completed on 2025-04-29 18:22:27
+
+--
+-- PostgreSQL database dump complete
+--
+
