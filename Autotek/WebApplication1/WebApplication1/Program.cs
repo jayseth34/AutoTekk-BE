@@ -11,7 +11,7 @@ builder.WebHost.ConfigureKestrel(options =>
 {
 	options.ListenAnyIP(443, listenOptions =>
 	{
-		listenOptions.UseHttps("~/certificate.pfx", "Autotekk@1234");
+		listenOptions.UseHttps("/etc/ssl/mybackend/certificate.pfx > /dev/null", "Autotekk@1234");
 	});
 });
 
