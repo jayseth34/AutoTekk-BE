@@ -65,6 +65,7 @@ namespace WebApplication1.DL
 		{
 			try
 			{
+				Console.WriteLine(this._connectionFactory);
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 				{
 					conn.Open();
@@ -82,7 +83,7 @@ namespace WebApplication1.DL
 			}
 			catch (Exception ex)
 			{
-				return false;
+				Console.WriteLine(ex.Message);
 			}
 			return false;
 		}
