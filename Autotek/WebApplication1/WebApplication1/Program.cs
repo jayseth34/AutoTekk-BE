@@ -4,7 +4,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseUrls("http://0.0.0.0:5000", "https://0.0.0.0:443");
+builder.WebHost.UseUrls("http://0.0.0.0:5000", "https://0.0.0.0:5050");
 
 // Adding Domain certificate
 builder.WebHost.ConfigureKestrel(options =>
