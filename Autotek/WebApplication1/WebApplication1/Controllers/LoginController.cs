@@ -39,29 +39,47 @@ namespace WebApplication1.Controllers
 			}
 		}
 
-		[HttpGet("send-otp")]
-		public async Task<IActionResult> SendOtp([FromQuery] string phoneNumber)
-		{
-			OtpRs otpRs = new OtpRs();
-			LoginBL loginBL = new LoginBL(this.config);
+        [HttpGet("send-otp")]
+        public async Task<IActionResult> SendOtp([FromQuery] string phoneNumber)
+        {
+            OtpRs otpRs = new OtpRs();
+            LoginBL loginBL = new LoginBL(this.config);
 
-			bool exist = await loginBL.ValidateOtpUser(phoneNumber);
-			if (!exist)
-			{
-				otpRs.status = "FAILED";
-				otpRs.statusmessage = "Kindly Register before Login";
-				return Ok(otpRs);
-			}
+            bool exist = await loginBL.ValidateOtpUser(phoneNumber);
+            if (!exist)
+            {
+                otpRs.status = "FAILED";
+                otpRs.statusmessage = "Kindly Register before Login";
+                return Ok(otpRs);
+            }
 
-			string apiKey = "3cb8a053-8404-11ec-b9b5-0200cd936042";
-			var client = new HttpClient();
-			var request = new HttpRequestMessage(HttpMethod.Get, $"https://2factor.in/API/V1/{apiKey}/SMS/+91{phoneNumber}/AUTOGEN/OTP FOR LOGIN VERIFICATION");
-			var response = await client.SendAsync(request);
-			response.EnsureSuccessStatusCode();
-			return Ok(response.Content.ReadAsStringAsync());
-		}
+            string apiKey = "3cb8a053-8404-11ec-b9b5-0200cd936042";
+            var client = new HttpClient();
+            var request = new HttpRequestMessage(HttpMethod.Get,
+                $"https://2factor.in/API/V1/{apiKey}/SMS/+91{phoneNumber}/AUTOGEN/OTP FOR LOGIN VERIFICATION");
 
-		[HttpPost("verify-otp")]
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // ✅ Wrap response in the Task-like structure Angular expects
+            return Ok(new
+            {
+                result = content,
+                id = 137,
+                exception = (string?)null,
+                status = 5,
+                isCanceled = false,
+                isCompleted = true,
+                isCompletedSuccessfully = true,
+                creationOptions = 0,
+                asyncState = (string?)null,
+                isFaulted = false
+            });
+        }
+
+
+
+        [HttpPost("verify-otp")]
 		public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
 		{
 			OtpRs otpRs = new OtpRs();
