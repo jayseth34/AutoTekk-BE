@@ -385,6 +385,47 @@ namespace WebApplication1.DL
 				}
 				if (!partyexist)
 				{
+					// Read current running totals so we adjust rather than overwrite accumulated transaction history.
+					decimal oldOpeningBalance = 0;
+					string oldTopayOrReceive = "";
+					decimal currentTopay = 0;
+					decimal currentToreceive = 0;
+					try
+					{
+						using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+						{
+							conn.Open();
+							NpgsqlCommand cmd = new NpgsqlCommand();
+							cmd.Connection = conn;
+							cmd.CommandType = CommandType.Text;
+							cmd.CommandText = "SELECT openingbalance, topayorreceive, topayparty, toreceivefromparty FROM party WHERE registeredphonenumber = @registeredphonenumber AND partyname = @oldpartyname";
+							cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
+							cmd.Parameters.AddWithValue("@oldpartyname", opartyRq.oldpartyname);
+							NpgsqlDataReader reader = cmd.ExecuteReader();
+							if (reader.HasRows && reader.Read())
+							{
+								oldOpeningBalance = reader["openingbalance"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["openingbalance"]);
+								oldTopayOrReceive = reader["topayorreceive"] as string ?? "";
+								currentTopay = reader["topayparty"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["topayparty"]);
+								currentToreceive = reader["toreceivefromparty"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["toreceivefromparty"]);
+							}
+						}
+					}
+					catch (Exception ex) { Console.WriteLine(ex.Message); }
+
+					// Remove old opening balance contribution from running totals.
+					if (oldTopayOrReceive.ToUpper() == "RECEIVE")
+						currentToreceive -= oldOpeningBalance;
+					else if (oldTopayOrReceive.ToUpper() == "PAY")
+						currentTopay -= oldOpeningBalance;
+
+					// Add new opening balance contribution to running totals.
+					string newTopayOrReceive = opartyRq.topayorreceive?.ToUpper() ?? "";
+					if (newTopayOrReceive == "RECEIVE")
+						currentToreceive += opartyRq.openingbalance;
+					else if (newTopayOrReceive == "PAY")
+						currentTopay += opartyRq.openingbalance;
+
 					try
 					{
 						using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
@@ -421,8 +462,8 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@additionalfieldname2value", opartyRq.additionalfieldname2value);
 							cmd.Parameters.AddWithValue("@additionalfieldname3value", opartyRq.additionalfieldname3value);
 							cmd.Parameters.AddWithValue("@additionalfieldname4value", opartyRq.additionalfieldname4value);
-							cmd.Parameters.AddWithValue("@topayparty", opartyRq.topayparty);
-							cmd.Parameters.AddWithValue("@toreceivefromparty", opartyRq.toreceivefromparty);
+							cmd.Parameters.AddWithValue("@topayparty", currentTopay);
+							cmd.Parameters.AddWithValue("@toreceivefromparty", currentToreceive);
 							cmd.ExecuteNonQuery();
 							opartyRs.status = "Success";
 							opartyRs.statusmessage = "Party Updated Successfully";
@@ -433,63 +474,32 @@ namespace WebApplication1.DL
 						Console.WriteLine(ex.Message);
 					}
 				}
-				if (opartyRq.typeofpay == "RECEIVABLE OPENING BALANCE" || opartyRq.typeofpay == "PAYABLE OPENING BALANCE")
+				// Always delete existing opening balance transactions first (handles amount change,
+				// type switch RECEIVE<->PAY, and opening balance removal cleanly).
+				try
 				{
-					try
+					using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 					{
-						using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-						{
-							conn.Open();
-							using (NpgsqlTransaction transaction = conn.BeginTransaction())
-							{
-								try
-								{
-									NpgsqlCommand cmd = new NpgsqlCommand();
-									cmd.Connection = conn;
-									cmd.CommandType = CommandType.Text;
-									int affectedRows = 0;
-									if (affectedRows == 0)
-									{
-										// No rows updated, perform insert
-										cmd.CommandText = "INSERT INTO transactions (typeofpay, invoicedate, total, balance, customername, phonenumber, registeredphonenumber, paymentstatus, invoicenumber)" +
-														  " VALUES (@typeofpay, @invoicedate, @total, @balance, @customername, @phonenumber, @registeredphonenumber, @paymentstatus, 1)";
-										cmd.Parameters.AddWithValue("@typeofpay", opartyRq.typeofpay);
-										cmd.Parameters.AddWithValue("@invoicedate", DateTime.UtcNow);
-										cmd.Parameters.AddWithValue("@total", opartyRq.openingbalance);
-										cmd.Parameters.AddWithValue("@balance", opartyRq.openingbalance);
-										cmd.Parameters.AddWithValue("@customername", opartyRq.partyname);
-										cmd.Parameters.AddWithValue("@phonenumber", opartyRq.phonenumber);
-										cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
-										cmd.Parameters.AddWithValue("@oldpartyname", opartyRq.oldpartyname);
-										cmd.Parameters.AddWithValue("@paymentstatus", "UNPAID");
-										cmd.ExecuteNonQuery();
-										opartyRs.status = "Success";
-										opartyRs.statusmessage = "Party Updated Successfully";
-										string val = string.Empty;
-										if (opartyRq.typeofpay == "PAYABLE OPENING BALANCE")
-											val = "RECEIVABLE OPENING BALANCE";
-										else if (opartyRq.typeofpay == "RECEIVABLE OPENING BALANCE")
-											val = "PAYABLE OPENING BALANCE";
-										cmd.CommandText = "DELETE FROM transactions where registeredphonenumber = @registeredphonenumber AND customername = @oldpartyname AND typeofpay = '" + val + "'";
-										cmd.ExecuteNonQuery();
-									}
-
-									transaction.Commit();
-								}
-								catch (Exception ex)
-								{
-									transaction.Rollback();
-									Console.WriteLine(ex.Message);
-								}
-							}
-						}
-					}
-					catch (Exception ex)
-					{
-						Console.WriteLine(ex.Message);
+						conn.Open();
+						NpgsqlCommand cmd = new NpgsqlCommand();
+						cmd.Connection = conn;
+						cmd.CommandType = CommandType.Text;
+						cmd.CommandText = @"DELETE FROM transactions
+                WHERE registeredphonenumber = @registeredphonenumber
+                  AND customername = @oldpartyname
+                  AND (typeofpay = 'RECEIVABLE OPENING BALANCE' OR typeofpay = 'PAYABLE OPENING BALANCE')
+                  AND invoicenumber = 1";
+						cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@oldpartyname", opartyRq.oldpartyname);
+						cmd.ExecuteNonQuery();
 					}
 				}
-				else
+				catch (Exception ex)
+				{
+					Console.WriteLine(ex.Message);
+				}
+				// Insert fresh opening balance transaction with updated amount/type.
+				if (opartyRq.typeofpay == "RECEIVABLE OPENING BALANCE" || opartyRq.typeofpay == "PAYABLE OPENING BALANCE")
 				{
 					try
 					{
@@ -499,13 +509,19 @@ namespace WebApplication1.DL
 							NpgsqlCommand cmd = new NpgsqlCommand();
 							cmd.Connection = conn;
 							cmd.CommandType = CommandType.Text;
-							cmd.CommandText = @"DELETE FROM transactions
-                WHERE registeredphonenumber = @registeredphonenumber
-                  AND customername = @oldpartyname
-                  AND (typeofpay = 'RECEIVABLE OPENING BALANCE' OR typeofpay = 'PAYABLE OPENING BALANCE')";
+							cmd.CommandText = "INSERT INTO transactions (typeofpay, invoicedate, total, balance, customername, phonenumber, registeredphonenumber, paymentstatus, invoicenumber)" +
+											  " VALUES (@typeofpay, @invoicedate, @total, @balance, @customername, @phonenumber, @registeredphonenumber, @paymentstatus, 1)";
+							cmd.Parameters.AddWithValue("@typeofpay", opartyRq.typeofpay);
+							cmd.Parameters.AddWithValue("@invoicedate", DateTime.UtcNow);
+							cmd.Parameters.AddWithValue("@total", opartyRq.openingbalance);
+							cmd.Parameters.AddWithValue("@balance", opartyRq.openingbalance);
+							cmd.Parameters.AddWithValue("@customername", opartyRq.partyname);
+							cmd.Parameters.AddWithValue("@phonenumber", opartyRq.phonenumber);
 							cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
-							cmd.Parameters.AddWithValue("@oldpartyname", opartyRq.oldpartyname);
+							cmd.Parameters.AddWithValue("@paymentstatus", "UNPAID");
 							cmd.ExecuteNonQuery();
+							opartyRs.status = "Success";
+							opartyRs.statusmessage = "Party Updated Successfully";
 						}
 					}
 					catch (Exception ex)
