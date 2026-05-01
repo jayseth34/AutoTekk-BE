@@ -1311,6 +1311,43 @@ namespace WebApplication1.DL
                 oDashboardDetailsRs.status = "Failed";
                 Console.WriteLine(ex.Message);
 			}
+
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = @"
+						SELECT COALESCE(SUM((elem->>'amount')::FLOAT), 0) as cashinhand
+						FROM transactions
+						CROSS JOIN LATERAL jsonb_array_elements(
+							CASE WHEN amountdetails IS NOT NULL AND amountdetails != '' AND amountdetails != '[]'
+								 THEN amountdetails::jsonb
+								 ELSE '[]'::jsonb
+							END
+						) AS elem
+						WHERE registeredphonenumber = @registeredphonenumber
+						AND showtransaction = 'SHOW'
+						AND elem->>'type' = 'CASH'";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows && reader.Read())
+					{
+						oDashboardDetailsRs.cashinhand = Convert.ToDouble(reader["cashinhand"]);
+					}
+					oDashboardDetailsRs.status = "Success";
+				}
+			}
+			catch (Exception ex)
+			{
+				oDashboardDetailsRs.statusmessage = "Something went wrong!";
+				oDashboardDetailsRs.status = "Failed";
+				Console.WriteLine(ex.Message);
+			}
+
 			return oDashboardDetailsRs;
 		}
 
