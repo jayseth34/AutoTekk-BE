@@ -267,8 +267,8 @@ namespace WebApplication1.DL
 							NpgsqlCommand cmd = new NpgsqlCommand();
 							cmd.Connection = conn;
 							cmd.CommandType = CommandType.Text;
-							cmd.CommandText = "INSERT INTO transactions(typeofpay, invoicedate, total, balance, customername, phonenumber, registeredphonenumber," +
-								"paymentstatus, invoicenumber) VALUES(@typeofpay, @invoicedate, @total, @balance, @customername, @phonenumber, @registeredphonenumber," +
+							cmd.CommandText = "INSERT INTO transactions(typeofpay, invoicedate, total, received, balance, customername, phonenumber, registeredphonenumber," +
+								"paymentstatus, invoicenumber) VALUES(@typeofpay, @invoicedate, @total, 0, @balance, @customername, @phonenumber, @registeredphonenumber," +
 								"@paymentstatus, 1) RETURNING transaction_id";
 							cmd.Parameters.AddWithValue("@typeofpay", opartyRq.typeofpay);
 							cmd.Parameters.AddWithValue("@invoicedate", DateTime.UtcNow);
@@ -439,7 +439,7 @@ namespace WebApplication1.DL
 											  "creditlimit = @creditlimit, additionalfieldname1 = @additionalfieldname1," + "additionalfieldname2 = @additionalfieldname2, additionalfieldname3 = @additionalfieldname3, " +
 											  "additionalfieldname4 = @additionalfieldname4," + " additionalfieldname1value = @additionalfieldname1value, " +
 											  "additionalfieldname2value = @additionalfieldname2value, additionalfieldname3value = @additionalfieldname3value, " +
-											  "additionalfieldname4value = @additionalfieldname4value, topayparty = @topayparty, toreceivefromparty = @toreceivefromparty WHERE registeredphonenumber = " + opartyRq.registeredphonenumber + " AND partyname = '" + opartyRq.oldpartyname + "'";
+											  "additionalfieldname4value = @additionalfieldname4value, topayparty = @topayparty, toreceivefromparty = @toreceivefromparty WHERE registeredphonenumber = @registeredphonenumber AND partyname = @oldpartyname";
 							cmd.Parameters.AddWithValue("@typeofpay", opartyRq.typeofpay);
 							cmd.Parameters.AddWithValue("@partyname", opartyRq.partyname);
 							cmd.Parameters.AddWithValue("@gst", opartyRq.GST);
@@ -464,6 +464,8 @@ namespace WebApplication1.DL
 							cmd.Parameters.AddWithValue("@additionalfieldname4value", opartyRq.additionalfieldname4value);
 							cmd.Parameters.AddWithValue("@topayparty", currentTopay);
 							cmd.Parameters.AddWithValue("@toreceivefromparty", currentToreceive);
+							cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
+							cmd.Parameters.AddWithValue("@oldpartyname", opartyRq.oldpartyname);
 							cmd.ExecuteNonQuery();
 							opartyRs.status = "Success";
 							opartyRs.statusmessage = "Party Updated Successfully";
@@ -509,8 +511,8 @@ namespace WebApplication1.DL
 							NpgsqlCommand cmd = new NpgsqlCommand();
 							cmd.Connection = conn;
 							cmd.CommandType = CommandType.Text;
-							cmd.CommandText = "INSERT INTO transactions (typeofpay, invoicedate, total, balance, customername, phonenumber, registeredphonenumber, paymentstatus, invoicenumber)" +
-											  " VALUES (@typeofpay, @invoicedate, @total, @balance, @customername, @phonenumber, @registeredphonenumber, @paymentstatus, 1)";
+							cmd.CommandText = "INSERT INTO transactions (typeofpay, invoicedate, total, received, balance, customername, phonenumber, registeredphonenumber, paymentstatus, invoicenumber)" +
+											  " VALUES (@typeofpay, @invoicedate, @total, 0, @balance, @customername, @phonenumber, @registeredphonenumber, @paymentstatus, 1)";
 							cmd.Parameters.AddWithValue("@typeofpay", opartyRq.typeofpay);
 							cmd.Parameters.AddWithValue("@invoicedate", DateTime.UtcNow);
 							cmd.Parameters.AddWithValue("@total", opartyRq.openingbalance);

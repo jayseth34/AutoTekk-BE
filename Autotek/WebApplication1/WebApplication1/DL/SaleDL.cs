@@ -588,7 +588,7 @@ namespace WebApplication1.DL
 						" shippingaddress, paymentstatus, isconverted, amountdetails, isbankscustomernameupdate, bankscustomername) VALUES(@typeofpay, @invoicenumber, @invoicedate, @stateofsupply, @paymenttype, @total, @received, @balance, @customername, @phonenumber, @registeredphonenumber, @billingaddress," +
 						" @shippingaddress, @paymentstatus, @isconverted, @amountdetails, false, @bankscustomername) RETURNING transaction_id";
 					cmd.Parameters.AddWithValue("@typeofpay", typeofpay);
-					cmd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
+					cmd.Parameters.AddWithValue("@invoicenumber", invoicecount);
 					cmd.Parameters.AddWithValue("@invoicedate", otransactionRq.invoicedate);
 					cmd.Parameters.AddWithValue("@stateofsupply", otransactionRq.stateofsupply);
 					cmd.Parameters.AddWithValue("@paymenttype", otransactionRq.paymenttype);
@@ -665,9 +665,13 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@typeofpay", typeofpay);
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 					object result = cmd.ExecuteScalar();
-					if (result != DBNull.Value)
+					if (result != null && result != DBNull.Value)
 					{
-						invoicecount = (Convert.ToInt64(result) + 1 );
+						invoicecount = (Convert.ToInt64(result) + 1);
+					}
+					else
+					{
+						invoicecount = 1;
 					}
 				}
 			}
@@ -941,7 +945,6 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@registeredphonenumber", otransactionRq.registeredphonenumber);
 					cmd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
 					cmd.Parameters.AddWithValue("@customername", otransactionRq.customername);
-					cmd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
 					cmd.ExecuteNonQuery();
 					status = "SUCCESS";
 				}
@@ -1009,12 +1012,12 @@ namespace WebApplication1.DL
 					else if (itemDetail.queryoperationtype == "UPDATE")
 					{
 						query = "UPDATE item_details SET item = @item, qty = @qty, unit = @unit, priceperunit = @priceperunit, invoicedate = @invoicedate, typeofpay = @typeofpay, paymentstatus = @paymentstatus," +
-							"taxrate = @taxrate, taxrateamount = @taxrateamount, discountpercent = @discountpercent, discountamount = @discountamount, itemcode = @itemcode, mrp = @mrp WHERE registeredphonenumber = " + otransactionRq.registeredphonenumber + " AND transaction_id = " + itemDetail.transactionid + " " +
-							"AND item = '" + itemDetail.item + "' AND invoicenumber = " + otransactionRq.invoicenumber;
+							"taxrate = @taxrate, taxrateamount = @taxrateamount, discountpercent = @discountpercent, discountamount = @discountamount, itemcode = @itemcode, mrp = @mrp " +
+							"WHERE registeredphonenumber = @registeredphonenumber AND transaction_id = @transaction_id AND item = @item AND invoicenumber = @invoicenumber";
 					}
 					else if (itemDetail.queryoperationtype == "DELETE")
 					{
-						query = "DELETE FROM item_details WHERE registeredphonenumber = " + otransactionRq.registeredphonenumber + " AND transaction_id = " + itemDetail.transactionid + " AND item = '" + itemDetail.item + "' AND invoicenumber = " + otransactionRq.invoicenumber;
+						query = "DELETE FROM item_details WHERE registeredphonenumber = @registeredphonenumber AND transaction_id = @transaction_id AND item = @item AND invoicenumber = @invoicenumber";
 					}
 					if(!string.IsNullOrEmpty(query))
 					{
@@ -1025,12 +1028,12 @@ namespace WebApplication1.DL
 							cmdd.Connection = connn;
 							cmdd.CommandType = CommandType.Text;
 							cmdd.CommandText = query;
+							cmdd.Parameters.AddWithValue("@registeredphonenumber", otransactionRq.registeredphonenumber);
+							cmdd.Parameters.AddWithValue("@transaction_id", itemDetail.transactionid);
+							cmdd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
 							if (itemDetail.queryoperationtype == "INSERT")
 							{
-								cmdd.Parameters.AddWithValue("@transaction_id", itemDetail.transactionid);
-								cmdd.Parameters.AddWithValue("@registeredphonenumber", otransactionRq.registeredphonenumber);
 								cmdd.Parameters.AddWithValue("@customername", otransactionRq.customername);
-								cmdd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
 							}
 							cmdd.Parameters.AddWithValue("@item", itemDetail.item);
 							cmdd.Parameters.AddWithValue("@qty", itemDetail.qty);
@@ -1342,22 +1345,21 @@ namespace WebApplication1.DL
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 				{
 					conn.Open();
-					NpgsqlCommand cmd = new NpgsqlCommand();
-					cmd.Connection = conn;
-					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = sqlQuery;
-					foreach(GetLinkedPaymentTransactionList str in transactions)
+					foreach (GetLinkedPaymentTransactionList str in transactions)
 					{
-						cmd.Parameters.AddWithValue("@typeofpay", str.typeofpay);
-						cmd.Parameters.AddWithValue("@registeredphonenumber", str.registeredphonenumber);
-						cmd.Parameters.AddWithValue("@customername", str.customername);
-						cmd.Parameters.AddWithValue("@invoicedate", str.invoicedate);
-						cmd.Parameters.AddWithValue("@invoicenumber", str.invoicenumber);
-						cmd.Parameters.AddWithValue("@linkedamount", str.unused);
-						cmd.Parameters.AddWithValue("@paymentininvoicenumber", str.paymentininvoicenumber);
-						cmd.ExecuteNonQuery();
-						val = true;
-						
+						using (NpgsqlCommand cmd = new NpgsqlCommand(sqlQuery, conn))
+						{
+							cmd.CommandType = CommandType.Text;
+							cmd.Parameters.AddWithValue("@typeofpay", str.typeofpay);
+							cmd.Parameters.AddWithValue("@registeredphonenumber", str.registeredphonenumber);
+							cmd.Parameters.AddWithValue("@customername", str.customername);
+							cmd.Parameters.AddWithValue("@invoicedate", str.invoicedate);
+							cmd.Parameters.AddWithValue("@invoicenumber", str.invoicenumber);
+							cmd.Parameters.AddWithValue("@linkedamount", str.unused);
+							cmd.Parameters.AddWithValue("@paymentininvoicenumber", str.paymentininvoicenumber);
+							cmd.ExecuteNonQuery();
+							val = true;
+						}
 					}
 				}
 			}
@@ -1809,6 +1811,26 @@ namespace WebApplication1.DL
 		}
 
 
+		private static string GetBankAmountQuery(string typeofpay, string sqlQueryAdd, string sqlQuerySubtract)
+		{
+			switch (typeofpay)
+			{
+				// Money received into our account
+				case "SALE":
+				case "PAYMENT IN":
+				case "ADVANCE OUT":  // customer paid advance to us
+					return sqlQueryAdd;
+				// Money paid out of our account
+				case "PURCHASE":
+				case "PAYMENT OUT":
+				case "SALE RETURN":   // we refunded customer
+				case "ADVANCE IN":    // we paid advance to supplier
+					return sqlQuerySubtract;
+				default:
+					return string.Empty;
+			}
+		}
+
 		public async Task<string> UpdateBankAmount(List<AmountDetails> oAmountDetails, Int64 registeredphonenumber, string typeofpay)
 		{
 			string result = string.Empty;
@@ -1818,15 +1840,7 @@ namespace WebApplication1.DL
 			string sqlQuerySubtract = "UPDATE BankForm " +
 								"SET amount = amount - @amount " +
 								"WHERE registeredphonenumber = @registeredphonenumber and accountdisplayname = @type";
-			string query = string.Empty;
-			if(typeofpay == "SALE")
-			{
-				query = sqlQueryAdd;
-			}
-			else if (typeofpay == "PURCHASE")
-			{
-				query = sqlQuerySubtract;
-			}
+			string query = GetBankAmountQuery(typeofpay, sqlQueryAdd, sqlQuerySubtract);
 
 
 			try
@@ -1884,12 +1898,12 @@ namespace WebApplication1.DL
 						var matchingNewAmt = oAmountDetails.FirstOrDefault(a => a.type == oldAmt.type);
 						if (matchingNewAmt == null)
 						{
-							// If the type in amt is not found in oAmountDetails, revert the amount
-							if (typeofpay == "SALE")
+							// If the type in amt is not found in oAmountDetails, revert the amount (opposite direction)
+							if (typeofpay == "SALE" || typeofpay == "PAYMENT IN" || typeofpay == "ADVANCE OUT")
 							{
 								query = sqlQuerySubtract;
 							}
-							else if (typeofpay == "PURCHASE")
+							else if (typeofpay == "PURCHASE" || typeofpay == "PAYMENT OUT" || typeofpay == "SALE RETURN" || typeofpay == "ADVANCE IN")
 							{
 								query = sqlQueryAdd;
 							}
@@ -1912,14 +1926,14 @@ namespace WebApplication1.DL
 
 						if (matchingAmt != null)
 						{
-							// If the type is found in amt, handle based on type
+							// If the type is found in amt, apply the delta in the same direction
 							decimal amountDifference = details.amount - matchingAmt.amount;
 
-							if (typeofpay == "SALE")
+							if (typeofpay == "SALE" || typeofpay == "PAYMENT IN" || typeofpay == "ADVANCE OUT")
 							{
 								query = sqlQueryAdd;
 							}
-							else if (typeofpay == "PURCHASE")
+							else if (typeofpay == "PURCHASE" || typeofpay == "PAYMENT OUT" || typeofpay == "SALE RETURN" || typeofpay == "ADVANCE IN")
 							{
 								query = sqlQuerySubtract;
 							}
@@ -1935,12 +1949,12 @@ namespace WebApplication1.DL
 						}
 						else
 						{
-							// If the type is not found in amt, handle as a new addition
-							if (typeofpay == "SALE")
+							// Type not in original amt — treat as a new addition in the transaction direction
+							if (typeofpay == "SALE" || typeofpay == "PAYMENT IN" || typeofpay == "ADVANCE OUT")
 							{
 								query = sqlQueryAdd;
 							}
-							else if (typeofpay == "PURCHASE")
+							else if (typeofpay == "PURCHASE" || typeofpay == "PAYMENT OUT" || typeofpay == "SALE RETURN" || typeofpay == "ADVANCE IN")
 							{
 								query = sqlQuerySubtract;
 							}
