@@ -4,7 +4,8 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseUrls("http://0.0.0.0:5000");
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 // Adding Domain certificate
 //builder.WebHost.ConfigureKestrel(options =>
@@ -87,8 +88,6 @@ if (app.Environment.IsDevelopment())
 		c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
 	});
 }
-
-app.UseHttpsRedirection();
 
 app.UseRouting();
 

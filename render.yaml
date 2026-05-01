@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: autotek-api
+    env: docker
+    dockerfilePath: ./Autotek/WebApplication1/WebApplication1/Dockerfile
+    dockerContext: ./Autotek/WebApplication1
+    plan: free
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings
+        sync: false
+      - key: JwtSettings__SecretKey
+        sync: false
+      - key: Razorpay__KeyId
+        sync: false
+      - key: Razorpay__KeySecret
+        sync: false
