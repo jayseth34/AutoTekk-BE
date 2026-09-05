@@ -1825,6 +1825,7 @@ namespace WebApplication1.DL
 				case "PAYMENT OUT":
 				case "SALE RETURN":   // we refunded customer
 				case "ADVANCE IN":    // we paid advance to supplier
+				case "EXPENSE":       // we paid a business expense
 					return sqlQuerySubtract;
 				default:
 					return string.Empty;
@@ -1903,7 +1904,7 @@ namespace WebApplication1.DL
 							{
 								query = sqlQuerySubtract;
 							}
-							else if (typeofpay == "PURCHASE" || typeofpay == "PAYMENT OUT" || typeofpay == "SALE RETURN" || typeofpay == "ADVANCE IN")
+							else if (typeofpay == "PURCHASE" || typeofpay == "PAYMENT OUT" || typeofpay == "SALE RETURN" || typeofpay == "ADVANCE IN" || typeofpay == "EXPENSE")
 							{
 								query = sqlQueryAdd;
 							}
@@ -1933,7 +1934,7 @@ namespace WebApplication1.DL
 							{
 								query = sqlQueryAdd;
 							}
-							else if (typeofpay == "PURCHASE" || typeofpay == "PAYMENT OUT" || typeofpay == "SALE RETURN" || typeofpay == "ADVANCE IN")
+							else if (typeofpay == "PURCHASE" || typeofpay == "PAYMENT OUT" || typeofpay == "SALE RETURN" || typeofpay == "ADVANCE IN" || typeofpay == "EXPENSE")
 							{
 								query = sqlQuerySubtract;
 							}
@@ -1954,7 +1955,7 @@ namespace WebApplication1.DL
 							{
 								query = sqlQueryAdd;
 							}
-							else if (typeofpay == "PURCHASE" || typeofpay == "PAYMENT OUT" || typeofpay == "SALE RETURN" || typeofpay == "ADVANCE IN")
+							else if (typeofpay == "PURCHASE" || typeofpay == "PAYMENT OUT" || typeofpay == "SALE RETURN" || typeofpay == "ADVANCE IN" || typeofpay == "EXPENSE")
 							{
 								query = sqlQuerySubtract;
 							}

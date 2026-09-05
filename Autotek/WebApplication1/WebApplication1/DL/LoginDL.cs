@@ -1348,6 +1348,73 @@ namespace WebApplication1.DL
 				Console.WriteLine(ex.Message);
 			}
 
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = @"
+						SELECT COALESCE(SUM((elem->>'amount')::FLOAT), 0) as expensecash
+						FROM expense
+						CROSS JOIN LATERAL jsonb_array_elements(
+							CASE WHEN amountdetails IS NOT NULL AND amountdetails != '' AND amountdetails != '[]'
+								 THEN amountdetails::jsonb
+								 ELSE '[]'::jsonb
+							END
+						) AS elem
+						WHERE registeredphonenumber = @registeredphonenumber
+						AND showtransaction = 'SHOW'
+						AND elem->>'type' = 'CASH'";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows && reader.Read())
+					{
+						// Cash paid out for expenses reduces cash on hand.
+						oDashboardDetailsRs.cashinhand -= Convert.ToDouble(reader["expensecash"]);
+					}
+					oDashboardDetailsRs.status = "Success";
+				}
+			}
+			catch (Exception ex)
+			{
+				oDashboardDetailsRs.statusmessage = "Something went wrong!";
+				oDashboardDetailsRs.status = "Failed";
+				Console.WriteLine(ex.Message);
+			}
+
+			try
+			{
+				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				{
+					conn.Open();
+					NpgsqlCommand cmd = new NpgsqlCommand();
+					cmd.Connection = conn;
+					cmd.CommandType = CommandType.Text;
+					cmd.CommandText = @"
+						SELECT COALESCE(SUM(total), 0) as totalexpense
+						FROM expense
+						WHERE registeredphonenumber = @registeredphonenumber
+						AND showtransaction = 'SHOW'
+						AND DATE_TRUNC('month', expensedate) = DATE_TRUNC('month', CURRENT_DATE)";
+					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+					NpgsqlDataReader reader = cmd.ExecuteReader();
+					if (reader.HasRows && reader.Read())
+					{
+						oDashboardDetailsRs.totalexpense = Convert.ToDouble(reader["totalexpense"]);
+					}
+					oDashboardDetailsRs.status = "Success";
+				}
+			}
+			catch (Exception ex)
+			{
+				oDashboardDetailsRs.statusmessage = "Something went wrong!";
+				oDashboardDetailsRs.status = "Failed";
+				Console.WriteLine(ex.Message);
+			}
+
 			return oDashboardDetailsRs;
 		}
 

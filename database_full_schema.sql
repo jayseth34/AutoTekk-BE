@@ -32,6 +32,14 @@ CREATE SEQUENCE public.transactions_transaction_id_seq
     NO MAXVALUE
     CACHE 1;
 
+CREATE SEQUENCE public.expense_expense_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
 
 -- ============================================================
 -- SECTION 2: CREATE TABLE SCRIPTS (with all columns)
@@ -242,6 +250,25 @@ CREATE TABLE public.bankform (
 
 
 -- ------------------------------------------------------------
+-- TABLE: expense
+-- Business expenses (rent, salaries, utilities, etc.) - not
+-- coupled to item stock/party-ledger logic like transactions is
+-- ------------------------------------------------------------
+CREATE TABLE public.expense (
+    expense_id              integer                 NOT NULL DEFAULT nextval('public.expense_expense_id_seq'::regclass),
+    registeredphonenumber   numeric,
+    expensedate             date,
+    category                character varying(255),
+    partyname               character varying(255) DEFAULT ''::character varying,
+    description             character varying(500) DEFAULT ''::character varying,
+    total                   numeric                 DEFAULT 0,
+    paymenttype             character varying(255),
+    amountdetails           character varying(255) DEFAULT ''::character varying,
+    showtransaction         character varying(100) DEFAULT 'SHOW'::character varying
+);
+
+
+-- ------------------------------------------------------------
 -- TABLE: payementinouttransactions
 -- Links payment-in/out invoices to sale/purchase invoices
 -- ------------------------------------------------------------
@@ -275,6 +302,9 @@ ALTER TABLE ONLY public.transactions
 
 ALTER TABLE ONLY public.item_details
     ADD CONSTRAINT item_details_pkey PRIMARY KEY (detail_id);
+
+ALTER TABLE ONLY public.expense
+    ADD CONSTRAINT expense_pkey PRIMARY KEY (expense_id);
 
 
 -- ============================================================

@@ -258,6 +258,7 @@ namespace WebApplication1.Models
 		public double stockvalue { get; set; } = 0;
 		public double cashinhand { get; set; } = 0;
 		public double bankamount { get; set; } = 0;
+		public double totalexpense { get; set; } = 0;
 		public DashboardDetailsRs()
 		{
 			lowstocks = new List<Lowstocks>();
