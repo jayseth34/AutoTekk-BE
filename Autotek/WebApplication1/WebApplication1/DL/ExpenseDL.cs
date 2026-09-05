@@ -102,7 +102,7 @@ namespace WebApplication1.DL
 					cmd.CommandText = "SELECT amountdetails FROM expense WHERE expense_id = @expense_id AND registeredphonenumber = @registeredphonenumber";
 					cmd.Parameters.AddWithValue("@expense_id", expense_id);
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.Read())
 					{
 						string amtdetails = reader["amountdetails"] == DBNull.Value ? "" : Convert.ToString(reader["amountdetails"]);
@@ -134,7 +134,7 @@ namespace WebApplication1.DL
 					cmd.CommandText = "SELECT expense_id, expensedate, category, partyname, description, total, paymenttype, amountdetails FROM expense " +
 						"WHERE registeredphonenumber = @registeredphonenumber AND showtransaction = 'SHOW' ORDER BY expensedate DESC, expense_id DESC";
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						while (reader.Read())

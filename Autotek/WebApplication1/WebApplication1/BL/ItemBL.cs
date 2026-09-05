@@ -9,16 +9,17 @@ namespace WebApplication1.BL
 	{
 		private readonly IConfiguration config;
 		private readonly string dbConn;
+		private readonly ItemDL itemDL;
 		public ItemBL(IConfiguration _config)
 		{
 			config = _config;
 			dbConn = config.GetValue<string>("ConnectionStrings");
+			itemDL = new ItemDL(_config);
 		}
 
 		public async Task<ItemRs> AddItem(ItemRq oitemRq)
 		{
 			ItemRs oitemRs = new ItemRs();
-			ItemDL itemDL = new ItemDL(this.config);
 			if (oitemRq.isitemupdate)
 			{
 				oitemRs = itemDL.UpdateItem(oitemRq);
@@ -34,7 +35,6 @@ namespace WebApplication1.BL
 		public async Task<GetItemListRs> GetItemList(Int64 registeredphonenumber)
 		{
 			GetItemListRs oGetItemListRs = new GetItemListRs();
-			ItemDL itemDL = new ItemDL(this.config);
 			oGetItemListRs = itemDL.GetItemList(registeredphonenumber);
 			return oGetItemListRs;
 		}
@@ -42,7 +42,6 @@ namespace WebApplication1.BL
 		public async Task<GetItemRs> GetItemDetails(Int64 registeredphonenumber, string itemname)
 		{
 			GetItemRs oGetItemRs = new GetItemRs();
-			ItemDL itemDL = new ItemDL(this.config);
 			oGetItemRs = itemDL.GetItemDetails(registeredphonenumber, itemname);
 			return oGetItemRs;
 		}
@@ -50,7 +49,6 @@ namespace WebApplication1.BL
 		public async Task<GetCategoryRs> GetCategory(Int64 registeredphonenumber)
 		{
 			GetCategoryRs oGetCategoryRs = new GetCategoryRs();
-			ItemDL itemDL = new ItemDL(this.config);
 			oGetCategoryRs = itemDL.GetCategory(registeredphonenumber);
 			return oGetCategoryRs;
 		}
@@ -58,14 +56,12 @@ namespace WebApplication1.BL
 		public async Task<GetItemByCategoryRs> GetItemByCategory(Int64 registeredphonenumber, string category)
 		{
 			GetItemByCategoryRs oGetItemByCategoryRs = new GetItemByCategoryRs();
-			ItemDL itemDL = new ItemDL(this.config);
 			oGetItemByCategoryRs = itemDL.GetItemByCategory(registeredphonenumber, category);
 			return oGetItemByCategoryRs;
 		}
 		public async Task<AddUpdateCategoryRs> AddUpdateCategory(AddUpdateCategoryRq oAddUpdateCategoryRq)
 		{
 			AddUpdateCategoryRs oAddUpdateCategoryRs = new AddUpdateCategoryRs();
-			ItemDL itemDL = new ItemDL(this.config);
 			oAddUpdateCategoryRs = itemDL.AddUpdateCategory(oAddUpdateCategoryRq);
 			return oAddUpdateCategoryRs;
 		}
@@ -73,7 +69,6 @@ namespace WebApplication1.BL
 		public async Task<AssignCodeRs> AssignCode(AssignCodeRq oAssignCodeRq)
 		{
 			AssignCodeRs oAssignCodeRs = new AssignCodeRs();
-			ItemDL itemDL = new ItemDL(this.config);
 			oAssignCodeRs.status = "FAILED";
 			long value = await itemDL.GetNextSequenceValue();
 			if(value != 0)
@@ -190,8 +185,7 @@ namespace WebApplication1.BL
 
 			foreach (var item in items)
 			{
-				ItemDL itemDL = new ItemDL(this.config);
-				oitemRs = itemDL.AddItem(item);
+					oitemRs = itemDL.AddItem(item);
 			}
 			return oitemRs;
 		}

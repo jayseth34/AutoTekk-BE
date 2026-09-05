@@ -16,17 +16,18 @@ namespace WebApplication1.BL
 		private readonly string dbConn;
 		private readonly string _keyId;
 		private readonly string _keySecret;
+		private readonly LoginDL logindl;
 		public LoginBL(IConfiguration _config)
 		{
 			config = _config;
 			dbConn = config.GetValue<string>("ConnectionStrings");
 			_keyId = config["Razorpay:KeyId"];
 			_keySecret = config["Razorpay:KeySecret"];
+			logindl = new LoginDL(_config);
 		}
 		public async Task<LoginRs> ValidateLogin(LoginRq ologinRq)
 		{
 			LoginRs ologinRs = new LoginRs();
-			LoginDL logindl = new LoginDL(this.config);
 			ologinRs = logindl.GetLoginDetails(ologinRq);
 			if(ologinRs.status == "SUCCESS")
 			{
@@ -38,7 +39,6 @@ namespace WebApplication1.BL
 
 		public async Task<bool> ValidateOtpUser(string phonenumber)
 		{
-			LoginDL logindl = new LoginDL(this.config);
 			bool exist = logindl.GetOtpLoginDetails(phonenumber);
 			return exist;
 		}
@@ -47,7 +47,6 @@ namespace WebApplication1.BL
 		{
 			OtpRs otpRs = new OtpRs();
 			otpRs.status = "FAILED";
-			LoginDL logindl = new LoginDL(this.config);
 			otpRs = logindl.VerifyOtpser(request);
 			if (otpRs.status == "SUCCESS")
 			{
@@ -90,7 +89,6 @@ namespace WebApplication1.BL
 		public async Task<RegisterRs> RegisterUser(RegisterRq oregisterRq)
 		{
 			RegisterRs oregisterRs = new RegisterRs();
-			LoginDL logindl = new LoginDL(this.config);
 			oregisterRs = logindl.RegisterUser(oregisterRq);
 			return oregisterRs;
 		}
@@ -124,7 +122,6 @@ namespace WebApplication1.BL
 		public bool UpdateExpiryDate(DateTime date, Int64 registeredphonenumber, string planType)
 		{
 			PartyRs opartyRs = new PartyRs();
-			LoginDL logindl = new LoginDL(this.config);
 			var val = logindl.UpdateExpiryDate(date, registeredphonenumber, planType);
 			if (!val)
 			{
@@ -136,7 +133,6 @@ namespace WebApplication1.BL
 		public async Task<PartyRs> Party(PartyRq opartyRq)
 		{
 			PartyRs opartyRs = new PartyRs();
-			LoginDL logindl = new LoginDL(this.config);
 			if (opartyRq.ispartyupdate)
 			{
 				opartyRs = logindl.UpdateParty(opartyRq);
@@ -151,7 +147,6 @@ namespace WebApplication1.BL
 		public async Task<GetPartyRs> GetPartyDetails(Int64 registeredphonenumber, string partyname)
 		{
 			GetPartyRs ogetPartyRs = new GetPartyRs();
-			LoginDL logindl = new LoginDL(this.config);
 			ogetPartyRs = logindl.GetPartyDetails(registeredphonenumber, partyname);
 			return ogetPartyRs;
 		}
@@ -159,14 +154,12 @@ namespace WebApplication1.BL
 		public async Task<GetPartyListRs> GetPartyList(Int64 registeredphonenumber)
 		{
 			GetPartyListRs oGetPartyListRs = new GetPartyListRs();
-			LoginDL logindl = new LoginDL(this.config);
 			oGetPartyListRs = logindl.GetPartyList(registeredphonenumber);
 			return oGetPartyListRs;
 		}
 		public async Task<GetPartyGroupRs> GetPartyGroup(Int64 registeredphonenumber)
 		{
 			GetPartyGroupRs oGetPartyGroupRs = new GetPartyGroupRs();
-			LoginDL logindl = new LoginDL(this.config);
 			oGetPartyGroupRs = logindl.GetPartyGroup(registeredphonenumber);
 			return oGetPartyGroupRs;
 		}
@@ -174,7 +167,6 @@ namespace WebApplication1.BL
         public async Task<GetPartyByGroupRs> GetPartyByGroup(Int64 registeredphonenumber, string groupname)
 		{
 			GetPartyByGroupRs oGetPartyByGroupRs = new GetPartyByGroupRs();
-			LoginDL logindl = new LoginDL(this.config);
 			oGetPartyByGroupRs = logindl.GetPartyByGroup(registeredphonenumber, groupname);
 			return oGetPartyByGroupRs;
 		}
@@ -182,7 +174,6 @@ namespace WebApplication1.BL
 		public async Task<AddUpdatePartyGropRs> AddUpdatePartyGroup(AddUpdatePartyGropRq oAddUpdatePartyGropRq)
 		{
 			AddUpdatePartyGropRs oAddUpdatePartyGropRs = new AddUpdatePartyGropRs();
-			LoginDL logindl = new LoginDL(this.config);
 			oAddUpdatePartyGropRs = logindl.AddUpdatePartyGroup(oAddUpdatePartyGropRq);
 			return oAddUpdatePartyGropRs;
 		}
@@ -190,7 +181,6 @@ namespace WebApplication1.BL
         public async Task<GetBusinessInfoRs> GetBusinessInfo(Int64 registeredphonenumber)
         {
             GetBusinessInfoRs oGetBusinessInfoRs = new GetBusinessInfoRs();
-            LoginDL logindl = new LoginDL(this.config);
             oGetBusinessInfoRs = logindl.GetBusinessInfo(registeredphonenumber);
             return oGetBusinessInfoRs;
         }
@@ -198,7 +188,6 @@ namespace WebApplication1.BL
         public async Task<AddBusinessInformationRs> AddUpdateBusinessInformation(AddBusinessInformationRq oAddBusinessInformationRq)
         {
             AddBusinessInformationRs oAddBusinessInformationRs = new AddBusinessInformationRs();
-            LoginDL logindl = new LoginDL(this.config);
             oAddBusinessInformationRs = logindl.AddUpdateBusinessInformation(oAddBusinessInformationRq);
             return oAddBusinessInformationRs;
         }
@@ -206,7 +195,6 @@ namespace WebApplication1.BL
 		public async Task<DashboardDetailsRs> DashBoardDetails(Int64 registeredphonenumber)
 		{
 			DashboardDetailsRs oDashboardDetailsRs = new DashboardDetailsRs();
-			LoginDL logindl = new LoginDL(this.config);
 			oDashboardDetailsRs = logindl.DashBoardDetails(registeredphonenumber);
 			return oDashboardDetailsRs;
 		}
@@ -214,7 +202,6 @@ namespace WebApplication1.BL
 		public async Task<DashboardSaleDetailsRs> DashboardSaleDetails(DashboardSaleDetailsRq oDashboardSaleDetailsRq)
 		{
 			DashboardSaleDetailsRs oDashboardSaleDetailsRs = new DashboardSaleDetailsRs();
-			LoginDL logindl = new LoginDL(this.config);
 			string daterange = GetDateCondition(oDashboardSaleDetailsRq.month);
 			oDashboardSaleDetailsRs = await logindl.DashboardSaleDetails(oDashboardSaleDetailsRq, daterange);
 			return oDashboardSaleDetailsRs;

@@ -19,136 +19,65 @@ namespace WebApplication1.DL
 		public ItemRs AddItem(ItemRq oitemRq)
 		{
 			ItemRs oitemRs = new ItemRs();
-			bool exist = false;
 			try
 			{
-				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
+				if (DbHelper.RecordExists(this._connectionFactory, "item", "itemname", oitemRq.itemname, oitemRq.registeredphonenumber))
 				{
-					conn.Open();
-					NpgsqlCommand cmd = new NpgsqlCommand();
-					cmd.Connection = conn;
-					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "SELECT itemname FROM item WHERE registeredphonenumber = @registeredphonenumber AND itemname = @itemname";
-					cmd.Parameters.AddWithValue("@registeredphonenumber", oitemRq.registeredphonenumber);
-					cmd.Parameters.AddWithValue("@itemname", oitemRq.itemname);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
-					while (reader.Read())
+					oitemRs.statusmessage = "Item already exists.";
+					oitemRs.status = "Failed";
+					return oitemRs;
+				}
+				try
+				{
+					using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 					{
-						oitemRs.statusmessage = "Item already exists.";
-						oitemRs.status = "Failed";
-						return oitemRs;
+						conn.Open();
+						NpgsqlCommand cmd = new NpgsqlCommand();
+						cmd.Connection = conn;
+						cmd.CommandType = CommandType.Text;
+						cmd.CommandText = "INSERT INTO item (typeofpay, registeredphonenumber, itemname, itemhsn, baseunit, secondaryunit, conversionrates, category, itemcode, saleprice, salewithorwithouttax, discountonsaleprice," +
+							"wholesaleprice, wholesalewithorwithouttax, minimumwholesalequantity, purchaseprice, purchasewithorwithouttax, taxrate, openingquantity, remainingquantity, atprice, asofdate, minimumstocktomaintain, _location, percentageoramounttype, mrp) " +
+							"VALUES (@typeofpay, @registeredphonenumber, @itemname, @itemhsn, @baseunit, @secondaryunit, @conversionrates, @category, @itemcode, @saleprice, @salewithorwithouttax, @discountonsaleprice," +
+							" @wholesaleprice, @wholesalewithorwithouttax, @minimumwholesalequantity, @purchaseprice, @purchasewithorwithouttax, @taxrate, @openingquantity, @remainingquantity, @atprice, @asofdate, @minimumstocktomaintain, @_location, @percentageoramounttype, @mrp)";
+						cmd.Parameters.AddWithValue("@typeofpay", oitemRq.typeofpay);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", oitemRq.registeredphonenumber);
+						cmd.Parameters.AddWithValue("@itemname", oitemRq.itemname);
+						cmd.Parameters.AddWithValue("@itemhsn", oitemRq.itemhsn);
+						cmd.Parameters.AddWithValue("@baseunit", oitemRq.baseunit);
+						cmd.Parameters.AddWithValue("@secondaryunit", oitemRq.secondaryunit);
+						cmd.Parameters.AddWithValue("@conversionrates", oitemRq.conversionrates);
+						cmd.Parameters.AddWithValue("@category", oitemRq.category);
+						cmd.Parameters.AddWithValue("@itemcode", oitemRq.itemcode);
+						cmd.Parameters.AddWithValue("@saleprice", oitemRq.saleprice);
+						cmd.Parameters.AddWithValue("@salewithorwithouttax", oitemRq.salewithorwithouttax);
+						cmd.Parameters.AddWithValue("@discountonsaleprice", oitemRq.discountonsaleprice);
+						cmd.Parameters.AddWithValue("@wholesaleprice", oitemRq.wholesaleprice);
+						cmd.Parameters.AddWithValue("@wholesalewithorwithouttax", oitemRq.wholesalewithorwithouttax);
+						cmd.Parameters.AddWithValue("@minimumwholesalequantity", oitemRq.minimumwholesalequantity);
+						cmd.Parameters.AddWithValue("@purchaseprice", oitemRq.purchaseprice);
+						cmd.Parameters.AddWithValue("@purchasewithorwithouttax", oitemRq.purchasewithorwithouttax);
+						cmd.Parameters.AddWithValue("@taxrate", oitemRq.taxrate);
+						cmd.Parameters.AddWithValue("@openingquantity", oitemRq.openingquantity);
+						cmd.Parameters.AddWithValue("@remainingquantity", oitemRq.remainingquantity);
+						cmd.Parameters.AddWithValue("@atprice", oitemRq.atprice);
+						cmd.Parameters.AddWithValue("@asofdate", oitemRq.asofdate);
+						cmd.Parameters.AddWithValue("@minimumstocktomaintain", oitemRq.minimumstocktomaintain);
+						cmd.Parameters.AddWithValue("@_location", oitemRq._location);
+						cmd.Parameters.AddWithValue("@percentageoramounttype", oitemRq.percentageoramounttype);
+						cmd.Parameters.AddWithValue("@mrp", oitemRq.mrp);
+						cmd.ExecuteNonQuery();
+						oitemRs.statusmessage = "Inserted Successfully";
+						oitemRs.status = "Success";
 					}
 				}
-				if (!exist)
+				catch (Exception ex)
 				{
-					try
-					{
-						using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-						{
-							conn.Open();
-							NpgsqlCommand cmd = new NpgsqlCommand();
-							cmd.Connection = conn;
-							cmd.CommandType = CommandType.Text;
-							cmd.CommandText = "INSERT INTO item (typeofpay, registeredphonenumber, itemname, itemhsn, baseunit, secondaryunit, conversionrates, category, itemcode, saleprice, salewithorwithouttax, discountonsaleprice," +
-								"wholesaleprice, wholesalewithorwithouttax, minimumwholesalequantity, purchaseprice, purchasewithorwithouttax, taxrate, openingquantity, remainingquantity, atprice, asofdate, minimumstocktomaintain, _location, percentageoramounttype, mrp) " +
-								"VALUES (@typeofpay, @registeredphonenumber, @itemname, @itemhsn, @baseunit, @secondaryunit, @conversionrates, @category, @itemcode, @saleprice, @salewithorwithouttax, @discountonsaleprice," +
-								" @wholesaleprice, @wholesalewithorwithouttax, @minimumwholesalequantity, @purchaseprice, @purchasewithorwithouttax, @taxrate, @openingquantity, @remainingquantity, @atprice, @asofdate, @minimumstocktomaintain, @_location, @percentageoramounttype, @mrp)";
-							cmd.Parameters.AddWithValue("@typeofpay", oitemRq.typeofpay);
-							cmd.Parameters.AddWithValue("@registeredphonenumber", oitemRq.registeredphonenumber);
-							cmd.Parameters.AddWithValue("@itemname", oitemRq.itemname);
-							cmd.Parameters.AddWithValue("@itemhsn", oitemRq.itemhsn);
-							cmd.Parameters.AddWithValue("@baseunit", oitemRq.baseunit);
-							cmd.Parameters.AddWithValue("@secondaryunit", oitemRq.secondaryunit);
-							cmd.Parameters.AddWithValue("@conversionrates", oitemRq.conversionrates);
-							cmd.Parameters.AddWithValue("@category", oitemRq.category);
-							cmd.Parameters.AddWithValue("@itemcode", oitemRq.itemcode);
-							cmd.Parameters.AddWithValue("@saleprice", oitemRq.saleprice);
-							cmd.Parameters.AddWithValue("@salewithorwithouttax", oitemRq.salewithorwithouttax);
-							cmd.Parameters.AddWithValue("@discountonsaleprice", oitemRq.discountonsaleprice);
-							cmd.Parameters.AddWithValue("@wholesaleprice", oitemRq.wholesaleprice);
-							cmd.Parameters.AddWithValue("@wholesalewithorwithouttax", oitemRq.wholesalewithorwithouttax);
-							cmd.Parameters.AddWithValue("@minimumwholesalequantity", oitemRq.minimumwholesalequantity);
-							cmd.Parameters.AddWithValue("@purchaseprice", oitemRq.purchaseprice);
-							cmd.Parameters.AddWithValue("@purchasewithorwithouttax", oitemRq.purchasewithorwithouttax);
-							cmd.Parameters.AddWithValue("@taxrate", oitemRq.taxrate);
-							cmd.Parameters.AddWithValue("@openingquantity", oitemRq.openingquantity);
-							cmd.Parameters.AddWithValue("@remainingquantity", oitemRq.remainingquantity);
-							cmd.Parameters.AddWithValue("@atprice", oitemRq.atprice);
-							cmd.Parameters.AddWithValue("@asofdate", oitemRq.asofdate);
-							cmd.Parameters.AddWithValue("@minimumstocktomaintain", oitemRq.minimumstocktomaintain);
-							cmd.Parameters.AddWithValue("@_location", oitemRq._location);
-							cmd.Parameters.AddWithValue("@percentageoramounttype", oitemRq.percentageoramounttype);
-							cmd.Parameters.AddWithValue("@mrp", oitemRq.mrp);
-							cmd.ExecuteNonQuery();
-							oitemRs.statusmessage = "Inserted Successfully";
-							oitemRs.status = "Success";
-						}
-					}
-					catch (Exception ex)
-					{
-						oitemRs.statusmessage = "Data Could Not Be Inserted";
-						oitemRs.status = "Failed";
-					}
+					Console.WriteLine(ex.Message);
+					oitemRs.statusmessage = "Data Could Not Be Inserted";
+					oitemRs.status = "Failed";
 				}
-				if(!string.IsNullOrEmpty(oitemRq.category))
-				{
-					bool categoryexist = false;
-					try
-					{
-						try
-						{
-							using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-							{
-								conn.Open();
-								NpgsqlCommand cmd = new NpgsqlCommand();
-								cmd.Connection = conn;
-								cmd.CommandType = CommandType.Text;
-								cmd.CommandText = "SELECT category FROM category WHERE registeredphonenumber = @registeredphonenumber AND category = @category";
-								cmd.Parameters.AddWithValue("@registeredphonenumber", oitemRq.registeredphonenumber);
-								cmd.Parameters.AddWithValue("@category", oitemRq.category);
-								NpgsqlDataReader reader = cmd.ExecuteReader();
-								while (reader.Read())
-								{
-									categoryexist = true;
-								}
-							}
-						}
-						catch (Exception ex)
-						{
-							Console.WriteLine(ex.Message);
-						}
-						try
-						{
-							if (!categoryexist)
-							{
-								using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-								{
-									conn.Open();
-									NpgsqlCommand cmd = new NpgsqlCommand();
-									cmd.Connection = conn;
-									cmd.CommandType = CommandType.Text;
-									cmd.CommandText = "INSERT INTO category (category, registeredphonenumber) VALUES(@category, @registeredphonenumber)";
-									cmd.Parameters.AddWithValue("@category", oitemRq.category);
-									cmd.Parameters.AddWithValue("@registeredphonenumber", oitemRq.registeredphonenumber);
-									cmd.ExecuteNonQuery();
-									oitemRs.status = "Success";
-									oitemRs.statusmessage = "Inserted Successfully";
-								}
-							}
-						}
-						catch (Exception ex)
-						{
-							Console.WriteLine(ex.Message);
-							oitemRs.status = "Failed";
-						}
 
-					}
-					catch (Exception ex)
-					{
-						Console.WriteLine(ex.Message);
-						oitemRs.status = "Failed";
-					}
-				}
+				DbHelper.EnsureLookupValueExists(this._connectionFactory, "category", "category", oitemRq.category, oitemRq.registeredphonenumber);
 			}
 			catch (Exception ex)
 			{
@@ -162,30 +91,15 @@ namespace WebApplication1.DL
 		public ItemRs UpdateItem(ItemRq oitemRq)
 		{
 			ItemRs oitemRs = new ItemRs();
-			bool exist = false;
 			try
 			{
-				if (oitemRq.itemname != oitemRq.olditemname)
+				if (oitemRq.itemname != oitemRq.olditemname &&
+					DbHelper.RecordExists(this._connectionFactory, "item", "itemname", oitemRq.itemname, oitemRq.registeredphonenumber))
 				{
-					using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-					{
-						conn.Open();
-						NpgsqlCommand cmd = new NpgsqlCommand();
-						cmd.Connection = conn;
-						cmd.CommandType = CommandType.Text;
-						cmd.CommandText = "SELECT itemname FROM item WHERE registeredphonenumber = @registeredphonenumber AND itemname = @itemname";
-						cmd.Parameters.AddWithValue("@registeredphonenumber", oitemRq.registeredphonenumber);
-						cmd.Parameters.AddWithValue("@itemname", oitemRq.itemname);
-						NpgsqlDataReader reader = cmd.ExecuteReader();
-						while (reader.Read())
-						{
-							oitemRs.statusmessage = "Item already exists.";
-							oitemRs.status = "Failed";
-							return oitemRs;
-						}
-					}
+					oitemRs.statusmessage = "Item already exists.";
+					oitemRs.status = "Failed";
+					return oitemRs;
 				}
-				if (!exist)
 				{
 					try
 					{
@@ -238,65 +152,7 @@ namespace WebApplication1.DL
 						oitemRs.status = "Failed";
 					}
 				}
-				if (!string.IsNullOrEmpty(oitemRq.category))
-				{
-					bool categoryexist = false;
-					try
-					{
-						try
-						{
-							using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-							{
-								conn.Open();
-								NpgsqlCommand cmd = new NpgsqlCommand();
-								cmd.Connection = conn;
-								cmd.CommandType = CommandType.Text;
-								cmd.CommandText = "SELECT category FROM category WHERE registeredphonenumber = @registeredphonenumber AND category = @category";
-								cmd.Parameters.AddWithValue("@registeredphonenumber", oitemRq.registeredphonenumber);
-								cmd.Parameters.AddWithValue("@category", oitemRq.category);
-								NpgsqlDataReader reader = cmd.ExecuteReader();
-								while (reader.Read())
-								{
-									categoryexist = true;
-								}
-							}
-						}
-						catch (Exception ex)
-						{
-							Console.WriteLine(ex.Message);
-						}
-						try
-						{
-							if (!categoryexist)
-							{
-								using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-								{
-									conn.Open();
-									NpgsqlCommand cmd = new NpgsqlCommand();
-									cmd.Connection = conn;
-									cmd.CommandType = CommandType.Text;
-									cmd.CommandText = "INSERT INTO category (category, registeredphonenumber) VALUES(@category, @registeredphonenumber)";
-									cmd.Parameters.AddWithValue("@category", oitemRq.category);
-									cmd.Parameters.AddWithValue("@registeredphonenumber", oitemRq.registeredphonenumber);
-									cmd.ExecuteNonQuery();
-									oitemRs.status = "Success";
-									oitemRs.statusmessage = "Item Updated Successfully";
-								}
-							}
-						}
-						catch (Exception ex)
-						{
-							Console.WriteLine(ex.Message);
-							oitemRs.status = "Failed";
-						}
-
-					}
-					catch (Exception ex)
-					{
-						Console.WriteLine(ex.Message);
-						oitemRs.status = "Failed";
-					}
-				}
+				DbHelper.EnsureLookupValueExists(this._connectionFactory, "category", "category", oitemRq.category, oitemRq.registeredphonenumber);
 				return oitemRs;
 			}
 			catch(Exception ex)
@@ -319,7 +175,7 @@ namespace WebApplication1.DL
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT itemname, remainingquantity, saleprice, purchaseprice, baseunit, wholesaleprice, minimumwholesalequantity, percentageoramounttype, discountonsaleprice, mrp, itemcode FROM item WHERE registeredphonenumber = @registeredphonenumber";
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try
@@ -374,7 +230,7 @@ namespace WebApplication1.DL
                 WHERE registeredphonenumber = @registeredphonenumber AND itemname = @itemname";
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 					cmd.Parameters.AddWithValue("@itemname", itemname);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try
@@ -446,7 +302,7 @@ namespace WebApplication1.DL
                 GROUP BY cat.category";
 					cmd.Parameters.AddWithValue("@registeredphonenumber_where", registeredphonenumber);
 					cmd.Parameters.AddWithValue("@registeredphonenumber_join", registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try
@@ -488,7 +344,7 @@ namespace WebApplication1.DL
 					cmd.CommandText = "SELECT itemname, remainingquantity, purchaseprice FROM item WHERE registeredphonenumber = @registeredphonenumber AND category = @category";
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 					cmd.Parameters.AddWithValue("@category", category);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try

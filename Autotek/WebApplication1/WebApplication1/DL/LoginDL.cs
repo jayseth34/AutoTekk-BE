@@ -40,7 +40,7 @@ namespace WebApplication1.DL
                   AND _password = @password";
 					cmd.Parameters.AddWithValue("@phonenumber", ologinRq.phonenumber);
 					cmd.Parameters.AddWithValue("@password", ologinRq.password);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					while (reader.Read())
 					{
 						ologinrs.status = "SUCCESS";
@@ -74,7 +74,7 @@ namespace WebApplication1.DL
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT status, expirydate FROM registeragent WHERE phonenumber = @phonenumber";
 					cmd.Parameters.AddWithValue("@phonenumber", Convert.ToInt64(phonenumber));
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					while (reader.Read())
 					{
 						return true;
@@ -101,7 +101,7 @@ namespace WebApplication1.DL
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT status, expirydate, plantype FROM registeragent WHERE phonenumber = @phonenumber";
 					cmd.Parameters.AddWithValue("@phonenumber", Convert.ToInt64(request.registeredphonenumber));
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					while (reader.Read())
 					{
 						otpRs.status = "SUCCESS";
@@ -132,7 +132,7 @@ namespace WebApplication1.DL
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT phonenumber FROM registeragent WHERE phonenumber = @phonenumber";
 					cmd.Parameters.AddWithValue("@phonenumber", oregisterRq.phonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					while (reader.Read())
 					{
 						oregisterrs.status = "Phone Number already exists.";
@@ -171,42 +171,24 @@ namespace WebApplication1.DL
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex.Message);
+				oregisterrs.status = "Something went wrong. Please try again.";
+				oregisterrs.stat = "Failed";
 			}
-			
+
 			return oregisterrs;
 		}
 
 		public PartyRs Party(PartyRq opartyRq)
 		{
 			PartyRs opartyRs = new PartyRs();
-			Boolean partyexist = false;
 			try
 			{
-				try
+				if (DbHelper.RecordExists(this._connectionFactory, "party", "partyname", opartyRq.partyname, opartyRq.registeredphonenumber))
 				{
-					using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-					{
-						conn.Open();
-						NpgsqlCommand cmd = new NpgsqlCommand();
-						cmd.Connection = conn;
-						cmd.CommandType = CommandType.Text;
-						cmd.CommandText = "SELECT partyname FROM party WHERE registeredphonenumber = @registeredphonenumber AND partyname = @partyname";
-						cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
-						cmd.Parameters.AddWithValue("@partyname", opartyRq.partyname);
-						NpgsqlDataReader reader = cmd.ExecuteReader();
-						while (reader.Read())
-						{
-							opartyRs.status = "Failed";
-							opartyRs.statusmessage = "Party Name Already Exists";
-							return opartyRs;
-						}
-					}
+					opartyRs.status = "Failed";
+					opartyRs.statusmessage = "Party Name Already Exists";
+					return opartyRs;
 				}
-				catch (Exception ex)
-				{
-					Console.WriteLine(ex.Message);
-				}
-				if (!partyexist)
 				{
 					try
 					{
@@ -286,62 +268,7 @@ namespace WebApplication1.DL
 						Console.WriteLine(ex.Message);
 					}
 				}
-				if (!string.IsNullOrEmpty(opartyRq.partygroup))
-				{
-					bool partygroupexist = false;
-					try
-					{
-						try
-						{
-							using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-							{
-								conn.Open();
-								NpgsqlCommand cmd = new NpgsqlCommand();
-								cmd.Connection = conn;
-								cmd.CommandType = CommandType.Text;
-								cmd.CommandText = "SELECT partygroup FROM partygroup WHERE registeredphonenumber = @registeredphonenumber AND partygroup = @partygroup";
-								cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
-								cmd.Parameters.AddWithValue("@partygroup", opartyRq.partygroup);
-								NpgsqlDataReader reader = cmd.ExecuteReader();
-								while (reader.Read())
-								{
-									partygroupexist = true;
-								}
-							}
-						}
-						catch (Exception ex)
-						{
-							Console.WriteLine(ex.Message);
-						}
-						try
-						{
-							if (!partygroupexist)
-							{
-								using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-								{
-									conn.Open();
-									NpgsqlCommand cmd = new NpgsqlCommand();
-									cmd.Connection = conn;
-									cmd.CommandType = CommandType.Text;
-									cmd.CommandText = "INSERT INTO partygroup(partygroup, registeredphonenumber) VALUES(@partygroup, @registeredphonenumber)";
-									cmd.Parameters.AddWithValue("@partygroup", opartyRq.partygroup);
-									cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
-									cmd.ExecuteNonQuery();
-									opartyRs.status = "Success";
-									opartyRs.statusmessage = "Inserted Successfully";
-								}
-							}
-						}
-						catch(Exception ex)
-						{
-							Console.WriteLine(ex.Message);
-						}
-					}
-					catch (Exception ex)
-					{
-						Console.WriteLine(ex.Message);
-					}
-				}
+				DbHelper.EnsureLookupValueExists(this._connectionFactory, "partygroup", "partygroup", opartyRq.partygroup, opartyRq.registeredphonenumber);
 			}
 			catch(Exception ex)
 			{
@@ -353,37 +280,15 @@ namespace WebApplication1.DL
 		public PartyRs UpdateParty(PartyRq opartyRq)
 		{
 			PartyRs opartyRs = new PartyRs();
-			Boolean partyexist = false;
 			try
 			{
-				if(opartyRq.partyname != opartyRq.oldpartyname)
+				if (opartyRq.partyname != opartyRq.oldpartyname &&
+					DbHelper.RecordExists(this._connectionFactory, "party", "partyname", opartyRq.partyname, opartyRq.registeredphonenumber))
 				{
-					try
-					{
-						using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-						{
-							conn.Open();
-							NpgsqlCommand cmd = new NpgsqlCommand();
-							cmd.Connection = conn;
-							cmd.CommandType = CommandType.Text;
-							cmd.CommandText = "SELECT partyname FROM party WHERE registeredphonenumber = @registeredphonenumber AND partyname = @partyname";
-							cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
-							cmd.Parameters.AddWithValue("@partyname", opartyRq.partyname);
-							NpgsqlDataReader reader = cmd.ExecuteReader();
-							while (reader.Read())
-							{
-								opartyRs.status = "Failed";
-								opartyRs.statusmessage = "Party Name Already Exists";
-								return opartyRs;
-							}
-						}
-					}
-					catch (Exception ex)
-					{
-						Console.WriteLine(ex.Message);
-					}
+					opartyRs.status = "Failed";
+					opartyRs.statusmessage = "Party Name Already Exists";
+					return opartyRs;
 				}
-				if (!partyexist)
 				{
 					// Read current running totals so we adjust rather than overwrite accumulated transaction history.
 					decimal oldOpeningBalance = 0;
@@ -401,7 +306,7 @@ namespace WebApplication1.DL
 							cmd.CommandText = "SELECT openingbalance, topayorreceive, topayparty, toreceivefromparty FROM party WHERE registeredphonenumber = @registeredphonenumber AND partyname = @oldpartyname";
 							cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
 							cmd.Parameters.AddWithValue("@oldpartyname", opartyRq.oldpartyname);
-							NpgsqlDataReader reader = cmd.ExecuteReader();
+							using NpgsqlDataReader reader = cmd.ExecuteReader();
 							if (reader.HasRows && reader.Read())
 							{
 								oldOpeningBalance = reader["openingbalance"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["openingbalance"]);
@@ -531,60 +436,7 @@ namespace WebApplication1.DL
 						Console.WriteLine(ex.Message);
 					}
 				}
-				if (!string.IsNullOrEmpty(opartyRq.partygroup))
-				{
-					bool partygroupexist = false;
-					try
-					{
-						try
-						{
-							using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-							{
-								conn.Open();
-								NpgsqlCommand cmd = new NpgsqlCommand();
-								cmd.Connection = conn;
-								cmd.CommandType = CommandType.Text;
-								cmd.CommandText = "SELECT partygroup FROM partygroup WHERE registeredphonenumber = @registeredphonenumber AND partygroup = @partygroup";
-								cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
-								cmd.Parameters.AddWithValue("@partygroup", opartyRq.partygroup);
-								NpgsqlDataReader reader = cmd.ExecuteReader();
-								while (reader.Read())
-								{
-									partygroupexist = true;
-								}
-							}
-						}
-						catch (Exception ex)
-						{
-							Console.WriteLine(ex.Message);
-						}
-						try
-						{
-							if (!partygroupexist)
-							{
-								using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-								{
-									conn.Open();
-									NpgsqlCommand cmd = new NpgsqlCommand();
-									cmd.Connection = conn;
-									cmd.CommandType = CommandType.Text;
-									cmd.CommandText = "INSERT INTO partygroup(partygroup, registeredphonenumber) VALUES(@partygroup, @registeredphonenumber)";
-									cmd.Parameters.AddWithValue("@partygroup", opartyRq.partygroup);
-									cmd.Parameters.AddWithValue("@registeredphonenumber", opartyRq.registeredphonenumber);
-									cmd.ExecuteNonQuery();
-								}
-							}
-						}
-						catch (Exception ex)
-						{
-							Console.WriteLine(ex.Message);
-						}
-					}
-					catch (Exception ex)
-					{
-						Console.WriteLine(ex.Message);
-					}
-				}
+				DbHelper.EnsureLookupValueExists(this._connectionFactory, "partygroup", "partygroup", opartyRq.partygroup, opartyRq.registeredphonenumber);
 				try
 				{
 					using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
@@ -743,7 +595,7 @@ namespace WebApplication1.DL
                 FROM party
                 WHERE registeredphonenumber = @registeredphonenumber";
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try
@@ -797,7 +649,7 @@ namespace WebApplication1.DL
                 GROUP BY pg.partygroup";
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try
@@ -847,7 +699,7 @@ namespace WebApplication1.DL
                   AND partygroup = @groupname";
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 					cmd.Parameters.AddWithValue("@groupname", groupname);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try
@@ -935,7 +787,7 @@ namespace WebApplication1.DL
                     cmd.CommandType = CommandType.Text;
                     cmd.CommandText = "SELECT * FROM AddBusinessInformation WHERE registeredphonenumber = @registeredphonenumber";
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
                     if (reader.HasRows)
                     {
                         try
@@ -989,7 +841,7 @@ namespace WebApplication1.DL
                     cmd.CommandType = CommandType.Text;
                     cmd.CommandText = "SELECT registeredphonenumber FROM AddBusinessInformation WHERE registeredphonenumber = @registeredphonenumber";
 					cmd.Parameters.AddWithValue("@registeredphonenumber", OAddBusinessInformationRq.registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
                         OAddBusinessInformationRs.statusmsg = "Phone Number already registered.";
@@ -1105,21 +957,22 @@ namespace WebApplication1.DL
 
 		public DashboardDetailsRs DashBoardDetails(Int64 registeredphonenumber)
 		{
+			// All 7 queries below share a single connection (previously each opened its own),
+			// since they're all read-only and independent of each other. Each still has its
+			// own try/catch so one failing query doesn't stop the rest of the dashboard from loading.
 			DashboardDetailsRs oDashboardDetailsRs = new DashboardDetailsRs();
 			try
 			{
 				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
 				{
 					conn.Open();
-					NpgsqlCommand cmd = new NpgsqlCommand();
-					cmd.Connection = conn;
-					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "select partyname, topayparty, toreceivefromparty from party where registeredphonenumber = @registeredphonenumber";
-					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
-					if (reader.HasRows)
+
+					try
 					{
-						try
+						using NpgsqlCommand cmd = new NpgsqlCommand("select partyname, topayparty, toreceivefromparty from party where registeredphonenumber = @registeredphonenumber", conn);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+						using NpgsqlDataReader reader = cmd.ExecuteReader();
+						if (reader.HasRows)
 						{
 							while (reader.Read())
 							{
@@ -1132,37 +985,21 @@ namespace WebApplication1.DL
 								oDashboardDetailsRs.youllpay += oYoullpayreceive.partypay;
 							}
 						}
-						catch (Exception ex)
-						{
-                            oDashboardDetailsRs.statusmessage = "Something went wrong!";
-                            oDashboardDetailsRs.status = "Failed";
-                            Console.WriteLine(ex.Message);
-						}
+						oDashboardDetailsRs.status = "Success";
 					}
-                    oDashboardDetailsRs.status = "Success";
-                }
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.Message);
-                oDashboardDetailsRs.statusmessage = "Something went wrong!";
-                oDashboardDetailsRs.status = "Failed";
-            }
-
-			try
-			{
-				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-				{
-					conn.Open();
-					NpgsqlCommand cmd = new NpgsqlCommand();
-					cmd.Connection = conn;
-					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "select itemname, remainingquantity from item where minimumstocktomaintain > remainingquantity and registeredphonenumber = @registeredphonenumber";
-					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
-					if (reader.HasRows)
+					catch (Exception ex)
 					{
-						try
+						oDashboardDetailsRs.statusmessage = "Something went wrong!";
+						oDashboardDetailsRs.status = "Failed";
+						Console.WriteLine(ex.Message);
+					}
+
+					try
+					{
+						using NpgsqlCommand cmd = new NpgsqlCommand("select itemname, remainingquantity from item where minimumstocktomaintain > remainingquantity and registeredphonenumber = @registeredphonenumber", conn);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+						using NpgsqlDataReader reader = cmd.ExecuteReader();
+						if (reader.HasRows)
 						{
 							while (reader.Read())
 							{
@@ -1172,74 +1009,42 @@ namespace WebApplication1.DL
 								oDashboardDetailsRs.lowstocks.Add(oLowstocks);
 							}
 						}
-						catch (Exception ex)
-						{
-                            oDashboardDetailsRs.statusmessage = "Something went wrong!";
-                            oDashboardDetailsRs.status = "Failed";
-                            Console.WriteLine(ex.Message);
-						}
+						oDashboardDetailsRs.status = "Success";
 					}
-                    oDashboardDetailsRs.status = "Success";
-                }
-            }
-			catch(Exception ex)
-			{
-                oDashboardDetailsRs.statusmessage = "Something went wrong!";
-                oDashboardDetailsRs.status = "Failed";
-                Console.WriteLine(ex.Message);
-			}
-
-			try
-			{
-				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-				{
-					conn.Open();
-					NpgsqlCommand cmd = new NpgsqlCommand();
-					cmd.Connection = conn;
-					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "select remainingquantity * purchaseprice as stockvalue from item where registeredphonenumber = @registeredphonenumber";
-					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
-					if (reader.HasRows)
+					catch (Exception ex)
 					{
-						try
+						oDashboardDetailsRs.statusmessage = "Something went wrong!";
+						oDashboardDetailsRs.status = "Failed";
+						Console.WriteLine(ex.Message);
+					}
+
+					try
+					{
+						using NpgsqlCommand cmd = new NpgsqlCommand("select remainingquantity * purchaseprice as stockvalue from item where registeredphonenumber = @registeredphonenumber", conn);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+						using NpgsqlDataReader reader = cmd.ExecuteReader();
+						if (reader.HasRows)
 						{
 							while (reader.Read())
 							{
 								oDashboardDetailsRs.stockvalue += Convert.ToDouble(reader["stockvalue"]);
 							}
 						}
-						catch (Exception ex)
-						{
-                            oDashboardDetailsRs.statusmessage = "Something went wrong!";
-                            oDashboardDetailsRs.status = "Failed";
-                            Console.WriteLine(ex.Message);
-						}
+						oDashboardDetailsRs.status = "Success";
 					}
-                    oDashboardDetailsRs.status = "Success";
-                }
-            }
-			catch (Exception ex)
-			{
-                oDashboardDetailsRs.statusmessage = "Something went wrong!";
-                oDashboardDetailsRs.status = "Failed";
-                Console.WriteLine(ex.Message);
-			}
-
-			try
-			{
-				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-				{
-					conn.Open();
-					NpgsqlCommand cmd = new NpgsqlCommand();
-					cmd.Connection = conn;
-					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "select ide.typeofpay, ide.item, tr.total from item_details as ide left join transactions as tr on ide.transaction_id = tr.transaction_id where (ide.typeofpay = 'SALE' or ide.typeofpay = 'PURCHASE') and ide.registeredphonenumber = @registeredphonenumber";
-					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
-					if (reader.HasRows)
+					catch (Exception ex)
 					{
-						try
+						oDashboardDetailsRs.statusmessage = "Something went wrong!";
+						oDashboardDetailsRs.status = "Failed";
+						Console.WriteLine(ex.Message);
+					}
+
+					try
+					{
+						using NpgsqlCommand cmd = new NpgsqlCommand("select ide.typeofpay, ide.item, tr.total from item_details as ide left join transactions as tr on ide.transaction_id = tr.transaction_id where (ide.typeofpay = 'SALE' or ide.typeofpay = 'PURCHASE') and ide.registeredphonenumber = @registeredphonenumber", conn);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+						using NpgsqlDataReader reader = cmd.ExecuteReader();
+						if (reader.HasRows)
 						{
 							while (reader.Read())
 							{
@@ -1247,44 +1052,28 @@ namespace WebApplication1.DL
 								oPurchaseDash.typeofpay = Convert.ToString(reader["typeofpay"]);
 								oPurchaseDash.item = Convert.ToString(reader["item"]);
 								oPurchaseDash.total = Convert.ToDouble(reader["total"]);
-								if(oPurchaseDash.typeofpay == "PURCHASE")
+								if (oPurchaseDash.typeofpay == "PURCHASE")
 								{
 									oDashboardDetailsRs.totalpurchase += oPurchaseDash.total;
 								}
 								oDashboardDetailsRs.purchasedash.Add(oPurchaseDash);
 							}
 						}
-						catch (Exception ex)
-						{
-                            oDashboardDetailsRs.statusmessage = "Something went wrong!";
-                            oDashboardDetailsRs.status = "Failed";
-                            Console.WriteLine(ex.Message);
-						}
+						oDashboardDetailsRs.status = "Success";
 					}
-                    oDashboardDetailsRs.status = "Success";
-                }
-            }
-			catch (Exception ex)
-			{
-                oDashboardDetailsRs.statusmessage = "Something went wrong!";
-                oDashboardDetailsRs.status = "Failed";
-                Console.WriteLine(ex.Message);
-			}
-
-			try
-			{
-				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-				{
-					conn.Open();
-					NpgsqlCommand cmd = new NpgsqlCommand();
-					cmd.Connection = conn;
-					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = "select accountdisplayname, amount from BankForm where registeredphonenumber = @registeredphonenumber";
-					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
-					if (reader.HasRows)
+					catch (Exception ex)
 					{
-						try
+						oDashboardDetailsRs.statusmessage = "Something went wrong!";
+						oDashboardDetailsRs.status = "Failed";
+						Console.WriteLine(ex.Message);
+					}
+
+					try
+					{
+						using NpgsqlCommand cmd = new NpgsqlCommand("select accountdisplayname, amount from BankForm where registeredphonenumber = @registeredphonenumber", conn);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+						using NpgsqlDataReader reader = cmd.ExecuteReader();
+						if (reader.HasRows)
 						{
 							while (reader.Read())
 							{
@@ -1295,121 +1084,101 @@ namespace WebApplication1.DL
 								oDashboardDetailsRs.bankamount += oBankaccounts.bankamount;
 							}
 						}
-						catch (Exception ex)
+						oDashboardDetailsRs.status = "Success";
+					}
+					catch (Exception ex)
+					{
+						oDashboardDetailsRs.statusmessage = "Something went wrong!";
+						oDashboardDetailsRs.status = "Failed";
+						Console.WriteLine(ex.Message);
+					}
+
+					try
+					{
+						using NpgsqlCommand cmd = new NpgsqlCommand(@"
+							SELECT COALESCE(SUM((elem->>'amount')::FLOAT), 0) as cashinhand
+							FROM transactions
+							CROSS JOIN LATERAL jsonb_array_elements(
+								CASE WHEN amountdetails IS NOT NULL AND amountdetails != '' AND amountdetails != '[]'
+									 THEN amountdetails::jsonb
+									 ELSE '[]'::jsonb
+								END
+							) AS elem
+							WHERE registeredphonenumber = @registeredphonenumber
+							AND showtransaction = 'SHOW'
+							AND elem->>'type' = 'CASH'", conn);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+						using NpgsqlDataReader reader = cmd.ExecuteReader();
+						if (reader.HasRows && reader.Read())
 						{
-                            oDashboardDetailsRs.statusmessage = "Something went wrong!";
-                            oDashboardDetailsRs.status = "Failed";
-                            Console.WriteLine(ex.Message);
+							oDashboardDetailsRs.cashinhand = Convert.ToDouble(reader["cashinhand"]);
 						}
+						oDashboardDetailsRs.status = "Success";
 					}
-                    oDashboardDetailsRs.status = "Success";
-                }
-            }
-			catch (Exception ex)
-			{
-                oDashboardDetailsRs.statusmessage = "Something went wrong!";
-                oDashboardDetailsRs.status = "Failed";
-                Console.WriteLine(ex.Message);
-			}
-
-			try
-			{
-				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-				{
-					conn.Open();
-					NpgsqlCommand cmd = new NpgsqlCommand();
-					cmd.Connection = conn;
-					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = @"
-						SELECT COALESCE(SUM((elem->>'amount')::FLOAT), 0) as cashinhand
-						FROM transactions
-						CROSS JOIN LATERAL jsonb_array_elements(
-							CASE WHEN amountdetails IS NOT NULL AND amountdetails != '' AND amountdetails != '[]'
-								 THEN amountdetails::jsonb
-								 ELSE '[]'::jsonb
-							END
-						) AS elem
-						WHERE registeredphonenumber = @registeredphonenumber
-						AND showtransaction = 'SHOW'
-						AND elem->>'type' = 'CASH'";
-					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
-					if (reader.HasRows && reader.Read())
+					catch (Exception ex)
 					{
-						oDashboardDetailsRs.cashinhand = Convert.ToDouble(reader["cashinhand"]);
+						oDashboardDetailsRs.statusmessage = "Something went wrong!";
+						oDashboardDetailsRs.status = "Failed";
+						Console.WriteLine(ex.Message);
 					}
-					oDashboardDetailsRs.status = "Success";
+
+					try
+					{
+						using NpgsqlCommand cmd = new NpgsqlCommand(@"
+							SELECT COALESCE(SUM((elem->>'amount')::FLOAT), 0) as expensecash
+							FROM expense
+							CROSS JOIN LATERAL jsonb_array_elements(
+								CASE WHEN amountdetails IS NOT NULL AND amountdetails != '' AND amountdetails != '[]'
+									 THEN amountdetails::jsonb
+									 ELSE '[]'::jsonb
+								END
+							) AS elem
+							WHERE registeredphonenumber = @registeredphonenumber
+							AND showtransaction = 'SHOW'
+							AND elem->>'type' = 'CASH'", conn);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+						using NpgsqlDataReader reader = cmd.ExecuteReader();
+						if (reader.HasRows && reader.Read())
+						{
+							// Cash paid out for expenses reduces cash on hand.
+							oDashboardDetailsRs.cashinhand -= Convert.ToDouble(reader["expensecash"]);
+						}
+						oDashboardDetailsRs.status = "Success";
+					}
+					catch (Exception ex)
+					{
+						oDashboardDetailsRs.statusmessage = "Something went wrong!";
+						oDashboardDetailsRs.status = "Failed";
+						Console.WriteLine(ex.Message);
+					}
+
+					try
+					{
+						using NpgsqlCommand cmd = new NpgsqlCommand(@"
+							SELECT COALESCE(SUM(total), 0) as totalexpense
+							FROM expense
+							WHERE registeredphonenumber = @registeredphonenumber
+							AND showtransaction = 'SHOW'
+							AND DATE_TRUNC('month', expensedate) = DATE_TRUNC('month', CURRENT_DATE)", conn);
+						cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
+						using NpgsqlDataReader reader = cmd.ExecuteReader();
+						if (reader.HasRows && reader.Read())
+						{
+							oDashboardDetailsRs.totalexpense = Convert.ToDouble(reader["totalexpense"]);
+						}
+						oDashboardDetailsRs.status = "Success";
+					}
+					catch (Exception ex)
+					{
+						oDashboardDetailsRs.statusmessage = "Something went wrong!";
+						oDashboardDetailsRs.status = "Failed";
+						Console.WriteLine(ex.Message);
+					}
 				}
 			}
 			catch (Exception ex)
 			{
-				oDashboardDetailsRs.statusmessage = "Something went wrong!";
-				oDashboardDetailsRs.status = "Failed";
-				Console.WriteLine(ex.Message);
-			}
-
-			try
-			{
-				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-				{
-					conn.Open();
-					NpgsqlCommand cmd = new NpgsqlCommand();
-					cmd.Connection = conn;
-					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = @"
-						SELECT COALESCE(SUM((elem->>'amount')::FLOAT), 0) as expensecash
-						FROM expense
-						CROSS JOIN LATERAL jsonb_array_elements(
-							CASE WHEN amountdetails IS NOT NULL AND amountdetails != '' AND amountdetails != '[]'
-								 THEN amountdetails::jsonb
-								 ELSE '[]'::jsonb
-							END
-						) AS elem
-						WHERE registeredphonenumber = @registeredphonenumber
-						AND showtransaction = 'SHOW'
-						AND elem->>'type' = 'CASH'";
-					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
-					if (reader.HasRows && reader.Read())
-					{
-						// Cash paid out for expenses reduces cash on hand.
-						oDashboardDetailsRs.cashinhand -= Convert.ToDouble(reader["expensecash"]);
-					}
-					oDashboardDetailsRs.status = "Success";
-				}
-			}
-			catch (Exception ex)
-			{
-				oDashboardDetailsRs.statusmessage = "Something went wrong!";
-				oDashboardDetailsRs.status = "Failed";
-				Console.WriteLine(ex.Message);
-			}
-
-			try
-			{
-				using (NpgsqlConnection conn = new NpgsqlConnection(this._connectionFactory))
-				{
-					conn.Open();
-					NpgsqlCommand cmd = new NpgsqlCommand();
-					cmd.Connection = conn;
-					cmd.CommandType = CommandType.Text;
-					cmd.CommandText = @"
-						SELECT COALESCE(SUM(total), 0) as totalexpense
-						FROM expense
-						WHERE registeredphonenumber = @registeredphonenumber
-						AND showtransaction = 'SHOW'
-						AND DATE_TRUNC('month', expensedate) = DATE_TRUNC('month', CURRENT_DATE)";
-					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
-					if (reader.HasRows && reader.Read())
-					{
-						oDashboardDetailsRs.totalexpense = Convert.ToDouble(reader["totalexpense"]);
-					}
-					oDashboardDetailsRs.status = "Success";
-				}
-			}
-			catch (Exception ex)
-			{
+				// Connection itself failed to open - none of the 7 queries above ran.
 				oDashboardDetailsRs.statusmessage = "Something went wrong!";
 				oDashboardDetailsRs.status = "Failed";
 				Console.WriteLine(ex.Message);
@@ -1431,7 +1200,7 @@ namespace WebApplication1.DL
 					cmd.CommandType = CommandType.Text;
 					cmd.CommandText = "SELECT invoicedate, total from transactions where registeredphonenumber = @registeredphonenumber and typeofpay = 'SALE' " + daterange;
 					cmd.Parameters.AddWithValue("@registeredphonenumber", oDashboardSaleDetailsRq.registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try

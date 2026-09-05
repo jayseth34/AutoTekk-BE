@@ -10,16 +10,17 @@ namespace WebApplication1.BL
 	{
 		private readonly IConfiguration config;
 		private readonly string dbConn;
+		private readonly SaleDL saledl;
 		public SaleBL(IConfiguration _config)
 		{
 			config = _config;
 			dbConn = config.GetValue<string>("ConnectionStrings");
+			saledl = new SaleDL(_config);
 		}
 
 		public async Task<TransactionRs> SaveTransaction(TransactionRq otransactionRq)
 		{
 			TransactionRs otransactionRs = new TransactionRs();
-			SaleDL saledl = new SaleDL(this.config);
 			string result = string.Empty;
 			bool isconverted = false;
 			string amtdeatils = string.Empty;
@@ -70,14 +71,12 @@ namespace WebApplication1.BL
 		public async Task<GetPartyTransactionsRs> GetPartyTransactions(Int64 registeredphonenumber, string customername)
 		{
 			GetPartyTransactionsRs oGetPartyTransactionsRqs = new GetPartyTransactionsRs();
-			SaleDL saledl = new SaleDL(this.config);
 			oGetPartyTransactionsRqs = saledl.GetPartyTransactions(registeredphonenumber, customername);
 			return oGetPartyTransactionsRqs;
 		}
 
 		public async Task<GetPartyTransactionDetailsRs> GetPartyTransactionDetails(GetPartyTransactionDetailsRq oGetPartyTransactionDetailsRq)
 		{
-			SaleDL saledl = new SaleDL(this.config);
 			GetPartyTransactionDetailsRs oGetPartyTransactionDetailsRs = new GetPartyTransactionDetailsRs();
 
 			oGetPartyTransactionDetailsRs = saledl.GetPartyTransactionDetails(oGetPartyTransactionDetailsRq);
@@ -107,14 +106,12 @@ namespace WebApplication1.BL
 		public async Task<PaymentInOutTrnxRs> GetPaymentInOutTransactionDetails(GetPartyTransactionDetailsRq oGetPartyTransactionDetailsRq)
 		{
 			PaymentInOutTrnxRs oPaymentInOutTrnxRs = new PaymentInOutTrnxRs();
-			SaleDL saledl = new SaleDL(this.config);
 			oPaymentInOutTrnxRs = saledl.GetPaymentInOutTransactionDetails(oGetPartyTransactionDetailsRq);
 			return oPaymentInOutTrnxRs;
 		}
 		public async Task<GetItemTransactionsRs> GetItemTransactions(Int64 registeredphonenumber, string itemname)
 		{
 			GetItemTransactionsRs oGetItemTransactionsRs = new GetItemTransactionsRs();
-			SaleDL saledl = new SaleDL(this.config);
 			oGetItemTransactionsRs.itemTransactionsList = saledl.GetItemTransactions(registeredphonenumber,itemname);
 			oGetItemTransactionsRs = saledl.GetItemHeaderDetails(registeredphonenumber,itemname, oGetItemTransactionsRs.itemTransactionsList);
 			return oGetItemTransactionsRs;
@@ -122,7 +119,6 @@ namespace WebApplication1.BL
 		public async Task<GetLinkedPaymentTransactionRs> GetLinkedPaymentTransaction(Int64 registeredphonenumber, string customername, string typeofpay)
 		{
 			GetLinkedPaymentTransactionRs oGetLinkedPaymentTransactionRs = new GetLinkedPaymentTransactionRs();
-			SaleDL saledl = new SaleDL(this.config);
 			oGetLinkedPaymentTransactionRs = saledl.GetLinkedPaymentTransaction(registeredphonenumber, customername, typeofpay);
 			return oGetLinkedPaymentTransactionRs;
 		}
@@ -130,7 +126,6 @@ namespace WebApplication1.BL
 		public async Task<GetTypeOfPayTransactionsRs> GetTypeOfPayTransactions(Int64 registeredphonenumber, string typeofpay)
 		{
 			GetTypeOfPayTransactionsRs oGetTypeOfPayTransactionsRs = new GetTypeOfPayTransactionsRs();
-			SaleDL saledl = new SaleDL(this.config);
 			oGetTypeOfPayTransactionsRs = saledl.GetTypeOfPayTransactions(registeredphonenumber, typeofpay);
 			if (typeofpay == "SALE" || typeofpay == "ESTIMATE QUOTATION" || typeofpay == "PAYMENT IN" || typeofpay == "PAYMENT OUT" || 
 				typeofpay == "SALE ORDER" || typeofpay == "DELIVERY CHALLAN" || typeofpay == "SALE RETURN" || typeofpay == "PURCHASE ORDER" || typeofpay == "PURCHASE" || typeofpay == "ADVANCE IN" || typeofpay == "ADVANCE OUT")
@@ -146,7 +141,6 @@ namespace WebApplication1.BL
 			GetTypeOfPayTransactionsRq oGetTypeOfPayTransactionsRq = new GetTypeOfPayTransactionsRq();
 			oGetTypeOfPayTransactionsRq.typeofpay = oConvertToSaleSaleOrderRq.typeofpay;
 			oGetTypeOfPayTransactionsRq.registeredphonenumber = oConvertToSaleSaleOrderRq.registeredphonenumber;
-			SaleDL saledl = new SaleDL(this.config);
 			if (oConvertToSaleSaleOrderRq.isconvert && (oConvertToSaleSaleOrderRq.typeofpay == "SALE" || oConvertToSaleSaleOrderRq.typeofpay == "SALE ORDER"))
 			{
 				oConvertToSaleSaleOrderRs = saledl.ConvertToSaleSaleOrder(oConvertToSaleSaleOrderRq);
@@ -158,7 +152,6 @@ namespace WebApplication1.BL
 		public async Task<TransactionRs> UpdateSale(TransactionRq otransactionRq)
 		{
 			TransactionRs otransactionRs = new TransactionRs();
-			SaleDL saledl = new SaleDL(this.config);
 			string amtdeatils = string.Empty;
 			amtdeatils = await saledl.GetAmtDetails(otransactionRq);
 			List<AmountDetails> amt = new List<AmountDetails>();
@@ -176,7 +169,6 @@ namespace WebApplication1.BL
 
 		public async Task<bool> UpdateLinkedPaymentTransaction(List<GetLinkedPaymentTransactionList> transactions)
 		{
-			SaleDL saledl = new SaleDL(this.config);
 			bool val = await saledl.UpdateLinkedPaymentTransaction(transactions);
 			if (val)
 			{
@@ -188,7 +180,6 @@ namespace WebApplication1.BL
 		public async Task<UpadatePaymentInOutTrnxRs> UpdatePaymentInOutTrnx(UpadatePaymentInOutTrnxRq oUpadatePaymentInOutTrnxRq)
 		{
 			UpadatePaymentInOutTrnxRs oUpadatePaymentInOutTrnxRs = new UpadatePaymentInOutTrnxRs();
-			SaleDL saledl = new SaleDL(this.config);
 			oUpadatePaymentInOutTrnxRs = await saledl.UpdatePaymentInOutTrnx(oUpadatePaymentInOutTrnxRq);
 			return oUpadatePaymentInOutTrnxRs;
 		}
@@ -196,7 +187,6 @@ namespace WebApplication1.BL
 		public async Task<UpadatePaymentInOutTrnxRs> InsertAdvanceTrnx(InsertAdvanceTrnxRq oInsertAdvanceTrnxRq)
 		{
 			UpadatePaymentInOutTrnxRs oUpadatePaymentInOutTrnxRs = new UpadatePaymentInOutTrnxRs();
-			SaleDL saledl = new SaleDL(this.config);
 			oUpadatePaymentInOutTrnxRs = await saledl.InsertAdvanceTrnx(oInsertAdvanceTrnxRq);
 			if(oUpadatePaymentInOutTrnxRs.status == "SUCCESS")
 			{
@@ -209,7 +199,6 @@ namespace WebApplication1.BL
 		public async Task<GetUpdatedTrnxInOutValRs> GetUpdatedTrnxInOutVal(GetUpdatedTrnxInOutValRq oGetUpdatedTrnxInOutValRq)
 		{
 			GetUpdatedTrnxInOutValRs oGetUpdatedTrnxInOutValRs = new GetUpdatedTrnxInOutValRs();
-			SaleDL saledl = new SaleDL(this.config);
 			oGetUpdatedTrnxInOutValRs = await saledl.GetUpdatedTrnxInOutVal(oGetUpdatedTrnxInOutValRq);
 			return oGetUpdatedTrnxInOutValRs;
 		}
@@ -218,7 +207,6 @@ namespace WebApplication1.BL
 		{
 			BankFormRs oBankFormRs = new BankFormRs();
 			GetBankDetailsRs oGetBankDetailsRs = new GetBankDetailsRs();
-			SaleDL saledl = new SaleDL(this.config);
 			bool inserttransaction = false;
 
 			bool bankExists = await saledl.IfBankExists(oBankFormRq);
@@ -260,7 +248,6 @@ namespace WebApplication1.BL
 		public async Task<GetBankDetailsRs> GetBankDetails(GetBankDetailsRq oGetBankDetailsRq)
 		{
 			GetBankDetailsRs oGetBankDetailsRs = new GetBankDetailsRs();
-			SaleDL saledl = new SaleDL(this.config);
 			oGetBankDetailsRs = await saledl.GetBankDetailsAsync(oGetBankDetailsRq);
 			return oGetBankDetailsRs;
 		}
@@ -268,7 +255,6 @@ namespace WebApplication1.BL
 		public async Task<GetBanksRs> GetBanks(GetBanksRq oGetBanksRq)
 		{
 			GetBanksRs oGetBanksRs = new GetBanksRs();
-			SaleDL saledl = new SaleDL(this.config);
 			oGetBanksRs = await saledl.GetBanks(oGetBanksRq);
 			return oGetBanksRs;
 		}
@@ -276,7 +262,6 @@ namespace WebApplication1.BL
 		public async Task<GetBanksDetailsValuesRs> GetBanksDetailsValues(GetBanksDetailsValuesRq oGetBanksDetailsValuesRq)
 		{
 			GetBanksDetailsValuesRs oGetBanksDetailsValuesRs = new GetBanksDetailsValuesRs();
-			SaleDL saledl = new SaleDL(this.config);
 			oGetBanksDetailsValuesRs = await saledl.GetBanksDetailsValues(oGetBanksDetailsValuesRq);
 			return oGetBanksDetailsValuesRs;
 		}
@@ -284,7 +269,6 @@ namespace WebApplication1.BL
 		public async Task<GetTransferDetailsValuesRs> GetTransferDetailsValues(GetTransferDetailsValuesRq oGetTransferDetailsValuesRq)
 		{
 			GetTransferDetailsValuesRs oGetTransferDetailsValuesRs = new GetTransferDetailsValuesRs();
-			SaleDL saledl = new SaleDL(this.config);
 			oGetTransferDetailsValuesRs = await saledl.GetTransferDetailsValues(oGetTransferDetailsValuesRq);
 			return oGetTransferDetailsValuesRs;
 		}
@@ -292,7 +276,6 @@ namespace WebApplication1.BL
 		public async Task<TransfersRs> Transfers(TransfersRq oTransfersRq)
 		{
 			TransfersRs oTransfersRs = new TransfersRs();
-			SaleDL saledl = new SaleDL(this.config);
 			string sqlquery = string.Empty;
 			string sqlquery1 = string.Empty;
 			List<AmountDetails> amounts = new List<AmountDetails>();

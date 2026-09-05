@@ -7,10 +7,14 @@ namespace WebApplication1.BL
 	{
 		private readonly IConfiguration config;
 		private readonly string dbConn;
+		private readonly ExpenseDL expenseDL;
+		private readonly SaleDL saleDL;
 		public ExpenseBL(IConfiguration _config)
 		{
 			config = _config;
 			dbConn = config.GetValue<string>("ConnectionStrings");
+			expenseDL = new ExpenseDL(_config);
+			saleDL = new SaleDL(_config);
 		}
 
 		public async Task<ExpenseRs> AddOrUpdateExpense(ExpenseRq oExpenseRq)
@@ -22,9 +26,6 @@ namespace WebApplication1.BL
 				oExpenseRs.statusmessage = "Please provide a category and an amount greater than 0.";
 				return oExpenseRs;
 			}
-
-			ExpenseDL expenseDL = new ExpenseDL(this.config);
-			SaleDL saleDL = new SaleDL(this.config);
 
 			if (oExpenseRq.isexpenseupdate)
 			{
@@ -50,15 +51,11 @@ namespace WebApplication1.BL
 
 		public async Task<GetExpenseListRs> GetExpenseList(Int64 registeredphonenumber)
 		{
-			ExpenseDL expenseDL = new ExpenseDL(this.config);
 			return expenseDL.GetExpenseList(registeredphonenumber);
 		}
 
 		public async Task<DeleteExpenseRs> DeleteExpense(DeleteExpenseRq oDeleteExpenseRq)
 		{
-			ExpenseDL expenseDL = new ExpenseDL(this.config);
-			SaleDL saleDL = new SaleDL(this.config);
-
 			// Credit back whatever this expense had debited from cash/bank before hiding it.
 			List<AmountDetails> oldAmountDetails = expenseDL.GetExpenseAmountDetails(oDeleteExpenseRq.expense_id, oDeleteExpenseRq.registeredphonenumber);
 			DeleteExpenseRs oDeleteExpenseRs = expenseDL.HideExpense(oDeleteExpenseRq);

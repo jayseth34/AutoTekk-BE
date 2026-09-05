@@ -183,7 +183,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 					cmd.Parameters.AddWithValue("@customername", customername);
 
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try
@@ -231,7 +231,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@customername", customername);
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try
@@ -311,7 +311,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@registeredphonenumber", oGetPartyTransactionDetailsRq.registeredphonenumber);
 					cmd.Parameters.AddWithValue("@typeofpay", oGetPartyTransactionDetailsRq.typeofpay);
 
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try
@@ -391,7 +391,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 					cmd.Parameters.AddWithValue("@itemname", itemname);
 					cmd.Parameters.AddWithValue("@showtransaction", "SHOW");
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try
@@ -446,7 +446,7 @@ namespace WebApplication1.DL
 					cmd.CommandText = query3;
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 					cmd.Parameters.AddWithValue("@itemname", itemname);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try
@@ -498,7 +498,7 @@ namespace WebApplication1.DL
 					cmd.CommandText = query4;
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
 					cmd.Parameters.AddWithValue("@typeofpay", typeofpay);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try
@@ -781,7 +781,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@registeredphonenumber", oConvertToSaleSaleOrderRq.registeredphonenumber);
 					cmd.Parameters.AddWithValue("@typeofpay", oConvertToSaleSaleOrderRq.typeofpay);
 					cmd.Parameters.AddWithValue("@customername", oConvertToSaleSaleOrderRq.customername);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try
@@ -864,7 +864,7 @@ namespace WebApplication1.DL
 					cmd.CommandText = sqlquery;
 					cmd.Parameters.AddWithValue("@customername", customername);
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try
@@ -972,7 +972,7 @@ namespace WebApplication1.DL
 				cmd.Parameters.AddWithValue("@typeofpay", otransactionRq.typeofpay);
 				cmd.Parameters.AddWithValue("@customername", otransactionRq.customername);
 				cmd.Parameters.AddWithValue("@invoicenumber", otransactionRq.invoicenumber);
-				NpgsqlDataReader reader = cmd.ExecuteReader();
+				using NpgsqlDataReader reader = cmd.ExecuteReader();
 				if (reader.HasRows)
 				{
 					try
@@ -1153,7 +1153,7 @@ namespace WebApplication1.DL
                   AND registeredphonenumber = @registeredphonenumber";
 					cmd.Parameters.AddWithValue("@partyname", customername);
 					cmd.Parameters.AddWithValue("@registeredphonenumber", registeredphonenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try
@@ -1211,7 +1211,7 @@ namespace WebApplication1.DL
 			catch(Exception ex)
 			{
 				Console.WriteLine(ex.Message);
-				oUpadatePaymentInOutTrnxRs.status = "FALED";
+				oUpadatePaymentInOutTrnxRs.status = "FAILED";
 			}
 			return oUpadatePaymentInOutTrnxRs;
 		}
@@ -1300,7 +1300,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@registeredphonenumber", oGetUpdatedTrnxInOutValRq.registeredphonenumber);
 					cmd.Parameters.AddWithValue("@invoicenumber", oGetUpdatedTrnxInOutValRq.invoicenumber);
 					cmd.Parameters.AddWithValue("@typeofpay", oGetUpdatedTrnxInOutValRq.typeofpay);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try
@@ -1416,7 +1416,7 @@ namespace WebApplication1.DL
 					cmd.Parameters.AddWithValue("@typeofpay", oGetPartyTransactionDetailsRq.typeofpay);
 					cmd.Parameters.AddWithValue("@registeredphonenumber", oGetPartyTransactionDetailsRq.registeredphonenumber);
 					cmd.Parameters.AddWithValue("@paymentininvoicenumber", oGetPartyTransactionDetailsRq.invoicenumber);
-					NpgsqlDataReader reader = cmd.ExecuteReader();
+					using NpgsqlDataReader reader = cmd.ExecuteReader();
 					if (reader.HasRows)
 					{
 						try
